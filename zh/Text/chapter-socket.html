@@ -81,15 +81,22 @@
   <h2 id="heading_id_4" class="en">The TCP/IP stack</h2>
   <h2 id="heading_id_4" class="zh">TCP/IP协议栈</h2>
 
-  <p>The OSI model was devised using a committee process wherein the standard was set up and then implemented. Some parts of the OSI standard are obscure, some parts cannot easily be implemented, some parts have not been implemented.</p>
+  <p class="en">The OSI model was devised using a committee process wherein the standard was set up and then implemented. Some parts of the OSI standard are obscure, some parts cannot easily be implemented, some parts have not been implemented.</p>
+  <p class="zh">OSI模型标准的建立和实施是一个委员会（国际标准化组织ISO）设计的。OSI标准中的一些部分是模糊的，有些部件不能很容易地实现，一些地方还没有得到落实。</p>
 
-  <p>The TCP/IP protocol was devised through a long-running DARPA project. This worked by implementation followed by RFCs (Request For Comment). TCP/IP is the principal Unix networking protocol. TCP/IP = Transmission Control Protocol/Internet Protocol.</p>
+  <p class="en">The TCP/IP protocol was devised through a long-running DARPA project. This worked by implementation followed by RFCs (Request For Comment). TCP/IP is the principal Unix networking protocol. TCP/IP = Transmission Control Protocol/Internet Protocol.</p>
+  <p class="zh">TCP/IP协议由长期运行的一个DARPA（美国国防先进研究项目局）项目设计。该工作其次由RFC (Request For Comment)实施。TCP/IP是Unix的首要网络协议。TCP/IP协议等于传输控制协议/互联网协议。</p>
+  <p class="zh">译者注：Request For Comments (RFC），是一系列以编号排定的文件。文件收集了有关因特网相关资讯，以及UNIX和因特网社群的软件文件。</P>
 
-  <p>The TCP/IP stack is shorter than the OSI one:<br />
+  <p class="en">The TCP/IP stack is shorter than the OSI one:<br />
   <img alt="" src="../Images/tcp_stack.gif" /><br />
   TCP is a connection-oriented protocol, UDP (User Datagram Protocol) is a connectionless protocol.</p>
+  <p class="zh">TCP/IP协议栈是OSI模型的一部分：<br />
+  <img alt="" src="../Images/tcp_stack.gif" /><br />
+  TCP是一个面向连接的协议，UDP（User Datagram Protocol，用户数据报协议）是一种无连接的协议。</p>
 
-  <h3 id="heading_id_5">IP datagrams</h3>
+  <h3 id="heading_id_5" class="en">IP datagrams</h3>
+  <h3 id="heading_id_5" class="zh">IP数据报</h3>
 
   <p>The IP layer provides a connectionless and unreliable delivery system. It considers each datagram independently of the others. Any association between datagrams must be supplied by the higher layers.</p>
 
