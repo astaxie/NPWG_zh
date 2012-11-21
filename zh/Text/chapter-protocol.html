@@ -51,24 +51,31 @@
 
 <body>
   <div class="chapter">
-    <h1 id="heading_id_2">Application-Level Protocols</h1>
+    <h1 id="heading_id_2" class="en">Application-Level Protocols</h1>
+    <h1 id="heading_id_2" class="zh">应用层协议</h1>
   </div>
 
   <div class="preface">
-    <p>A client and a server exchange messages consisting of message types and message data. This requires design of a suitable message exchange protocol. This chapter looks at some of the issues involved in this, and gives a complete example of a simple client-server application.</p>
+    <p class="en">A client and a server exchange messages consisting of message types and message data. This requires design of a suitable message exchange protocol. This chapter looks at some of the issues involved in this, and gives a complete example of a simple client-server application.</p>
+    <p class="zh">客户端和服务端需要进行消息交互，包括交换消息类型和消息数据。这就要求有合适的消息交互协议。这章的重点就在消息交互相关的问题上，并给出了一个非常完整但简单的客户端和服务端交互的例子。</p>
   </div>
 
   <div class="generate_from_h2" id="generated-toc"></div>
 
-  <h2 id="heading_id_3">Introduction</h2>
+  <h2 id="heading_id_3" class="en">Introduction</h2>
+  <h2 id="heading_id_3" class="zh">介绍</h2>
 
-  <p>A client and server need to exchange information via messages. TCP and UDP provide the transport mechanisms to do this. The two processes also need to have a protocol in place so that message exchange can take place meaningfully. A protocol defines what type of conversation can take place between two components of a distributed application, by specifying messages, data types, encoding formats and so on.</p>
+  <p class="en">A client and server need to exchange information via messages. TCP and UDP provide the transport mechanisms to do this. The two processes also need to have a protocol in place so that message exchange can take place meaningfully. A protocol defines what type of conversation can take place between two components of a distributed application, by specifying messages, data types, encoding formats and so on.</p>
+  <p class="zh">客户端和服务端需要通过消息来进行交互。TCP和UDP是两种消息交互的传输机制。在这两种传输机制之上就需要有协议来约定传输内容的含义。协议清楚说明了两个分布的组件之间交互消息的消息体、消息的数据类型、编码格式等。</p>
 
-  <h2 id="heading_id_4">Protocol Design</h2>
+  <h2 id="heading_id_4" class="en">Protocol Design</h2>
+  <h2 id="heading_id_4" class="zh">协议设计</h2>
 
-  <p>There are many possibilities and issues to be decided on when designing a protocol. Some of the issues include:</p>
+  <p class="en">There are many possibilities and issues to be decided on when designing a protocol. Some of the issues include:</p>
+  <p class="zh">当设计一个协议的时候，有许多可选择的方法和许多问题需要考虑到。这些需要考虑的问题包括：
+</p>
 
-  <ul>
+  <ul class="en">
     <li>Is it to be broadcast or point to point?<br />
     Broadcast must be UDP, local multicast or the more experimental MBONE. Point to point could be either TCP or UDP.</li>
 
@@ -93,22 +100,60 @@
     <li>Are you building a standalone application or a library to be used by others?<br />
     The standards of documentation required might vary.</li>
   </ul>
+  <ul class="zh">
+    <li>是广播消息还是点到点的消息？<br />
+    如果是广播消息那就应该使用UDP，本地多播或者是多播骨干网（MBONE）。点到点消息就应该使用TCP或者UDP。
+</li>
 
-  <h2 id="heading_id_5">Version control</h2>
+    <li>消息应该是有状态还是无状态的？<br />
+    任意一边是否需要维持另外一边的状态信息？虽然这个似乎很好实现，但是如果一些逻辑发生冲突的时候又应该怎么做呢？
+</li>
 
-  <p>A protocol used in a client/server system will evolve over time, changing as the system expands. This raises compatability problems: a version 2 client will make requests that a version 1 server doesn't understand, whereas a version 2 server will send replies that a version 1 client won't understand.</p>
+    <li>协议是可靠服务还是不可靠服务？<br />
+    一般来说，提供可靠服务就会更慢些，但是好处就是不需要考虑会丢失消息。</li>
 
-  <p>Each side should ideally be able to understand messages for its own version and all earlier ones. It should be able to write replies to old style queries in old style response format.</p>
+    <li>消息发送后是否需要响应？<br />
+    如果是需要响应的话，如何处理没有响应回复的情况？或许可以设置超时时间。
+</li>
+
+    <li>你想要使用什么数据格式？<br />
+    一般使用两种格式：MIME和字节流</li>
+
+    <li>消息流是使用突发性的还是稳定性的？<br />
+    Ethernet和Internet最好都是使用突发性信息流。稳定性的信息流通常是用在视频和声频流传输上。如果要求的话，你如何保证你的服务质量（QoS）？</li>
+
+    <li>有流同步的需求吗？<br />
+    有两种数据流需要进行同步吗？比如视频流和声频流。</li>
+
+    <li>建立的是单独的应用还是需要给别人使用的库？<br />
+    标准文档的编写可能需要巨大的精力。
+</li>
+  </ul>
+
+  <h2 id="heading_id_5" class="en">Version control</h2>
+  <h2 id="heading_id_5" class="zh">版本控制</h2>
+
+  <p class="en">A protocol used in a client/server system will evolve over time, changing as the system expands. This raises compatability problems: a version 2 client will make requests that a version 1 server doesn't understand, whereas a version 2 server will send replies that a version 1 client won't understand.</p>
+  <p class="zh">客户端和服务端之间的协议将有可能随着时间或者系统的扩展进行变化。这个可能会引起兼容性的问题：版本2的客户端发出的请求可能版本1的服务端无法解析，反之也一样，版本2的服务端也有可能回复版本1的客户端无法解析的信息。
+</p>
+
+  <p class="en">Each side should ideally be able to understand messages for its own version and all earlier ones. It should be able to write replies to old style queries in old style response format.</p>
+  <p class="zh">每一端最理想的情况是能满足自己这个版本的消息，也能满足之前所有版本的消息。理想情况下，每一端对于旧版本的请求应该能返回旧版本的响应。</p>
 
   <div class="sgc-1"><img alt="" src="../Images/version.png" /></div>
 
-  <p>The ability to talk earlier version formats may be lost if the protocol changes too much. In this case, you need to be able to ensure that no copies of the earlier version still exist - and that is generally imposible.</p>
+  <p class="en">The ability to talk earlier version formats may be lost if the protocol changes too much. In this case, you need to be able to ensure that no copies of the earlier version still exist - and that is generally imposible.</p>
+  <p class="zh">但是如果协议变化太大的话，与早期版本的兼容能力就可能无法保持了。在这种情况下，你就需要保证不再存在早期版本的数据 -- 当然这个几乎是不可能的。
+</p>
 
-  <p>Part of the protocol setup should involve version information.</p>
+  <p class="en">Part of the protocol setup should involve version information.</p>
+  <p class="zh">协议就应该包含有版本信息。</p>
 
-  <h3 id="heading_id_6">The Web</h3>
+  <h3 id="heading_id_6" class="en">The Web</h3>
+  <h3 id="heading_id_6" class="ch">Web协议</h3>
 
-  <p>The Web is a good example of a system that is messed up by different versions. The protocol has been through three versions, and most servers/browsers now use the latest version. The version is given in each request</p>
+  <p class="en">The Web is a good example of a system that is messed up by different versions. The protocol has been through three versions, and most servers/browsers now use the latest version. The version is given in each request</p>
+  <p class="zh">Web协议就是一个由于有不同协议同时存在而混乱的例子。Web协议已经有三个版本了，通常服务端和浏览器都是使用最新的版本，版本信息包含在请求中：</p>
 
   <div class="sgc-1">
     <table border="1">
@@ -138,9 +183,10 @@
     </table>
   </div>
 
-  <p>But the <em>content</em> of the messages has been through a large number of versions:</p>
+  <p class="en">But the <em>content</em> of the messages has been through a large number of versions:</p>
+  <p class="zh">不仅如此<em>Web内容</em>已经被大量版本修改过了：</p>
 
-  <ul>
+  <ul class="en">
     <li>HTML versions 1-4 (all different), with version 5 on the horizon;</li>
 
     <li>non-standard tags recognised by different browsers;</li>
@@ -154,6 +200,21 @@
     <li>Different runtime engines for Java</li>
 
     <li>Many pages do not conform to <em>any</em> HTML versions (e.g. with syntax errors)</li>
+  </ul>
+  <ul class="zh">
+    <li>HTML版本1-4（每个版本都不一样），还有即将到来的HTML5;</li>
+
+    <li>不同浏览器各自支持非标准化的标签;</li>
+
+    <li>HTML文档之外的内容也通常需要不同的内容处理器 -- 比如你的浏览器支持Flash播放器吗？</li>
+
+    <li>文档内容的不一致的处理方法（例如，在一些浏览器上，有的css会冲突）</li>
+
+    <li>浏览器对javascript的不同支持程度（当然javascript也同时存在不同的版本）</li>
+
+    <li>不同的java运行引擎</li>
+
+    <li>有的页面并没有遵守<em>任何</em>HTML版本规范（比如HTML格式错误的页面）</li>
   </ul>
 
   <h2 id="heading_id_7">Message Format</h2>
