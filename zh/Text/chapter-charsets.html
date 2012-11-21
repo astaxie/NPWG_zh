@@ -67,33 +67,34 @@
   <p class="zh">以前用EBCDIC和ASCII编码，(别看只有两种编码)，但事情从来不是那样简单恰恰相反变得越来越复杂了。但据推测,这就像(黎明前)地平线上闪过了一道光，但要等到天亮还得50年。</p>
 
   <p class="en">Early computers were developed in the english-speaking countries of the US, the UK and Australia. As a result of this, assumptions were made about the language and character sets in use. Basically, the Latin alphabet was used, plus numerals, punctuation characters and a few others. These were then encoded into bytes using ASCII or EBCDIC.</p>
-  <p class="zh">早期计算机是从美国、英国、澳大利亚这些英语国家发展起来的，结果</p>
+  <p class="zh">早期计算机是从美国、英国、澳大利亚这些英语国家发展起来的，结果计算机编码就已这些国家使用的语言和字符进行设计，简单地说，也就是拉丁字母，加上数字、标点和别的字符。他们使用ASCII或EBCDIC进行编码。</p>
 
   <p class="en">The character-handling mechanisms were based on this: text files and I/O consisted of a sequence of bytes, with each byte representing a single character. String comparison could be done by matching corresponding bytes; conversions from upper to lower case could be done by mapping individual bytes, and so on.</p>
-  <p class="zh"></p>
+  <p class="zh">字符处理的机制是这样设计的：文件和输入输出都被定义成字节序列，每个字节代表一个单独的字符。字符串比较可以通过对比字节匹配度实现，大小写转换可以通过单个字节完成，等等。</p>
 
   <p class="en">There are about 6,000 living languages in the world (3,000 of them in Papua New Guinea!). A few languages use the "english" characters but most do not. The Romanic languages such as French have adornments on various characters, so that you can write "j'ai arrêté", with two differently accented vowels. Similarly, the Germanic languages have extra characters such as '&szlig;'. Even UK English has characters not in the standard ASCII set: the pound symbol '&pound;' and recently the euro '&euro;'</p>
-  <p class="zh"></p>
+  <p class="zh">世界上现存约有6000种语言（居然有3000种在巴布亚新几内亚）。一小部分使用英文字符，但更多的则不是。想法文这样的拉丁语言还会有字符修饰符号，所以你可以用两种不同的元音来拼写“j'ai arrêté”。同样地，德语也有像'&szlig;'这样的字符，甚至是英式英语也会有不在ASCII编码中的字符：英镑和欧元('&pound;'和 '&euro;')</p>
 
   <p class="en">But the world is not restricted to variations on the Latin alphabet. Thailand has its own alphabet, with words looking like this: "ภาษาไทย". There are many other alphabets, and Japan even has two, Hiragana and Katagana.</p>
-  <p class="zh"></p>
+  <p class="zh">但是世界并不严格局限在拉丁字母中，泰国有它自己的字母，长这样子：“ภาษาไทย”。还有许多的字母形式像是日文，他居然有两种，平假文和片假文。</p>
 
   <p class="en">There are also the hierographic languages such as Chinese where you can write "百度一下，你就知道".</p>
-  <p class="zh"></p>
+  <p class="zh">还有一些象形文字，比如汉语，你可以这样写“百度一下，你就知道”。</p>
 
   <p class="en">It would be nice from a technical viewpoint if the world just used ASCII. However, the trend is in the opposite direction, with more and more users demanding that software use the language that they are familiar with. If you build an application that can be run in different countries then users will demand that it uses their own language. In a distributed system, different components of the system may be used by users expecting different languages and characters.</p>
-  <p class="zh"></p>
+  <p class="zh">用理工科的眼光看，世界上只有ASCII一种编码就清静了。但实际正是相反的趋势，越来越多的人需要计算机软件中使用自己熟悉的语言。如果你的软件可以在不同的国家运行，那你的用户就需要软件使用他们自己的语言。在分布式的系统中，使用不同的系统模块的人可能希望不同的语言和字符。</p>
 
   <p class="en"><em>Internationalisation</em> (i18n) is how you write your applications so that they can handle the variety of languages and cultures. <em>Localisation</em> (l10n) is the process of customising your internationalised application to a particular cultural group.</p>
-  <p class="zh"></p>
+  <p class="zh"><em>国际化</em>(i18n)是你的应用可以处理多种语言文化的解决方案。<em>本地化</em>(l10n)是你的一个把你的应用适配成小群体使用的解决方案。</p>
 
   <p class="en">i18n and l10n are big topics in themselves. For example, they cover issues such as colours: while white means "purity" in Western cultures, it means "death" to the Chinese and "joy" to Egyptians. In this chapter we just look at issues of character handling.</p>
-  <p class="zh"></p>
+  <p class="zh">国际化和本地化各自都是一个很大的课题。举个例子，关于颜色的话题：白色在西方表示纯洁，在中国表示死亡，在埃及表示喜悦。在这章中我们只关注字符的处理。</p>
 
   <h2 id="heading_id_4" class="en">Definitions</h2>
+  <h2 id="heading_id_4" class="en">定义</h2>
 
   <p class="en">It is important to be careful about exactly what part of a text handling system you are talking about. Here is a set of definitions that have proven useful.</p>
-  <p class="zh"></p>
+  <p class="zh">准确定义我们讨论的文本处理是什么，十分重要。下面是有人做的一套定义方法。</p>
 
   <h3 id="heading_id_5">Character</h3>
 
