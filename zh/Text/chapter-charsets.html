@@ -55,6 +55,7 @@
 
   <div class="preface">
     <p class="en">There are many languages in use throughout the world, and they use many different character sets. There are also many ways of encoding character sets into binary formats of bytes. This chapter considers some of the issues in this.</p>
+  <p class="zh"></p>
   </div>
 
   <div class="generate_from_h2" id="generated-toc"></div>
@@ -62,76 +63,103 @@
   <h2 id="heading_id_3" class="en">Introduction</h2>
 
   <p class="en">Once upon a time there was EBCDIC and ASCII... Actually, it was never that simple and has just become more complex over time. There is light on the horizon, but some estimates are that it may be 50 years before we all live in the daylight on this!</p>
+  <p class="zh"></p>
 
   <p class="en">Early computers were developed in the english-speaking countries of the US, the UK and Australia. As a result of this, assumptions were made about the language and character sets in use. Basically, the Latin alphabet was used, plus numerals, punctuation characters and a few others. These were then encoded into bytes using ASCII or EBCDIC.</p>
+  <p class="zh"></p>
 
   <p class="en">The character-handling mechanisms were based on this: text files and I/O consisted of a sequence of bytes, with each byte representing a single character. String comparison could be done by matching corresponding bytes; conversions from upper to lower case could be done by mapping individual bytes, and so on.</p>
+  <p class="zh"></p>
 
   <p class="en">There are about 6,000 living languages in the world (3,000 of them in Papua New Guinea!). A few languages use the "english" characters but most do not. The Romanic languages such as French have adornments on various characters, so that you can write "j'ai arrêté", with two differently accented vowels. Similarly, the Germanic languages have extra characters such as '&szlig;'. Even UK English has characters not in the standard ASCII set: the pound symbol '&pound;' and recently the euro '&euro;'</p>
+  <p class="zh"></p>
 
   <p class="en">But the world is not restricted to variations on the Latin alphabet. Thailand has its own alphabet, with words looking like this: "ภาษาไทย". There are many other alphabets, and Japan even has two, Hiragana and Katagana.</p>
+  <p class="zh"></p>
 
   <p class="en">There are also the hierographic languages such as Chinese where you can write "百度一下，你就知道".</p>
+  <p class="zh"></p>
 
   <p class="en">It would be nice from a technical viewpoint if the world just used ASCII. However, the trend is in the opposite direction, with more and more users demanding that software use the language that they are familiar with. If you build an application that can be run in different countries then users will demand that it uses their own language. In a distributed system, different components of the system may be used by users expecting different languages and characters.</p>
+  <p class="zh"></p>
 
   <p class="en"><em>Internationalisation</em> (i18n) is how you write your applications so that they can handle the variety of languages and cultures. <em>Localisation</em> (l10n) is the process of customising your internationalised application to a particular cultural group.</p>
+  <p class="zh"></p>
 
   <p class="en">i18n and l10n are big topics in themselves. For example, they cover issues such as colours: while white means "purity" in Western cultures, it means "death" to the Chinese and "joy" to Egyptians. In this chapter we just look at issues of character handling.</p>
+  <p class="zh"></p>
 
   <h2 id="heading_id_4" class="en">Definitions</h2>
 
   <p class="en">It is important to be careful about exactly what part of a text handling system you are talking about. Here is a set of definitions that have proven useful.</p>
+  <p class="zh"></p>
 
   <h3 id="heading_id_5">Character</h3>
 
   <p class="en">A character is a "unit of information that roughly corresponds to a grapheme (written symbol) of a natural language, such as a letter, numeral, or punctuation mark" (Wikipedia). A character is "the smallest component of written language that has a semantic value" (Unicode). This includes letters such as 'a' and 'À' (or letters in any other language), digits such as '2', punctuation characters such as ',' and various symbols such as the English pound currency symbol '£'.</p>
+  <p class="zh"></p>
 
   <p class="en">A character is some sort of abstraction of any actual symbol: the character 'a' is to any written 'a' as a Platonic circle is to any actual circle. The concept of character also includes control characters, which do not correspond to natural language symbols but to other bits of information used to process texts of the language.</p>
+  <p class="zh"></p>
 
   <p class="en">A character does not have any particular appearance, although we use the appearance to help recognise the character. However, even the appearance may have to be understood in a context: in mathematics, if you see the symbol π (pi) it is the character for the ratio of circumference to radius of a circle, while if you are reading Greek text, it is the sixteenth letter of the alphabet: "προσ" is the greek word for "with" and has nothing to do with 3.14159...</p>
+  <p class="zh"></p>
 
   <h3 id="heading_id_6">Character repertoire/character set</h3>
 
   <p class="en">A character repertoire is a set of distinct characters, such as the Latin alphabet. No particular ordering is assumed. In English, although we say that 'a' is earlier in the alphabet than 'z', we wouldn't say that 'a' is less than 'z'. The "phone book" ordering which puts "McPhee" before "MacRea" shows that "alphabetic ordering" isn't critical to the characters.</p>
+  <p class="zh"></p>
 
   <p class="en">A repertoire specifies the names of the characters and often a sample of how the characters might look. e.g the letter 'a' might look like 'a', '<em>a</em>' or '<b>a</b>'. But it doesn't force them to look like that - they are just samples. The repertoire may make distinctions such as upper and lower case, so that 'a' and 'A' are different. But it may regard them as the same, just with different sample appearances. (Just like some programming languages treat upper and lower as different - e.g. Go - but some don't e.g. Basic.). On the other hand, a repertoire might contain different characters with the same sample appearance: the repertoire for a Greek mathematician would have two different characters with appearance π. This is also called a noncoded character set.</p>
+  <p class="zh"></p>
 
   <h3 id="heading_id_7">Character code</h3>
 
   <p class="en">A character code is a mapping from characters to integers. The mapping for a character set is also called a coded character set or code set. The value of each character in this mapping is often called a code point. ASCII is a code set. The codepoint for 'a' is 97 and for 'A' is 65 (decimal).</p>
+  <p class="zh"></p>
 
   <p class="en">The character code is still an abstraction. It isn't yet what we will see in text files, or in TCP packets. However, it is getting close. as it supplies the mapping from human oriented concepts into numerical ones.</p>
+  <p class="zh"></p>
 
   <h3 id="heading_id_8">Character encoding</h3>
 
   <p class="en">To communicate or store a character you need to encode it in some way. To transmit a string, you need to encode all characters in the string. There are many possible encodings for any code set.</p>
+  <p class="zh"></p>
 
   <p class="en">For example, 7-bit ASCII code points can be encoded as themselves into 8-bit bytes (an octet). So ASCII 'A' (with codepoint 65) is encoded as the 8-bit octet 01000001. However, a different encoding would be to use the top bit for parity checking e.g. with odd parity ASCII 'A" would be the octet 11000001. Some protocols such as Sun's XDR use 32-bit word-length encoding. ASCII 'A' would be encoded as 00000000 00000000 0000000 01000001.</p>
+  <p class="zh"></p>
 
   <p class="en">The character encoding is where we function at the programming level. Our programs deal with encoded characters. It obviously makes a difference whether we are dealing with 8-bit characters with or without parity checking, or with 32-bit characters.</p>
+  <p class="zh"></p>
 
   <p class="en">The encoding extends to strings of characters. A word-length even parity encoding of "ABC" might be 10000000 (parity bit in high byte) 0100000011 (C) 01000010 (B) 01000001 (A in low byte). The comments about the importance of an encoding apply equally strongly to strings, where the rules may be different.</p>
+  <p class="zh"></p>
 
   <h3 id="heading_id_9">Transport encoding</h3>
 
   <p class="en">A character encoding will suffice for handling characters within a single application. However, once you start sending text <em>between</em> applications, then there is the further issue of how the bytes, shorts or words are put on the wire. An encoding can be based on space- and hence bandwidth-saving techniques such as <code>zip</code>'ping the text. Or it could be reduced to a 7-bit format to allow a parity checking bit, such as <code>base64</code>.</p>
+  <p class="zh"></p>
 
   <p class="en">If we do know the character and transport encoding, then it is a matter of programming to manage characters and strings. If we don't know the character or transport encoding then it is a matter of guesswork as to what to do with any particular string. There is no convention for files to signal the character encoding.</p>
+  <p class="zh"></p>
 
   <p class="en">There <em>is</em> however a convention for signalling encoding in text transmitted across the internet. It is simple: the header of a text message contains information about the encoding. For example, an HTTP header can contain lines such as</p>
+  <p class="zh"></p>
   <pre><code>
 Content-Type: text/html; charset=ISO-8859-4
 Content-Encoding: gzip
      </code></pre>
 
   <p class="en">which says that the character set is ISO 8859-4 (corresponding to certain countries in Europe) with the default encoding, but then <code>gzip</code>ed. The second part - content encoding - is what we are referring to as "transfer encoding" (IETF RFC 2130).</p>
+  <p class="zh"></p>
 
   <p class="en">But how do you read this information? Isn't it encoded? Don't we have a chicken and egg situation? Well, no. The convention is that such information is given in ASCII (to be precise, US ASCII) so that a program can read the headers and then adjust its encoding for the rest of the document.</p>
+  <p class="zh"></p>
 
   <h2 id="heading_id_10" class="en">ASCII</h2>
 
   <p class="en">ASCII has the repertoire of the English characters plus digits, punctuation and some control characters. The code points for ASCII are given by the familiar table</p>
+  <p class="zh"></p>
   <pre>
        Oct   Dec   Hex   Char           Oct   Dec   Hex   Char
        ------------------------------------------------------------
@@ -202,26 +230,35 @@ Content-Encoding: gzip
       </pre>
 
   <p class="en">The most common encoding for ASCII uses the code points as 7-bit bytes, so that the encoding of 'A' for example is 65.</p>
+  <p class="zh"></p>
 
   <p class="en">This set is actually <em>US ASCII</em>. Due to European desires for accented characters, some punctuation characters are omitted to form a minimal set, ISO 646, while there are "national variants" with suitable European characters. The page <a href="http://www.cs.tut.fi/~jkorpela/chars.html">http://www.cs.tut.fi/~jkorpela/chars.html</a> by Jukka Korpela has more information for those interested. We shall not need these variants though.</p>
+  <p class="zh"></p>
 
   <h2 id="heading_id_11" class="en">ISO 8859</h2>
 
   <p class="en">Octets are now the standard size for bytes. This allows 128 extra code points for extensions to ASCII. A number of different code sets to capture the repertoires of various subsets of European languages are the ISO 8859 series. ISO 8859-1 is also known as Latin-1 and covers many languages in western Europe, while others in this series cover the rest of Europe and even Hebrew, Arabic and Thai. For example, ISO 8859-5 includes the Cyrillic characters of countries such as Russia, while ISO 8859-8 includes the Hebrew alphabet.</p>
+  <p class="zh"></p>
 
   <p class="en">The standard encoding for these character sets is to use their code point as an 8-bit value. For example, the character 'Á' in ISO 8859-1 has the code point 193 and is encoded as 193. All of the ISO 8859 series have the bottom 128 values identical to ASCII, so that the ASCII characters are the same in all of these sets.</p>
+  <p class="zh"></p>
 
   <p class="en">The HTML specifications used to recommend the ISO 8859-1 character set. HTML 3.2 was the last one to do so, and after that HTML 4.0 recommended Unicode. In 2010 Google made an estimate that of the pages it sees, about 20% were still in ISO 8859 format while 20% were still in ASCII ("Unicode nearing 50% of the web" http://googleblog.blogspot.com/2010/01/unicode-nearing-50-of-web.html).</p>
+  <p class="zh"></p>
 
   <h2 id="heading_id_12" class="en">Unicode</h2>
 
   <p class="en">Neither ASCII nor ISO 8859 cover the languages based on hieroglyphs. Chinese is estimated to have about 20,000 separate characters, with about 5,000 in common use. These need more than a byte, and typically two bytes has been used. There have been many of these two-byte character sets: Big5, EUC-TW, GB2312 and GBK/GBX for Chinese, JIS X 0208 for Japanese, and so on. These encodings are generally not mutually compatable.</p>
+  <p class="zh"></p>
 
   <p class="en">Unicode is an embracing standard character set intended to cover all major character sets in use. It includes European, Asian, Indian and many more. It is now up to version 5.2 and has over 107,000 characters. The number of code points now exceeds 65,536, that is. more than 2^16. This has implications for character encodings.</p>
+  <p class="zh"></p>
 
   <p class="en">The first 256 code points correspond to ISO 8859-1, with US ASCII as the first 128. There is thus a backward compatability with these major character sets, as the code points for ISO 8859-1 and ASCII are exactly the same in Unicode. The same is not true for other character sets: for example, while most of the Big5 characters are also in Unicode, the code points are not the same. The page http://moztw.org/docs/big5/table/unicode1.1-obsolete.txt contains one example of a (large) table mapping from Big5 to Unicode.</p>
+  <p class="zh"></p>
 
   <p class="en">To represent Unicode characters in a computer system, an encoding must be used. The encoding UCS is a two-byte encoding using the code point values of the Unicode characters. However, since there are now too many characters in Unicode to fit them all into 2 bytes, this encoding is obsolete and no longer used. Instead there are:</p>
+  <p class="zh"></p>
 
   <ul class="en">
     <li>UTF-32 is a 4-byte encoding, but is not commonly used, and HTML 5 warns explicitly against using it</li>
@@ -236,12 +273,16 @@ Content-Encoding: gzip
   <h2 id="heading_id_13" class="en">UTF-8, Go and runes</h2>
 
   <p class="en">UTF-8 is the most commonly used encoding. Google estimates that 50% of the pages that it sees are encoded in UTF-8. The ASCII set has the same encoding values in UTF-8, so a UTF-8 reader can read text consisting of just ASCII characters as well as text from the full Unicode set.</p>
+  <p class="zh"></p>
 
   <p class="en">Go uses UTF-8 encoded characters in its strings. Each character is of type <code>rune</code>. This is a alias for <code>int32</code> as a Unicode character can be 1, 2 or 4 bytes in UTF-8 encoding. In terms of characters, a string is an array of runes.</p>
+  <p class="zh"></p>
 
   <p class="en">A string is also an array of bytes, but you have to be careful: only for the ASCII subset is a byte equal to a character. All other characters occupy two, three or four bytes. This means that the length of a string in characters (runes) is generally not the same as the length of its byte array. They are only equal when the string consists of ASCII characters only.</p>
+  <p class="zh"></p>
 
   <p class="en">The following program fragment illustrates this. If we take a UTF-8 string and test its length, you get the length of the underlying byte array. But if you cast the string to an array of runes <code>[]rune</code> then you get an array of the Unicode code points which is generally the number of characters:</p>
+  <p class="zh"></p>
   <pre><code>
 str := "百度一下，你就知道"
 
@@ -250,6 +291,7 @@ println("Byte length", len(str))
     </code></pre>
 
   <p class="en">prints</p>
+  <p class="zh"></p>
   <pre><code>
 String length 9
 Byte length 27
@@ -258,20 +300,26 @@ Byte length 27
   <h3 id="heading_id_14">UTF-8 client and server</h3>
 
   <p class="en">Possibly surprisingly, you need do nothing special to handle UTF-8 text in either the client or the server. The underlying data type for a UTF-8 string in Go is a byte array, and as we saw just above, Go looks after encoding the string into 1, 2, 3 or 4 bytes as needed. The length of the string is the length of the byte array, so you write any UTF-8 string by writing the byte array.</p>
+  <p class="zh"></p>
 
   <p class="en">Similarly to read a string, you just read into a byte array and then cast the array to a string using <code>string([]byte)</code>. If Go cannot properly decode bytes into Unicode characters, then it gives the Unicode Replacement Character \uFFFD. The length of the resulting byte array is the length of the legal portion of the string.</p>
+  <p class="zh"></p>
 
   <p class="en">So the clients and servers given in earlier chapters work perfectly well with UTF-8 encoded text.</p>
+  <p class="zh"></p>
 
   <h3 id="heading_id_15">ASCII client and server</h3>
 
   <p class="en">The ASCII characters have the same encoding in ASCII and in UTF-8. So ordinary UTF-8 character handling works fine for ASCII characters. No special handling need to be done.</p>
+  <p class="zh"></p>
 
   <h2 id="heading_id_16" class="en">UTF-16 and Go</h2>
 
   <p class="en">UTF-16 deals with arrays of short 16-bit unsigned integers. The package <code>utf16</code> is designed to manage such arrays. To convert a normal Go string, that is a UTF-8 string, into UTF-16, you first extract the code points by coercing it into a <code>[]rune</code> and then use <code>utf16.Encode</code> to produce an array of type <code>uint16</code>.</p>
+  <p class="zh"></p>
 
   <p class="en">Similarly, to decode an array of unsigned short UTF-16 values into a Go string, you use <code>utf16.Decode</code> to convert it into code points as type <code>[]rune</code> and then to a string. The following code fragment illustrates this</p>
+  <p class="zh"></p>
   <pre><code>
 str := "百度一下，你就知道"
 
@@ -282,12 +330,15 @@ str = string(ints)
     </code></pre>
 
   <p class="en">These type conversions need to be applied by clients or servers as appropriate, to read and write 16-bit short integers, as shown below.</p>
+  <p class="zh"></p>
 
   <h3 id="heading_id_17">Little-endian and big-endian</h3>
 
   <p class="en">Unfortunately, there is a little devil lurking behind UTF-16. It is basically an encoding of characters into 16-bit short integers. The big question is: for each short, how is it written as two bytes? The top one first, or the top one second? Either way is fine, as long as the receiver uses the same convention as the sender.</p>
+  <p class="zh"></p>
 
   <p class="en">Unicode has addressed this with a special character known as the BOM (byte order marker). This is a zero-width non-printing character, so you never see it in text. But its value 0xfffe is chosen so that you can tell the byte-order:</p>
+  <p class="zh"></p>
 
   <ul class="en">
     <li>In a big-endian system it is FF FE</li>
@@ -296,10 +347,12 @@ str = string(ints)
   </ul>
 
   <p class="en">Text will sometimes place the BOM as the first character in the text. The reader can then examine these two bytes to determine what endian-ness has been used.</p>
+  <p class="zh"></p>
 
   <h3 id="heading_id_18">UTF-16 client and server</h3>
 
   <p class="en">Using the BOM convention, we can write a server that prepends a BOM and writes a string in UTF-16 as</p>
+  <p class="zh"></p>
   <pre><code><span class="sgc-7">
 <span class="sgc-1">/* UTF16 Server
  */
@@ -368,6 +421,7 @@ const <span class="sgc-4">BOM</span> = '\ufffe'
 </span></code></pre>
 
   <p class="en">while a client that reads a byte stream, extracts and examines the BOM and then decodes the rest of the stream is</p>
+  <p class="zh"></p>
   <pre><code><span class="sgc-7">
 <span class="sgc-1">/* UTF16 Client
  */
@@ -447,18 +501,24 @@ const <span class="sgc-4">BOM</span> = '\ufffe'
   <h2 id="heading_id_19" class="en">Unicode gotcha's</h2>
 
   <p class="en">This book is not about i18n issues. In particular we don't want to delve into the arcane areas of Unicode. But you should know that Unicode is not a simple encoding and there are many complexities. For example, some earlier character sets used <em>non-spacing</em> characters, particularly for accents. This was brought into Unicode, so you can produce accented characters in two ways: as a single Unicode character, or as a pair of non-spacing accent plus non-accented character. For example, U+04D6 CYRILLIC CAPITAL LETTER IE WITH BREVE is a single character. It is equivalent to U+0415 CYRILLIC CAPITAL LETTER IE combined with the breve accent U+0306 COMBINING BREVE. This makes string comparison difficult on occassions. The Go specification does not at present address such issues.</p>
+  <p class="zh"></p>
 
   <h2 id="heading_id_20" class="en">ISO 8859 and Go</h2>
 
   <p class="en">The ISO 8859 series are 8-bit character sets for different parts of Europe and some other areas. They all have the ASCII set common in the low part, but differ in the top part. According to Google, ISO 8859 codes account for about 20% of the web pages it sees.</p>
+  <p class="zh"></p>
 
   <p class="en">The first code, ISO 8859-1 or Latin-1, has the first 256 characters in common with Unicode. The encoded value of the Latin-1 characters is the same in UTF-16 and in the default ISO 8859-1 encoding. But this doesn't really help much, as UTF-16 is a 16-bit encoding and ISO 8859-1 is an 8-bit encoding. UTF-8 is a 8-bit encoding, but it uses the top bit to signal extra bytes, so only the ASCII subset overlaps for UTF-8 and ISO 8859-1. So UTF-8 doesn't help much either.</p>
+  <p class="zh"></p>
 
   <p class="en">But the ISO 8859 series don't have any complex issues. To each character in each set corresponds a unique Unicode character. For example, in ISO 8859-2, the character "latin capital letter I with ogonek" has ISO 8859-2 code point 0xc7 (in hexadecimal) and corresponding Unicode code point of U+012E. Transforming either way between an ISO 8859 set and the corresponding Unicode characters is essentially just a table lookup.</p>
+  <p class="zh"></p>
 
   <p class="en">The table from ISO 8859 code points to Unicode code points could be done as an array of 256 integers. But many of these will have the same value as the index. So we just use a map of the different ones, and those not in the map take the index value.</p>
+  <p class="zh"></p>
 
   <p class="en">For ISO 8859-2 a portion of the map is</p>
+  <p class="zh"></p>
   <pre><code>
 var unicodeToISOMap = map[int] uint8 {
     0x12e: 0xc7,
@@ -469,6 +529,7 @@ var unicodeToISOMap = map[int] uint8 {
     </code></pre>
 
   <p class="en">and a function to convert UTF-8 strings to an array of ISO 8859-2 bytes is</p>
+  <p class="zh"></p>
   <pre><code>
 /* Turn a UTF-8 string into an ISO 8859 encoded byte array
 */ 
@@ -493,6 +554,7 @@ func unicodeStrToISO(str string) []byte {
     </code></pre>
 
   <p class="en">In a similar way you cacn change an array of ISO 8859-2 bytes into a UTF-8 string:</p>
+  <p class="zh"></p>
   <pre><code>
 var isoToUnicodeMap = map[uint8] int {
     0xc7: 0x12e, 
@@ -515,23 +577,30 @@ func isoBytesToUnicode(bytes []byte) string {
     </code></pre>
 
   <p class="en">These functions can be used to read and write UTF-8 strings as ISO 8859-2 bytes. By changing the mapping table, you can cover the other ISO 8859 codes. Latin-1, or ISO 8859-1, is a special case - the exception map is empty as the code points for Latin-1 are the same in Unicode. You could also use the same technique for other character sets based on a table mapping, such as Windows 1252.</p>
+  <p class="zh"></p>
 
   <h2 id="heading_id_21" class="en">Other character sets and Go</h2>
 
   <p class="en">There are very, very many character set encodings. According to Google, these generally only have a small use, which will hopefully decrease even further in time. But if your software wants to capture all markets, then you may need to handle them.</p>
+  <p class="zh"></p>
 
   <p class="en">In the simplest cases, a lookup table will suffice. But that doesn't always work. The character coding ISO 2022 minimised character set sizes by using a finite state machine to swap code pages in and out. This was borrowed by some of the Japanese encodings, and makes things very complex.</p>
+  <p class="zh"></p>
 
   <p class="en">Go does not at present give any language or package support for these other character sets. So you either avoid their use, fail to talk to applications that do use them, or write lots of your own code!</p>
+  <p class="zh"></p>
 
   <h2 id="heading_id_22" class="en">Conclusion</h2>
 
   <p class="en">There hasn't been much code in this chapter. Instead, there have been some of the concepts of a very complex area. It's up to you: if you want to assume everyone speaks US English then the world is simple. But if you want your applications to be usable by the rest of the world, then you need to pay attention to these complexities.</p>
+  <p class="zh"></p>
 
   <p class="en">Copyright Jan Newmarch, jan@newmarch.name</p>
+  <p class="zh"></p>
 
   <p class="en">If you like this book, please contribute using Flattr <a class="FlattrButton sgc-8" href="http://jan.newmarch.name/go/index.html"></a><br />
   or donate using PayPal</p>
+  <p class="zh"></p>
 
   <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
     <input name="cmd" type="hidden" value="_s-xclick" /> <input name="encrypted" type="hidden" value="-----BEGIN PKCS7-----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-----END PKCS7----- " /> <input alt="PayPal - The safer, easier way to pay online." border="0" name="submit" src="https://www.paypalobjects.com/WEBSCR-640-20110401-1/en_AU/i/btn/btn_donateCC_LG.gif" type="image" /> <img alt="" border="0" height="1" src="https://www.paypalobjects.com/WEBSCR-640-20110401-1/en_AU/i/scr/pixel.gif" width="1" />
