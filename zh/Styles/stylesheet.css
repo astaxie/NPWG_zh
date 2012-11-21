@@ -1,0 +1,37 @@
+
+
+div.chapter {
+	text-align: center;
+}
+
+div.preface {
+	margin-left: 10em;
+	margin-right: 10em;
+}
+
+div.warning {
+	color: red;
+}
+
+ 
+body { counter-reset: section; 
+}
+
+h2 { counter-increment: section; }
+h1:before  { content: "Chapter " counter(chapter) " "; }
+h2:before  { content: counter(chapter) "." counter(section) " "; }
+
+
+code {color: darkblue; font-weight: bold}
+pre  {color: darkblue; background: #DDDDDD; font-weight: bold}
+em  {color: blue; font-style: italic}
+ 
+P {background: white}
+
+textarea {font-family: monospace; font-weight: bold}
+ 
+
+.interactive_program {background: white}
+.interactive_program {color: green}
+ 
+.list {background: #CCCCFF}

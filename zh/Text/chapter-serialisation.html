@@ -1,0 +1,1248 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Data serialisation</title>
+  <link href="../Styles/stylesheet.css" rel="stylesheet" type="text/css" />
+  <script src="../toc.js" type="text/javascript">
+
+
+
+  //<![CDATA[
+
+   <!-- empty -->
+  //]]>
+  </script>
+  <script type="text/javascript">
+
+
+
+
+  /* <![CDATA[ */
+    (function() {
+        var s = document.createElement("script"), t = document.getElementsByTagName("script")[0];
+        s.type = "text/javascript";
+        s.async = true;
+        s.src = "http://api.flattr.com/js/0.6/load.js?mode=auto";
+        t.parentNode.insertBefore(s, t);
+    })();
+  /* ]]> */
+  </script>
+  <style type="text/css">
+/*<![CDATA[*/
+
+  body { counter-reset: chapter 4; }
+
+  a.sgc-10 {display:none;}
+  span.sgc-9 {color: darkred}
+  span.sgc-8 {color: black}
+  span.sgc-7 {color: darkmagenta}
+  span.sgc-6 {color: green}
+  span.sgc-5 {color: blue}
+  span.sgc-4 {color: DarkRed}
+  span.sgc-3 {color: purple}
+  span.sgc-2 {color: firebrick}
+  div.sgc-1 {text-align: center}
+  /*]]>*/
+  </style>
+</head>
+
+<body>
+  <div class="chapter">
+    <h1 id="heading_id_2">Data serialisation</h1>
+  </div>
+
+  <div class="preface">
+    <p>Communication between a client and a service requires the exchange of data. This data may be highly structured, but has to be serialised for transport. This chapter looks at the basics of serialisation and then considers several techniques supported by Go APIs.</p>
+  </div>
+
+  <div class="generate_from_h2" id="generated-toc"></div>
+
+  <h2 id="heading_id_3">Introduction</h2>
+
+  <p>A client and server need to exchange information via messages. TCP and UDP provide the transport mechanisms to do this. The two processes also have to have a protocol in place so that message exchange can take place meaningfully.</p>
+
+  <p>Messages are sent across the network as a sequence of bytes, which has no structure except for a linear stream of bytes. We shall address the various possibilities for messages and the protocols that define them in the next chapter. In this chapter we concentrate on a component of messages - the data that is transferred.</p>
+
+  <p>A program will typically build complex data structures to hold the current program state. In conversing with a remote client or service, the program will be attempting to transfer such data structures across the network - that is, outside of the application's own address space.</p>
+
+  <p>Programming languages use structured data such as</p>
+
+  <ul>
+    <li>records/structures</li>
+
+    <li>variant records</li>
+
+    <li>array - fixed size or varying</li>
+
+    <li>string - fixed size or varying</li>
+
+    <li>tables - e.g. arrays of records</li>
+
+    <li>non-linear structures such as
+
+      <ul>
+        <li>circular linked list</li>
+
+        <li>binary tree</li>
+
+        <li>objects with references to other objects</li>
+      </ul>
+    </li>
+  </ul>
+
+  <p>None of IP, TCP or UDP packets know the meaning of any of these data types. All that they can contain is a sequence of bytes. Thus an application has to <em>serialise</em> any data into a stream of bytes in order to write it, and deserialise the stream of bytes back into suitable data structures on reading it. These two operations are known as <em>marshalling</em> and <em>unmarshalling</em> respectively.</p>
+
+  <p>For example, consider sending the following variable length table of two columns of variable length strings:</p>
+
+  <div class="sgc-1">
+    <table border="1">
+      <tr>
+        <td>fred</td>
+
+        <td>programmer</td>
+      </tr>
+
+      <tr>
+        <td>liping</td>
+
+        <td>analyst</td>
+      </tr>
+
+      <tr>
+        <td>sureerat</td>
+
+        <td>manager</td>
+      </tr>
+    </table>
+  </div>
+
+  <p>This could be done by in various ways. For example, suppose that it is known that the data will be an unknown number of rows in a two-column table. Then a marshalled form could be</p>
+  <pre><code>
+    3                // 3 rows, 2 columns assumed
+    4 fred           // 4 char string,col 1
+    10 programmer    // 10 char string,col 2
+    6 liping         // 6 char string, col 1
+    7 analyst        // 7 char string, col 2
+    8 sureerat       // 8 char string, col 1
+    7 manager        // 7 char string, col 2
+</code></pre>
+
+  <p>Variable length things can alternatively have their length indicated by terminating them with an "illegal" value, such as '\0' for strings:</p>
+  <pre><code>
+    3
+    fred\0        
+    programmer\0
+    liping\0
+    analyst\0
+    sureerat\0
+    manager\0
+</code></pre>
+
+  <p>Alternatively, it may be known that the data is a 3-row fixed table of two columns of strings of length 8 and 10 respectively. Then a serialisation could be</p>
+  <pre><code>
+    fred\0\0\0\0
+    programmer
+    liping\0\0
+    analyst\0\0\0
+    sureerat
+    manager\0\0\0
+</code></pre>
+
+  <p><em>Any of these formats is okay - but the message exchange protocol must specify which one is used, or allow it to be determined at runtime.</em></p>
+
+  <h2 id="heading_id_4">Mutual agreement</h2>
+
+  <p>The previous section gave an overview of the issue of data serialisation. In practise, the details can be considerably more complex. For example, consider the first possibility, marshalling a table into the stream</p>
+  <pre><code>
+    3
+    4 fred
+    10 programmer
+    6 liping
+    7 analyst
+    8 sureerat
+    7 manager
+    </code></pre>
+
+  <p>Many questions arise. For example, how many rows are possible for the table - that is, how big an integer do we need to describe the row size? If it is 255 or less, then a single byte will do, but if it is more, then a short, integer or long may be needed. A similar problem occurs for the length of each string. With the characters themselves, to which character set do they belong? 7 bit ASCII? 16 bit Unicode? The question of character sets is discussed at length in a later chapter.</p>
+
+  <p>The above serialisation is <em>opaque</em> or <em>implicit</em>. If data is marshalled using the above format, then there is nothing in the serialised data to say how it should be unmarshalled. The unmarshalling side has to know exactly how the data is serialised in order to unmarshal it correctly. For example, if the number of rows is marshalled as an eight-bit integer, but unmarshalled as a sixteen-bit integer, then an incorrect result will occur as the receiver tries to unmarshall 3 and 4 as a sixteen-bit integer, and the receiving program will almost certainly fail later.</p>
+
+  <p>An early well-known serialisation method is XDR (external data representation) used by Sun's RPC, later known as ONC (Open Network Computing). XDR is defined by RFC 1832 and it is instructive to see how precise this specification is. Even so, XDR is inherently type-unsafe as serialised data contains no type information. The correctness of its use in ONC is ensured primarily by compilers generating code for both marshalling and unmarshalling.</p>
+
+  <p>Go contains no explicit support for marshalling or unmarshalling opaque serialised data. The RPC package in Go does not use XDR, but instead uses "gob" serialisation, described later in this chapter.</p>
+
+  <h2 id="heading_id_5">Self-describing data</h2>
+
+  <p>Self-describing data carries type information along with the data. For example, the previous data might get encoded as</p>
+  <pre><code>
+table
+   uint8 3
+   uint 2
+string
+   uint8 4
+   []byte fred
+string
+   uint8 10 
+   []byte programmer
+string
+   uint8 6 
+   []byte liping
+string
+   uint8 7 
+   []byte analyst
+string
+   uint8 8 
+   []byte sureerat
+string
+   uint8 7
+   []byte manager
+    </code></pre>
+
+  <p>Of course, a real encoding would not normally be as cumbersome and verbose as in the example: small integers would be used as type markers and the whole data would be packed in as small a byte array as possible. (XML provides a counter-example, though.). However, the principle is that the marshaller will generate such type information in the serialised data. The unmarshaller will know the type-generation rules and will be able to use this to reconstruct the correct data structure.</p>
+
+  <h2 id="heading_id_6">ASN.1</h2>
+
+  <p>Abstract Syntax Notation One (ASN.1) was originally designed in 1984 for the telecommunications industry. ASN.1 is a complex standard, and a subset of it is supported by Go in the package "asn1". It builds self-describing serialised data from complex data structures. Its primary use in current networking systems is as the encoding for X.509 certificates which are heavily used in authentication systems. The support in Go is based on what is needed to read and write X.509 certificates.</p>
+
+  <p>Two functions allow us to marshal and unmarshal data</p>
+  <pre><code>
+func Marshal(val interface{}) ([]byte, os.Error)
+func Unmarshal(val interface{}, b []byte) (rest []byte, err os.Error)
+    </code></pre>
+
+  <p>The first marshals a data value into a serialised byte array, and the second unmarshals it. However, the first argument of type <code>interface</code> deserves further examination. Given a variable of a type, we can marshal it by just passing its value. To unmarshal it, we need a variable of a named type that will match the serialised data. The precise details of this are discussed later. But we also need to make sure that the variable is allocated to memory for that type, so that there is actually existing memory for the unmarshalling to write values into.</p>
+
+  <p>We illustrate with an almost trivial example, of marshalling and unmarshalling an integer. We can pass an integer value to <code>Marshal</code> to return a byte array, and unmarshal the array into an integer variable as in this program: <!--
+. We can find the time from the function
+  <code>LocalTime</code> in package "time". We can marshal this
+  value directly as type <code>net.Time</code>. To unmarshal,
+  we need the address a variable also of that type. BUT: that
+  variable must have allocated space, which we can ensure
+  by using the operator <code>new</code>. 
+--></p>
+  <pre><code><span class="sgc-8">
+<span class="sgc-2">/* ASN.1
+ */
+</span>
+<span class="sgc-3">package</span> main
+
+<span class="sgc-3">import</span> (
+        <span class="sgc-4">"encoding/asn1"</span>
+        <span class="sgc-4">"fmt"</span>
+        <span class="sgc-4">"os"</span>
+)
+
+<span class="sgc-3">func</span> main() {
+        mdata, err := asn1.<span class="sgc-5">Marshal</span>(13)
+        checkError(err)
+
+        <span class="sgc-3">var</span> n <span class="sgc-6">int</span>
+        <span class="sgc-7">_</span>, err1 := asn1.<span class="sgc-5">Unmarshal</span>(mdata, &amp;n)
+        checkError(err1)
+
+        fmt.<span class="sgc-5">Println</span>(<span class="sgc-4">"After marshal/unmarshal: "</span>, n)
+}
+
+<span class="sgc-3">func</span> checkError(err error) {
+        <span class="sgc-3">if</span> err != nil {
+                fmt.<span class="sgc-5">Fprintf</span>(os.<span class="sgc-5">Stderr</span>, <span class="sgc-4">"Fatal error: %s"</span>, err.<span class="sgc-5">Error</span>())
+                os.<span class="sgc-5">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <p>The unmarshalled value, is of course, 13.</p>
+
+  <p>Once we move beyond this, things get harder. In order to manage more complex data types, we have to look more closely at the data structures supported by ASN.1, and how ASN.1 support is done in Go.</p>
+
+  <p>Any serialisation method will be able to handle certain data types and not handle some others. So in order to determine the suitability of any serialisation such as ASN.1, you have to look at the possible data types supported versus those you wish to use in your application. The following ASN.1 types are taken from http://www.obj-sys.com/asn1tutorial/node4.html</p>
+
+  <p>The simple types are</p>
+
+  <ul>
+    <li>BOOLEAN: two-state variable values</li>
+
+    <li>INTEGER: Model integer variable values</li>
+
+    <li>BIT STRING: Model binary data of arbitrary length</li>
+
+    <li>OCTET STRING: Model binary data whose length is a multiple of eight</li>
+
+    <li>NULL: Indicate effective absence of a sequence element</li>
+
+    <li>OBJECT IDENTIFIER: Name information objects</li>
+
+    <li>REAL: Model real variable values</li>
+
+    <li>ENUMERATED: Model values of variables with at least three states</li>
+
+    <li>CHARACTER STRING: Models values that are strings of characters fro</li>
+  </ul>
+
+  <p>Character strings can be from certain character sets</p>
+
+  <ul>
+    <li>NumericString: 0,1,2,3,4,5,6,7,8,9, and space</li>
+
+    <li>PrintableString: Upper and lower case letters, digits, space, apostrophe, left/right parenthesis, plus sign, comma, hyphen, full stop, solidus, colon, equal sign, question mark</li>
+
+    <li>TeletexString (T61String): The Teletex character set in CCITT's T61, space, and delete</li>
+
+    <li>VideotexString: The Videotex character set in CCITT's T.100 and T.101, space, and delete</li>
+
+    <li>VisibleString (ISO646String): Printing character sets of international ASCII, and space</li>
+
+    <li>IA5String: International Alphabet 5 (International ASCII)</li>
+
+    <li>GraphicString 25 All registered G sets, and space GraphicString</li>
+  </ul>
+
+  <p>And finally, there are the structured types:</p>
+
+  <ul>
+    <li>SEQUENCE: Models an ordered collection of variables of different type</li>
+
+    <li>SEQUENCE OF: Models an ordered collection of variables of the same type</li>
+
+    <li>SET: Model an unordered collection of variables of different types</li>
+
+    <li>SET OF: Model an unordered collection of variables of the same type</li>
+
+    <li>CHOICE: Specify a collection of distinct types from which to choose one type</li>
+
+    <li>SELECTION: Select a component type from a specified CHOICE type</li>
+
+    <li>ANY: Enable an application to specify the type Note: ANY is a deprecated ASN.1 Structured Type. It has been replaced with X.680 Open Type.</li>
+  </ul>
+
+  <p>Not all of these are supported by Go. Not all possible values are supported by Go. The rules as given in the Go "asn1" package documentation are</p>
+
+  <ul>
+    <li>An ASN.1 INTEGER can be written to an int or int64. If the encoded value does not fit in the Go type, Unmarshal returns a parse error.</li>
+
+    <li>An ASN.1 BIT STRING can be written to a BitString.</li>
+
+    <li>An ASN.1 OCTET STRING can be written to a []byte.</li>
+
+    <li>An ASN.1 OBJECT IDENTIFIER can be written to an ObjectIdentifier.</li>
+
+    <li>An ASN.1 ENUMERATED can be written to an Enumerated.</li>
+
+    <li>An ASN.1 UTCTIME or GENERALIZEDTIME can be written to a *time.Time.</li>
+
+    <li>An ASN.1 PrintableString or IA5String can be written to a string.</li>
+
+    <li>Any of the above ASN.1 values can be written to an interface{}. The value stored in the interface has the corresponding Go type. For integers, that type is int64.</li>
+
+    <li>An ASN.1 SEQUENCE OF x or SET OF x can be written to a slice if an x can be written to the slice's element type.</li>
+
+    <li>An ASN.1 SEQUENCE or SET can be written to a struct if each of the elements in the sequence can be written to the corresponding element in the struct.</li>
+  </ul>
+
+  <p>Go places real restrictions on ASN.1. For example, ASN.1 allows integers of any size, while the Go implementation will only allow upto signed 64-bit integers. On the other hand, Go distinguishes between signed and unsigned types, while ASN.1 doesn't. So for example, transmitting a value of <code>uint64</code> may fail if it is too large for <code>int64</code>,</p>
+
+  <p>In a similar vein, ASN.1 allows several different character sets. Go only supports PrintableString and IA5String (ASCII). ASN.1 does not support Unicode characters (which require the BMPString ASN.1 extension). The basic Unicode character set of Go is not supported, and if an application requires transport of Unicode characters, then an encoding such as UTF-7 will be needed. Such encodings are discussed in a later chapter on character sets.</p>
+
+  <p>We have seen that a value such as an integer can be easily marshalled and unmarshalled. Other basic types such as booleans and reals can be similarly dealt with. Strings which are composed entirely of ASCII characters can be marshalled and unmarshalled. However, if the string is, for example, "hello \u00bc" which contains the non-ASCII character '¼' then an error will occur: "ASN.1 structure error: PrintableString contains invalid character". This code works, as long as the string is only composed of printable characters:</p>
+  <pre><code>
+        s := "hello"
+        mdata, _ := asn1.Marshal(s)
+
+        var newstr string
+        asn1.Unmarshal(mdata, &amp;newstr)
+    </code></pre>
+
+  <p>ASN.1 also includes some "useful types" not in the above list, such as UTC time. Go supports this UTC time type. This means that you can pass time values in a way that is not possible for other data values. ASN.1 does not support pointers, but Go has special code to manage pointers to time values. The function <code>GetLocalTime</code> returns <code>*time.Time</code>. The special code marshals this, and it can be unmarshalled into a pointer variable to a <code>time.Time</code> object. Thus this code works</p>
+  <pre><code>
+        t := time.LocalTime()
+        mdata, err := asn1.Marshal(t)
+
+        var newtime = new(time.Time)
+        _, err1 := asn1.Unmarshal(&amp;newtime, mdata)
+    </code></pre>
+
+  <p>Both <code>LocalTime</code> and <code>new</code> handle pointers to a <code>*time.Time</code>, and Go looks after this special case.</p>
+
+  <p>In general, you will probably want to marshal and unmarshal structures. Apart from the special case of time, Go will happily deal with structures, but not with pointers to structures. Operations such as <code>new</code> create pointers, so you have to dereference them before marshalling/unmarshalling them. Go normally dereferences pointers for you when needed, but not in this case. These both work for a type <code>T</code>:</p>
+  <pre><code>
+// using variables
+var t1 T
+t1 = ...
+mdata1, _ := asn1.Marshal(t)
+
+var newT1 T
+asn1.Unmarshal(&amp;newT1, mdata1)
+
+/// using pointers
+var t2 = new(T)
+*t2 = ...
+mdata2, _ := asn1.Marshal(*t2)
+
+var newT2 = new(T)
+asn1.Unmarshal(newT2, mdata2)
+    </code></pre>
+
+  <p>Any suitable mix of pointers and variables will work as well.</p>
+
+  <p>The fields of a structure must all be exportable, that is, field names must begin with an uppercase letter. Go uses the <code>reflect</code> package to marshal/unmarshal structures, so it must be able to examine all fields. This type cannot be marshalled:</p>
+  <pre><code>
+      type T struct {
+          Field1 int
+          field2 int // not exportable
+      }
+    </code></pre>
+
+  <p>ASN.1 only deals with the data types. It does not consider the names of structure fields. So the following type <code>T1</code> can be marshalled/unmarshalled into type <code>T2</code> as the corresponding fields are the same types:</p>
+  <pre><code>
+type T1 struct {
+    F1 int
+    F2 string
+}
+
+type T2 struct {
+    FF1 int
+    FF2 string
+}
+    </code></pre>
+
+  <p>Not only the types of each field must match, but the number must match as well. These two types don't work:</p>
+  <pre><code>
+type T1 struct {
+    F1 int
+}
+
+type T2 struct {
+    F1 int
+    F2 string // too many fields
+}
+    </code></pre>
+
+  <h3 id="heading_id_7">ASN.1 daytime client and server</h3>
+
+  <p>Now (finally) let us turn to using ASN.1 to transport data across the network.</p>
+
+  <p>We can write a TCP server that delivers the current time as an ASN.1 Time type, using the techniques of the last chapter. A server is</p>
+  <pre><code><span class="sgc-8">
+<span class="sgc-2">/* ASN1 DaytimeServer
+ */
+</span><span class="sgc-3">package</span> main
+
+<span class="sgc-3">import</span> (
+        <span class="sgc-4">"encoding/asn1"</span>
+        <span class="sgc-4">"fmt"</span>
+        <span class="sgc-4">"net"</span>
+        <span class="sgc-4">"os"</span>
+        <span class="sgc-4">"time"</span>
+)
+
+<span class="sgc-3">func</span> main() {
+
+        service := <span class="sgc-4">":1200"</span>
+        tcpAddr, err := net.<span class="sgc-5">ResolveTCPAddr</span>(<span class="sgc-4">"tcp"</span>, service)
+        checkError(err)
+
+        listener, err := net.<span class="sgc-5">ListenTCP</span>(<span class="sgc-4">"tcp"</span>, tcpAddr)
+        checkError(err)
+
+        <span class="sgc-3">for</span> {
+                conn, err := listener.<span class="sgc-5">Accept</span>()
+                <span class="sgc-3">if</span> err != nil {
+                        <span class="sgc-3">continue</span>
+                }
+
+                daytime := time.<span class="sgc-5">Now</span>()
+                <span class="sgc-2">// Ignore return network errors.
+</span>         mdata, <span class="sgc-7">_</span> := asn1.<span class="sgc-5">Marshal</span>(daytime)
+                conn.<span class="sgc-5">Write</span>(mdata)
+                conn.<span class="sgc-5">Close</span>() <span class="sgc-2">// we're finished
+</span> }
+}
+
+<span class="sgc-3">func</span> checkError(err error) {
+        <span class="sgc-3">if</span> err != nil {
+                fmt.<span class="sgc-5">Fprintf</span>(os.<span class="sgc-5">Stderr</span>, <span class="sgc-4">"Fatal error: %s"</span>, err.<span class="sgc-5">Error</span>())
+                os.<span class="sgc-5">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <p>which can be compiled to an executable such as <code>ASN1DaytimeServer</code> and run with no arguments. It will wait for connections and then send the time as an ASN.1 string to the client.</p>
+
+  <p>A client is</p>
+  <pre><code><span class="sgc-8">
+<span class="sgc-2">/* ASN.1 DaytimeClient
+ */
+</span><span class="sgc-3">package</span> main
+
+<span class="sgc-3">import</span> (
+        <span class="sgc-4">"bytes"</span>
+        <span class="sgc-4">"encoding/asn1"</span>
+        <span class="sgc-4">"fmt"</span>
+        <span class="sgc-4">"io"</span>
+        <span class="sgc-4">"net"</span>
+        <span class="sgc-4">"os"</span>
+        <span class="sgc-4">"time"</span>
+)
+
+<span class="sgc-3">func</span> main() {
+        <span class="sgc-3">if</span> len(os.<span class="sgc-5">Args</span>) != 2 {
+                fmt.<span class="sgc-5">Fprintf</span>(os.<span class="sgc-5">Stderr</span>, <span class="sgc-4">"Usage: %s host:port"</span>, os.<span class="sgc-5">Args</span>[0])
+                os.<span class="sgc-5">Exit</span>(1)
+        }
+        service := os.<span class="sgc-5">Args</span>[1]
+
+        conn, err := net.<span class="sgc-5">Dial</span>(<span class="sgc-4">"tcp"</span>, service)
+        checkError(err)
+
+        result, err := readFully(conn)
+        checkError(err)
+
+        <span class="sgc-3">var</span> newtime time.<span class="sgc-5">Time</span>
+        <span class="sgc-7">_</span>, err1 := asn1.<span class="sgc-5">Unmarshal</span>(result, &amp;newtime)
+        checkError(err1)
+
+        fmt.<span class="sgc-5">Println</span>(<span class="sgc-4">"After marshal/unmarshal: "</span>, newtime.<span class="sgc-5">String</span>())
+
+        os.<span class="sgc-5">Exit</span>(0)
+}
+
+<span class="sgc-3">func</span> checkError(err error) {
+        <span class="sgc-3">if</span> err != nil {
+                fmt.<span class="sgc-5">Fprintf</span>(os.<span class="sgc-5">Stderr</span>, <span class="sgc-4">"Fatal error: %s"</span>, err.<span class="sgc-5">Error</span>())
+                os.<span class="sgc-5">Exit</span>(1)
+        }
+}
+
+<span class="sgc-3">func</span> readFully(conn net.<span class="sgc-5">Conn</span>) ([]<span class="sgc-6">byte</span>, error) {
+        defer conn.<span class="sgc-5">Close</span>()
+
+        result := bytes.<span class="sgc-5">NewBuffer</span>(nil)
+        <span class="sgc-3">var</span> buf [512]<span class="sgc-6">byte</span>
+        <span class="sgc-3">for</span> {
+                n, err := conn.<span class="sgc-5">Read</span>(buf[0:])
+                result.<span class="sgc-5">Write</span>(buf[0:n])
+                <span class="sgc-3">if</span> err != nil {
+                        <span class="sgc-3">if</span> err == io.<span class="sgc-5">EOF</span> {
+                                <span class="sgc-3">break</span>
+                        }
+                        <span class="sgc-3">return</span> nil, err
+                }
+        }
+        <span class="sgc-3">return</span> result.<span class="sgc-5">Bytes</span>(), nil
+}
+</span></code></pre>
+
+  <p>This connects to the service given in a form such as <code>localhost:1200</code>, reads the TCP packet and decodes the ASN.1 content back into a string, which it prints.</p>
+
+  <p>We should note that neither of these two - the client or the server - are compatable with the text-based clients and servers of the last chapter. This client and server are exchanging ASN.1 encoded data values, not textual strings.</p>
+
+  <h2 id="heading_id_8">JSON</h2>
+
+  <p>JSON stands for JavaScript Object Notation. It was designed to be a lighweight means of passing data between JavaScript systems. It uses a text-based format and is sufficiently general that it has become used as a general purpose serialisation method for many programming languages.</p>
+
+  <p>JSON serialises objects, arrays and basic values. The basic values include string, number, boolean values and the null value. Arrays are a comma-separated list of values that can represent arrays, vectors, lists or sequences of various programming languages. They are delimited by square brackets "[ ... ]". Objects are represented by a list of "field: value" pairs enclosed in curly braces "{ ... }".</p>
+
+  <p>For example, the table of employees given earlier could be written as an array of employee objects:</p>
+  <pre>
+<code>
+[
+   {Name: fred, Occupation: programmer},
+   {Name: liping, Occupation: analyst},
+   {Name: sureerat, Occupation: manager}
+]
+</code>
+</pre>
+
+  <p>There is no special support for complex data types such as dates, no distinction between number types, no recursive types, etc. JSON is a very simple language, but nevertheless can be quite useful. Its text-based format makes it easy for people to use, even though it has the overheads of string handling.</p>
+
+  <p>From the Go JSON package specification, marshalling uses the following type-dependent default encodings:</p>
+
+  <ul>
+    <li>Boolean values encode as JSON booleans.</li>
+
+    <li>Floating point and integer values encode as JSON numbers.</li>
+
+    <li>String values encode as JSON strings, with each invalid UTF-8 sequence replaced by the encoding of the Unicode replacement character U+FFFD.</li>
+
+    <li>Array and slice values encode as JSON arrays, except that []byte encodes as a base64-encoded string.</li>
+
+    <li>Struct values encode as JSON objects. Each struct field becomes a member of the object. By default the object's key name is the struct field name converted to lower case. If the struct field has a tag, that tag will be used as the name instead.</li>
+
+    <li>Map values encode as JSON objects. The map's key type must be string; the object keys are used directly as map keys.</li>
+
+    <li>Pointer values encode as the value pointed to. (Note: this allows trees, but not graphs!). A nil pointer encodes as the null JSON object.</li>
+
+    <li>Interface values encode as the value contained in the interface. A nil interface value encodes as the null JSON object.</li>
+
+    <li>Channel, complex, and function values cannot be encoded in JSON. Attempting to encode such a value causes Marshal to return an InvalidTypeError.</li>
+
+    <li>JSON cannot represent cyclic data structures and Marshal does not handle them. Passing cyclic structures to Marshal will result in an infinite recursion.</li>
+  </ul>
+
+  <p>A program to store JSON serialised data into a file is</p>
+  <pre><code><span class="sgc-8">
+<span class="sgc-2">/* SaveJSON
+ */
+</span>
+<span class="sgc-3">package</span> main
+
+<span class="sgc-3">import</span> (
+        <span class="sgc-4">"encoding/json"</span>
+        <span class="sgc-4">"fmt"</span>
+        <span class="sgc-4">"os"</span>
+)
+
+<span class="sgc-3">type</span> <span class="sgc-5">Person</span> <span class="sgc-3">struct</span> {
+        <span class="sgc-5">Name</span>  <span class="sgc-5">Name</span>
+        <span class="sgc-5">Email</span> []<span class="sgc-5">Email</span>
+}
+
+<span class="sgc-3">type</span> <span class="sgc-5">Name</span> <span class="sgc-3">struct</span> {
+        <span class="sgc-5">Family</span>   string
+        <span class="sgc-5">Personal</span> string
+}
+
+<span class="sgc-3">type</span> <span class="sgc-5">Email</span> <span class="sgc-3">struct</span> {
+        <span class="sgc-5">Kind</span>    string
+        <span class="sgc-5">Address</span> string
+}
+
+<span class="sgc-3">func</span> main() {
+        person := <span class="sgc-5">Person</span>{
+                <span class="sgc-5">Name</span>: <span class="sgc-5">Name</span>{<span class="sgc-5">Family</span>: <span class="sgc-4">"Newmarch"</span>, <span class="sgc-5">Personal</span>: <span class="sgc-4">"Jan"</span>},
+                <span class="sgc-5">Email</span>: []<span class="sgc-5">Email</span>{<span class="sgc-5">Email</span>{<span class="sgc-5">Kind</span>: <span class="sgc-4">"home"</span>, <span class="sgc-5">Address</span>: <span class="sgc-4">"jan@newmarch.name"</span>},
+                        <span class="sgc-5">Email</span>{<span class="sgc-5">Kind</span>: <span class="sgc-4">"work"</span>, <span class="sgc-5">Address</span>: <span class="sgc-4">"j.newmarch@boxhill.edu.au"</span>}}}
+
+        saveJSON(<span class="sgc-4">"person.json"</span>, person)
+}
+
+<span class="sgc-3">func</span> saveJSON(fileName string, key <span class="sgc-3">interface</span>{}) {
+        outFile, err := os.<span class="sgc-5">Create</span>(fileName)
+        checkError(err)
+        encoder := json.<span class="sgc-5">NewEncoder</span>(outFile)
+        err = encoder.<span class="sgc-5">Encode</span>(key)
+        checkError(err)
+        outFile.<span class="sgc-5">Close</span>()
+}
+
+<span class="sgc-3">func</span> checkError(err error) {
+        <span class="sgc-3">if</span> err != nil {
+                fmt.<span class="sgc-5">Println</span>(<span class="sgc-4">"Fatal error "</span>, err.<span class="sgc-5">Error</span>())
+                os.<span class="sgc-5">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <p>and to load it back into memory is</p>
+  <pre><code><span class="sgc-8">
+<span class="sgc-2">/* LoadJSON
+ */
+</span>
+<span class="sgc-3">package</span> main
+
+<span class="sgc-3">import</span> (
+        <span class="sgc-4">"encoding/json"</span>
+        <span class="sgc-4">"fmt"</span>
+        <span class="sgc-4">"os"</span>
+)
+
+<span class="sgc-3">type</span> <span class="sgc-5">Person</span> <span class="sgc-3">struct</span> {
+        <span class="sgc-5">Name</span>  <span class="sgc-5">Name</span>
+        <span class="sgc-5">Email</span> []<span class="sgc-5">Email</span>
+}
+
+<span class="sgc-3">type</span> <span class="sgc-5">Name</span> <span class="sgc-3">struct</span> {
+        <span class="sgc-5">Family</span>   string
+        <span class="sgc-5">Personal</span> string
+}
+
+<span class="sgc-3">type</span> <span class="sgc-5">Email</span> <span class="sgc-3">struct</span> {
+        <span class="sgc-5">Kind</span>    string
+        <span class="sgc-5">Address</span> string
+}
+
+<span class="sgc-3">func</span> (p <span class="sgc-5">Person</span>) <span class="sgc-5">String</span>() string {
+        s := p.<span class="sgc-5">Name</span>.<span class="sgc-5">Personal</span> + <span class="sgc-4">" "</span> + p.<span class="sgc-5">Name</span>.<span class="sgc-5">Family</span>
+        <span class="sgc-3">for</span> <span class="sgc-7">_</span>, v := range p.<span class="sgc-5">Email</span> {
+                s += <span class="sgc-4">"\n"</span> + v.<span class="sgc-5">Kind</span> + <span class="sgc-4">": "</span> + v.<span class="sgc-5">Address</span>
+        }
+        <span class="sgc-3">return</span> s
+}
+<span class="sgc-3">func</span> main() {
+        <span class="sgc-3">var</span> person <span class="sgc-5">Person</span>
+        loadJSON(<span class="sgc-4">"person.json"</span>, &amp;person)
+
+        fmt.<span class="sgc-5">Println</span>(<span class="sgc-4">"Person"</span>, person.<span class="sgc-5">String</span>())
+}
+
+<span class="sgc-3">func</span> loadJSON(fileName string, key <span class="sgc-3">interface</span>{}) {
+        inFile, err := os.<span class="sgc-5">Open</span>(fileName)
+        checkError(err)
+        decoder := json.<span class="sgc-5">NewDecoder</span>(inFile)
+        err = decoder.<span class="sgc-5">Decode</span>(key)
+        checkError(err)
+        inFile.<span class="sgc-5">Close</span>()
+}
+
+<span class="sgc-3">func</span> checkError(err error) {
+        <span class="sgc-3">if</span> err != nil {
+                fmt.<span class="sgc-5">Println</span>(<span class="sgc-4">"Fatal error "</span>, err.<span class="sgc-5">Error</span>())
+                os.<span class="sgc-5">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <p>The serialised form is (formatted nicely)</p>
+  <pre><code>
+{"Name":{"Family":"Newmarch",
+         "Personal":"Jan"},
+ "Email":[{"Kind":"home","Address":"jan@newmarch.name"},
+          {"Kind":"work","Address":"j.newmarch@boxhill.edu.au"}
+         ]
+}
+    </code></pre>
+
+  <h3 id="heading_id_9">A client and server</h3>
+
+  <p>A client to send a person's data and read it back ten times is</p>
+  <pre><code><span class="sgc-8">
+<span class="sgc-2">/* JSON EchoClient
+ */
+</span><span class="sgc-3">package</span> main
+
+<span class="sgc-3">import</span> (
+        <span class="sgc-4">"fmt"</span>
+        <span class="sgc-4">"net"</span>
+        <span class="sgc-4">"os"</span>
+        <span class="sgc-4">"encoding/json"</span>
+        <span class="sgc-4">"bytes"</span>
+        <span class="sgc-4">"io"</span>
+)
+
+<span class="sgc-3">type</span> <span class="sgc-5">Person</span> <span class="sgc-3">struct</span> {
+        <span class="sgc-5">Name</span>  <span class="sgc-5">Name</span>
+        <span class="sgc-5">Email</span> []<span class="sgc-5">Email</span>
+}
+
+<span class="sgc-3">type</span> <span class="sgc-5">Name</span> <span class="sgc-3">struct</span> {
+        <span class="sgc-5">Family</span>   string
+        <span class="sgc-5">Personal</span> string
+}
+
+<span class="sgc-3">type</span> <span class="sgc-5">Email</span> <span class="sgc-3">struct</span> {
+        <span class="sgc-5">Kind</span>    string
+        <span class="sgc-5">Address</span> string
+}
+
+<span class="sgc-3">func</span> (p <span class="sgc-5">Person</span>) <span class="sgc-5">String</span>() string {
+        s := p.<span class="sgc-5">Name</span>.<span class="sgc-5">Personal</span> + <span class="sgc-4">" "</span> + p.<span class="sgc-5">Name</span>.<span class="sgc-5">Family</span>
+        <span class="sgc-3">for</span> <span class="sgc-7">_</span>, v := range p.<span class="sgc-5">Email</span> {
+                s += <span class="sgc-4">"\n"</span> + v.<span class="sgc-5">Kind</span> + <span class="sgc-4">": "</span> + v.<span class="sgc-5">Address</span>
+        }
+        <span class="sgc-3">return</span> s
+}
+
+<span class="sgc-3">func</span> main() {
+        person := <span class="sgc-5">Person</span>{
+                <span class="sgc-5">Name</span>: <span class="sgc-5">Name</span>{<span class="sgc-5">Family</span>: <span class="sgc-4">"Newmarch"</span>, <span class="sgc-5">Personal</span>: <span class="sgc-4">"Jan"</span>},
+                <span class="sgc-5">Email</span>: []<span class="sgc-5">Email</span>{<span class="sgc-5">Email</span>{<span class="sgc-5">Kind</span>: <span class="sgc-4">"home"</span>, <span class="sgc-5">Address</span>: <span class="sgc-4">"jan@newmarch.name"</span>},
+                        <span class="sgc-5">Email</span>{<span class="sgc-5">Kind</span>: <span class="sgc-4">"work"</span>, <span class="sgc-5">Address</span>: <span class="sgc-4">"j.newmarch@boxhill.edu.au"</span>}}}
+
+        <span class="sgc-3">if</span> len(os.<span class="sgc-5">Args</span>) != 2 {
+                fmt.<span class="sgc-5">Println</span>(<span class="sgc-4">"Usage: "</span>, os.<span class="sgc-5">Args</span>[0], <span class="sgc-4">"host:port"</span>)
+                os.<span class="sgc-5">Exit</span>(1)
+        }
+        service := os.<span class="sgc-5">Args</span>[1]
+
+        conn, err := net.<span class="sgc-5">Dial</span>(<span class="sgc-4">"tcp"</span>, service)
+        checkError(err)
+
+        encoder := json.<span class="sgc-5">NewEncoder</span>(conn)
+        decoder := json.<span class="sgc-5">NewDecoder</span>(conn)
+
+        <span class="sgc-3">for</span> n := 0; n &lt; 10; n++ {
+                encoder.<span class="sgc-5">Encode</span>(person)
+                <span class="sgc-3">var</span> newPerson <span class="sgc-5">Person</span>
+                decoder.<span class="sgc-5">Decode</span>(&amp;newPerson)
+                fmt.<span class="sgc-5">Println</span>(newPerson.<span class="sgc-5">String</span>())
+        }
+
+        os.<span class="sgc-5">Exit</span>(0)
+}
+
+<span class="sgc-3">func</span> checkError(err error) {
+        <span class="sgc-3">if</span> err != nil {
+                fmt.<span class="sgc-5">Println</span>(<span class="sgc-4">"Fatal error "</span>, err.<span class="sgc-5">Error</span>())
+                os.<span class="sgc-5">Exit</span>(1)
+        }
+}
+
+<span class="sgc-3">func</span> readFully(conn net.<span class="sgc-5">Conn</span>) ([]<span class="sgc-6">byte</span>, error) {
+        defer conn.<span class="sgc-5">Close</span>()
+
+        result := bytes.<span class="sgc-5">NewBuffer</span>(nil)
+        <span class="sgc-3">var</span> buf [512]<span class="sgc-6">byte</span>
+        <span class="sgc-3">for</span> {
+                n, err := conn.<span class="sgc-5">Read</span>(buf[0:])
+                result.<span class="sgc-5">Write</span>(buf[0:n])
+                <span class="sgc-3">if</span> err != nil {
+                        <span class="sgc-3">if</span> err == io.<span class="sgc-5">EOF</span> {
+                                <span class="sgc-3">break</span>
+                        }
+                        <span class="sgc-3">return</span> nil, err
+                }
+        }
+        <span class="sgc-3">return</span> result.<span class="sgc-5">Bytes</span>(), nil
+}
+</span></code></pre>
+
+  <p>and the corrsponding server is</p>
+  <pre><code><span class="sgc-8">
+<span class="sgc-2">/* JSON EchoServer
+ */
+</span><span class="sgc-3">package</span> main
+
+<span class="sgc-3">import</span> (
+        <span class="sgc-4">"fmt"</span>
+        <span class="sgc-4">"net"</span>
+        <span class="sgc-4">"os"</span>
+        <span class="sgc-4">"encoding/json"</span>
+)
+
+<span class="sgc-3">type</span> <span class="sgc-5">Person</span> <span class="sgc-3">struct</span> {
+        <span class="sgc-5">Name</span>  <span class="sgc-5">Name</span>
+        <span class="sgc-5">Email</span> []<span class="sgc-5">Email</span>
+}
+
+<span class="sgc-3">type</span> <span class="sgc-5">Name</span> <span class="sgc-3">struct</span> {
+        <span class="sgc-5">Family</span>   string
+        <span class="sgc-5">Personal</span> string
+}
+
+<span class="sgc-3">type</span> <span class="sgc-5">Email</span> <span class="sgc-3">struct</span> {
+        <span class="sgc-5">Kind</span>    string
+        <span class="sgc-5">Address</span> string
+}
+
+<span class="sgc-3">func</span> (p <span class="sgc-5">Person</span>) <span class="sgc-5">String</span>() string {
+        s := p.<span class="sgc-5">Name</span>.<span class="sgc-5">Personal</span> + <span class="sgc-4">" "</span> + p.<span class="sgc-5">Name</span>.<span class="sgc-5">Family</span>
+        <span class="sgc-3">for</span> <span class="sgc-7">_</span>, v := range p.<span class="sgc-5">Email</span> {
+                s += <span class="sgc-4">"\n"</span> + v.<span class="sgc-5">Kind</span> + <span class="sgc-4">": "</span> + v.<span class="sgc-5">Address</span>
+        }
+        <span class="sgc-3">return</span> s
+}
+
+<span class="sgc-3">func</span> main() {
+
+        service := <span class="sgc-4">"0.0.0.0:1200"</span>
+        tcpAddr, err := net.<span class="sgc-5">ResolveTCPAddr</span>(<span class="sgc-4">"tcp"</span>, service)
+        checkError(err)
+
+        listener, err := net.<span class="sgc-5">ListenTCP</span>(<span class="sgc-4">"tcp"</span>, tcpAddr)
+        checkError(err)
+
+        <span class="sgc-3">for</span> {
+                conn, err := listener.<span class="sgc-5">Accept</span>()
+                <span class="sgc-3">if</span> err != nil {
+                        <span class="sgc-3">continue</span>
+                }
+
+                encoder := json.<span class="sgc-5">NewEncoder</span>(conn)
+                decoder := json.<span class="sgc-5">NewDecoder</span>(conn)
+
+                <span class="sgc-3">for</span> n := 0; n &lt; 10; n++ {
+                        <span class="sgc-3">var</span> person <span class="sgc-5">Person</span>
+                        decoder.<span class="sgc-5">Decode</span>(&amp;person)
+                        fmt.<span class="sgc-5">Println</span>(person.<span class="sgc-5">String</span>())
+                        encoder.<span class="sgc-5">Encode</span>(person)
+                }
+                conn.<span class="sgc-5">Close</span>() <span class="sgc-2">// we're finished
+</span> }
+}
+
+<span class="sgc-3">func</span> checkError(err error) {
+        <span class="sgc-3">if</span> err != nil {
+                fmt.<span class="sgc-5">Println</span>(<span class="sgc-4">"Fatal error "</span>, err.<span class="sgc-5">Error</span>())
+                os.<span class="sgc-5">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <h2 id="heading_id_10">The gob package</h2>
+
+  <p>Gob is a serialisation technique specific to Go. It is designed to encode Go data types specifically and does not at present have support for or by any other languages. It supports all Go data types except for channels, functions and interfaces. It supports integers of all types and sizes, strings and booleans, structs, arrays and slices. At present it has some problems with circular structures such as rings, but that will improve over time.</p>
+
+  <p>Gob encodes type information into its serialised forms. This is far more extensive than the type information in say an X.509 serialisation, but far more efficient than the type information contained in an XML document. Type information is only included once for each piece of data, but includes, for example, the names of struct fields.</p>
+
+  <p>This inclusion of type information makes Gob marshalling and unmarshalling fairly robust to changes or differences between the marshaller and unmarshaller. For example, a struct</p>
+  <pre><code>
+ struct T {
+     a int
+     b int
+}
+    </code></pre>
+
+  <p>can be marshalled and then unmarshalled into a different struct</p>
+  <pre><code>
+ struct T {
+     b int
+     a int
+}
+    </code></pre>
+
+  <p>where the order of fields has changed. It can also cope with missing fields (the values are ignored) or extra fields (the fields are left unchanged). It can cope with pointer types, so that the above struct could be unmarshalled into</p>
+  <pre><code>
+ struct T {
+     *a int
+     **b int
+}
+    </code></pre>
+
+  <p>To some extent it can cope with type coercions so that an <code>int</code> field can be broadened into an <code>int64</code>, but not with incompatable types such as <code>int</code> and <code>uint</code>.</p>
+
+  <p>To use Gob to marshall a data value, you first need to create an <code>Encoder</code>. This takes a <code>Writer</code> as parameter and marshalling will be done to this write stream. The encoder has a method <code>Encode</code> which marshalls the value to the stream. This method can be called multiple times on multiple pieces of data. Type information for each data type is only written once, though.</p>
+
+  <p>You use a <code>Decoder</code> to unmarshall the serialised data stream. This takes a <code>Reader</code> and each read returns an unmarshalled data value.</p>
+
+  <p>A program to store gob serialised data into a file is</p>
+  <pre><code><span class="sgc-8">
+<span class="sgc-2">/* SaveGob
+ */
+</span>
+<span class="sgc-3">package</span> main
+
+<span class="sgc-3">import</span> (
+        <span class="sgc-4">"fmt"</span>
+        <span class="sgc-4">"os"</span>
+        <span class="sgc-4">"encoding/gob"</span>
+)
+
+<span class="sgc-3">type</span> <span class="sgc-5">Person</span> <span class="sgc-3">struct</span> {
+        <span class="sgc-5">Name</span>  <span class="sgc-5">Name</span>
+        <span class="sgc-5">Email</span> []<span class="sgc-5">Email</span>
+}
+
+<span class="sgc-3">type</span> <span class="sgc-5">Name</span> <span class="sgc-3">struct</span> {
+        <span class="sgc-5">Family</span>   string
+        <span class="sgc-5">Personal</span> string
+}
+
+<span class="sgc-3">type</span> <span class="sgc-5">Email</span> <span class="sgc-3">struct</span> {
+        <span class="sgc-5">Kind</span>    string
+        <span class="sgc-5">Address</span> string
+}
+
+<span class="sgc-3">func</span> main() {
+        person := <span class="sgc-5">Person</span>{
+                <span class="sgc-5">Name</span>: <span class="sgc-5">Name</span>{<span class="sgc-5">Family</span>: <span class="sgc-4">"Newmarch"</span>, <span class="sgc-5">Personal</span>: <span class="sgc-4">"Jan"</span>},
+                <span class="sgc-5">Email</span>: []<span class="sgc-5">Email</span>{<span class="sgc-5">Email</span>{<span class="sgc-5">Kind</span>: <span class="sgc-4">"home"</span>, <span class="sgc-5">Address</span>: <span class="sgc-4">"jan@newmarch.name"</span>},
+                        <span class="sgc-5">Email</span>{<span class="sgc-5">Kind</span>: <span class="sgc-4">"work"</span>, <span class="sgc-5">Address</span>: <span class="sgc-4">"j.newmarch@boxhill.edu.au"</span>}}}
+
+        saveGob(<span class="sgc-4">"person.gob"</span>, person)
+}
+
+<span class="sgc-3">func</span> saveGob(fileName string, key <span class="sgc-3">interface</span>{}) {
+        outFile, err := os.<span class="sgc-5">Create</span>(fileName)
+        checkError(err)
+        encoder := gob.<span class="sgc-5">NewEncoder</span>(outFile)
+        err = encoder.<span class="sgc-5">Encode</span>(key)
+        checkError(err)
+        outFile.<span class="sgc-5">Close</span>()
+}
+
+<span class="sgc-3">func</span> checkError(err error) {
+        <span class="sgc-3">if</span> err != nil {
+                fmt.<span class="sgc-5">Println</span>(<span class="sgc-4">"Fatal error "</span>, err.<span class="sgc-5">Error</span>())
+                os.<span class="sgc-5">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <p>and to load it back into memory is</p>
+  <pre><code><span class="sgc-8">
+<span class="sgc-2">/* LoadGob
+ */
+</span>
+<span class="sgc-3">package</span> main
+
+<span class="sgc-3">import</span> (
+        <span class="sgc-4">"fmt"</span>
+        <span class="sgc-4">"os"</span>
+        <span class="sgc-4">"encoding/gob"</span>
+)
+
+<span class="sgc-3">type</span> <span class="sgc-5">Person</span> <span class="sgc-3">struct</span> {
+        <span class="sgc-5">Name</span>  <span class="sgc-5">Name</span>
+        <span class="sgc-5">Email</span> []<span class="sgc-5">Email</span>
+}
+
+<span class="sgc-3">type</span> <span class="sgc-5">Name</span> <span class="sgc-3">struct</span> {
+        <span class="sgc-5">Family</span>   string
+        <span class="sgc-5">Personal</span> string
+}
+
+<span class="sgc-3">type</span> <span class="sgc-5">Email</span> <span class="sgc-3">struct</span> {
+        <span class="sgc-5">Kind</span>    string
+        <span class="sgc-5">Address</span> string
+}
+
+<span class="sgc-3">func</span> (p <span class="sgc-5">Person</span>) <span class="sgc-5">String</span>() string {
+        s := p.<span class="sgc-5">Name</span>.<span class="sgc-5">Personal</span> + <span class="sgc-4">" "</span> + p.<span class="sgc-5">Name</span>.<span class="sgc-5">Family</span>
+        <span class="sgc-3">for</span> <span class="sgc-7">_</span>, v := range p.<span class="sgc-5">Email</span> {
+                s += <span class="sgc-4">"\n"</span> + v.<span class="sgc-5">Kind</span> + <span class="sgc-4">": "</span> + v.<span class="sgc-5">Address</span>
+        }
+        <span class="sgc-3">return</span> s
+}
+<span class="sgc-3">func</span> main() {
+        <span class="sgc-3">var</span> person <span class="sgc-5">Person</span>
+        loadGob(<span class="sgc-4">"person.gob"</span>, &amp;person)
+
+        fmt.<span class="sgc-5">Println</span>(<span class="sgc-4">"Person"</span>, person.<span class="sgc-5">String</span>())
+}
+
+<span class="sgc-3">func</span> loadGob(fileName string, key <span class="sgc-3">interface</span>{}) {
+        inFile, err := os.<span class="sgc-5">Open</span>(fileName)
+        checkError(err)
+        decoder := gob.<span class="sgc-5">NewDecoder</span>(inFile)
+        err = decoder.<span class="sgc-5">Decode</span>(key)
+        checkError(err)
+        inFile.<span class="sgc-5">Close</span>()
+}
+
+<span class="sgc-3">func</span> checkError(err error) {
+        <span class="sgc-3">if</span> err != nil {
+                fmt.<span class="sgc-5">Println</span>(<span class="sgc-4">"Fatal error "</span>, err.<span class="sgc-5">Error</span>())
+                os.<span class="sgc-5">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <h3 id="heading_id_11">A client and server</h3>
+
+  <p>A client to send a person's data and read it back ten times is</p>
+  <pre><code><span class="sgc-8">
+<span class="sgc-2">/* Gob EchoClient
+ */
+</span><span class="sgc-3">package</span> main
+
+<span class="sgc-3">import</span> (
+        <span class="sgc-4">"fmt"</span>
+        <span class="sgc-4">"net"</span>
+        <span class="sgc-4">"os"</span>
+        <span class="sgc-4">"encoding/gob"</span>
+        <span class="sgc-4">"bytes"</span>
+        <span class="sgc-4">"io"</span>
+)
+
+<span class="sgc-3">type</span> <span class="sgc-5">Person</span> <span class="sgc-3">struct</span> {
+        <span class="sgc-5">Name</span>  <span class="sgc-5">Name</span>
+        <span class="sgc-5">Email</span> []<span class="sgc-5">Email</span>
+}
+
+<span class="sgc-3">type</span> <span class="sgc-5">Name</span> <span class="sgc-3">struct</span> {
+        <span class="sgc-5">Family</span>   string
+        <span class="sgc-5">Personal</span> string
+}
+
+<span class="sgc-3">type</span> <span class="sgc-5">Email</span> <span class="sgc-3">struct</span> {
+        <span class="sgc-5">Kind</span>    string
+        <span class="sgc-5">Address</span> string
+}
+
+<span class="sgc-3">func</span> (p <span class="sgc-5">Person</span>) <span class="sgc-5">String</span>() string {
+        s := p.<span class="sgc-5">Name</span>.<span class="sgc-5">Personal</span> + <span class="sgc-4">" "</span> + p.<span class="sgc-5">Name</span>.<span class="sgc-5">Family</span>
+        <span class="sgc-3">for</span> <span class="sgc-7">_</span>, v := range p.<span class="sgc-5">Email</span> {
+                s += <span class="sgc-4">"\n"</span> + v.<span class="sgc-5">Kind</span> + <span class="sgc-4">": "</span> + v.<span class="sgc-5">Address</span>
+        }
+        <span class="sgc-3">return</span> s
+}
+
+<span class="sgc-3">func</span> main() {
+        person := <span class="sgc-5">Person</span>{
+                <span class="sgc-5">Name</span>: <span class="sgc-5">Name</span>{<span class="sgc-5">Family</span>: <span class="sgc-4">"Newmarch"</span>, <span class="sgc-5">Personal</span>: <span class="sgc-4">"Jan"</span>},
+                <span class="sgc-5">Email</span>: []<span class="sgc-5">Email</span>{<span class="sgc-5">Email</span>{<span class="sgc-5">Kind</span>: <span class="sgc-4">"home"</span>, <span class="sgc-5">Address</span>: <span class="sgc-4">"jan@newmarch.name"</span>},
+                        <span class="sgc-5">Email</span>{<span class="sgc-5">Kind</span>: <span class="sgc-4">"work"</span>, <span class="sgc-5">Address</span>: <span class="sgc-4">"j.newmarch@boxhill.edu.au"</span>}}}
+
+        <span class="sgc-3">if</span> len(os.<span class="sgc-5">Args</span>) != 2 {
+                fmt.<span class="sgc-5">Println</span>(<span class="sgc-4">"Usage: "</span>, os.<span class="sgc-5">Args</span>[0], <span class="sgc-4">"host:port"</span>)
+                os.<span class="sgc-5">Exit</span>(1)
+        }
+        service := os.<span class="sgc-5">Args</span>[1]
+
+        conn, err := net.<span class="sgc-5">Dial</span>(<span class="sgc-4">"tcp"</span>, service)
+        checkError(err)
+
+        encoder := gob.<span class="sgc-5">NewEncoder</span>(conn)
+        decoder := gob.<span class="sgc-5">NewDecoder</span>(conn)
+
+        <span class="sgc-3">for</span> n := 0; n &lt; 10; n++ {
+                encoder.<span class="sgc-5">Encode</span>(person)
+                <span class="sgc-3">var</span> newPerson <span class="sgc-5">Person</span>
+                decoder.<span class="sgc-5">Decode</span>(&amp;newPerson)
+                fmt.<span class="sgc-5">Println</span>(newPerson.<span class="sgc-5">String</span>())
+        }
+
+        os.<span class="sgc-5">Exit</span>(0)
+}
+
+<span class="sgc-3">func</span> checkError(err error) {
+        <span class="sgc-3">if</span> err != nil {
+                fmt.<span class="sgc-5">Println</span>(<span class="sgc-4">"Fatal error "</span>, err.<span class="sgc-5">Error</span>())
+                os.<span class="sgc-5">Exit</span>(1)
+        }
+}
+
+<span class="sgc-3">func</span> readFully(conn net.<span class="sgc-5">Conn</span>) ([]<span class="sgc-6">byte</span>, error) {
+        defer conn.<span class="sgc-5">Close</span>()
+
+        result := bytes.<span class="sgc-5">NewBuffer</span>(nil)
+        <span class="sgc-3">var</span> buf [512]<span class="sgc-6">byte</span>
+        <span class="sgc-3">for</span> {
+                n, err := conn.<span class="sgc-5">Read</span>(buf[0:])
+                result.<span class="sgc-5">Write</span>(buf[0:n])
+                <span class="sgc-3">if</span> err != nil {
+                        <span class="sgc-3">if</span> err == io.<span class="sgc-5">EOF</span> {
+                                <span class="sgc-3">break</span>
+                        }
+                        <span class="sgc-3">return</span> nil, err
+                }
+        }
+        <span class="sgc-3">return</span> result.<span class="sgc-5">Bytes</span>(), nil
+}
+</span></code></pre>
+
+  <p>and the corrsponding server is</p>
+  <pre><code><span class="sgc-8">
+<span class="sgc-2">/* Gob EchoServer
+ */
+</span><span class="sgc-3">package</span> main
+
+<span class="sgc-3">import</span> (
+        <span class="sgc-4">"fmt"</span>
+        <span class="sgc-4">"net"</span>
+        <span class="sgc-4">"os"</span>
+        <span class="sgc-4">"encoding/gob"</span>
+)
+
+<span class="sgc-3">type</span> <span class="sgc-5">Person</span> <span class="sgc-3">struct</span> {
+        <span class="sgc-5">Name</span>  <span class="sgc-5">Name</span>
+        <span class="sgc-5">Email</span> []<span class="sgc-5">Email</span>
+}
+
+<span class="sgc-3">type</span> <span class="sgc-5">Name</span> <span class="sgc-3">struct</span> {
+        <span class="sgc-5">Family</span>   string
+        <span class="sgc-5">Personal</span> string
+}
+
+<span class="sgc-3">type</span> <span class="sgc-5">Email</span> <span class="sgc-3">struct</span> {
+        <span class="sgc-5">Kind</span>    string
+        <span class="sgc-5">Address</span> string
+}
+
+<span class="sgc-3">func</span> (p <span class="sgc-5">Person</span>) <span class="sgc-5">String</span>() string {
+        s := p.<span class="sgc-5">Name</span>.<span class="sgc-5">Personal</span> + <span class="sgc-4">" "</span> + p.<span class="sgc-5">Name</span>.<span class="sgc-5">Family</span>
+        <span class="sgc-3">for</span> <span class="sgc-7">_</span>, v := range p.<span class="sgc-5">Email</span> {
+                s += <span class="sgc-4">"\n"</span> + v.<span class="sgc-5">Kind</span> + <span class="sgc-4">": "</span> + v.<span class="sgc-5">Address</span>
+        }
+        <span class="sgc-3">return</span> s
+}
+
+<span class="sgc-3">func</span> main() {
+
+        service := <span class="sgc-4">"0.0.0.0:1200"</span>
+        tcpAddr, err := net.<span class="sgc-5">ResolveTCPAddr</span>(<span class="sgc-4">"tcp"</span>, service)
+        checkError(err)
+
+        listener, err := net.<span class="sgc-5">ListenTCP</span>(<span class="sgc-4">"tcp"</span>, tcpAddr)
+        checkError(err)
+
+        <span class="sgc-3">for</span> {
+                conn, err := listener.<span class="sgc-5">Accept</span>()
+                <span class="sgc-3">if</span> err != nil {
+                        <span class="sgc-3">continue</span>
+                }
+
+                encoder := gob.<span class="sgc-5">NewEncoder</span>(conn)
+                decoder := gob.<span class="sgc-5">NewDecoder</span>(conn)
+
+                <span class="sgc-3">for</span> n := 0; n &lt; 10; n++ {
+                        <span class="sgc-3">var</span> person <span class="sgc-5">Person</span>
+                        decoder.<span class="sgc-5">Decode</span>(&amp;person)
+                        fmt.<span class="sgc-5">Println</span>(person.<span class="sgc-5">String</span>())
+                        encoder.<span class="sgc-5">Encode</span>(person)
+                }
+                conn.<span class="sgc-5">Close</span>() <span class="sgc-2">// we're finished
+</span> }
+}
+
+<span class="sgc-3">func</span> checkError(err error) {
+        <span class="sgc-3">if</span> err != nil {
+                fmt.<span class="sgc-5">Println</span>(<span class="sgc-4">"Fatal error "</span>, err.<span class="sgc-5">Error</span>())
+                os.<span class="sgc-5">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <h2 id="heading_id_12">Encoding binary data as strings</h2>
+
+  <p>Once upon a time, transmtting 8-bit data was problematic. It was often transmitted over noisy serial lines and could easily become corrupted. 7-bit data on the other hand could be transmitted more reliably because the 8th bit could be used as check digit. For example, in an "even parity" scheme, the check digit would be set to one or zero to make an even number of 1's in a byte. This allows detection of errors of a single bit in each byte.</p>
+
+  <p>ASCII is a 7-bit character set. A number of schemes have been developed that are more sophisticated than simple parity checking, but which involve translating 8-bit binary data into 7-bit ASCII format. Essentially, the 8-bit data is stretched out in some way over the 7-bit bytes.</p>
+
+  <p>Binary data transmitted in HTTP responses and requests is often translated into an ASCII form. This makes it easy to inspect the HTTP messages with a simple text reader without worrying about what strange 8-bit bytes might do to your display!</p>
+
+  <p>One common format is Base64. Go has support for many binary-to-text formats, including base64.</p>
+
+  <p>There are two principal functions to use for Base64 encoding and decoding:</p>
+  <pre>
+<code>
+func NewEncoder(enc *Encoding, w io.Writer) io.WriteCloser
+func NewDecoder(enc *Encoding, r io.Reader) io.Reader
+</code>
+</pre>
+
+  <p>A simple program just to encode and decode a set of eight binary digits is</p>
+  <pre><code><span class="sgc-8">
+<span class="sgc-9">/**
+ * Base64
+ */
+</span>
+<span class="sgc-3">package</span> main
+
+<span class="sgc-3">import</span> (
+        <span class="sgc-4">"bytes"</span>
+        <span class="sgc-4">"encoding/base64"</span>
+        <span class="sgc-4">"fmt"</span>
+)
+
+<span class="sgc-3">func</span> main() {
+
+        eightBitData := []<span class="sgc-6">byte</span>{1, 2, 3, 4, 5, 6, 7, 8}
+        bb := &amp;bytes.<span class="sgc-5">Buffer</span>{}
+        encoder := base64.<span class="sgc-5">NewEncoder</span>(base64.<span class="sgc-5">StdEncoding</span>, bb)
+        encoder.<span class="sgc-5">Write</span>(eightBitData)
+        encoder.<span class="sgc-5">Close</span>()
+        fmt.<span class="sgc-5">Println</span>(bb)
+
+        dbuf := make([]<span class="sgc-6">byte</span>, 12)
+        decoder := base64.<span class="sgc-5">NewDecoder</span>(base64.<span class="sgc-5">StdEncoding</span>, bb)
+        decoder.<span class="sgc-5">Read</span>(dbuf)
+        <span class="sgc-3">for</span> <span class="sgc-7">_</span>, ch := range dbuf {
+                fmt.<span class="sgc-5">Print</span>(ch)
+        }
+}
+</span></code></pre>
+
+  <p>Copyright Jan Newmarch, jan@newmarch.name</p>
+
+  <p>If you like this book, please contribute using Flattr <a class="FlattrButton sgc-10" href="http://jan.newmarch.name/go/index.html"></a><br />
+  or donate using PayPal</p>
+
+  <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+    <input name="cmd" type="hidden" value="_s-xclick" /> <input name="encrypted" type="hidden" value="-----BEGIN PKCS7-----MIIHLwYJKoZIhvcNAQcEoIIHIDCCBxwCAQExggEwMIIBLAIBADCBlDCBjjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtQYXlQYWwgSW5jLjETMBEGA1UECxQKbGl2ZV9jZXJ0czERMA8GA1UEAxQIbGl2ZV9hcGkxHDAaBgkqhkiG9w0BCQEWDXJlQHBheXBhbC5jb20CAQAwDQYJKoZIhvcNAQEBBQAEgYCCw7fVj6fuHxYMvE0PBlURcRgBFb1s4TxTUDgsS6BgkdJPt2GF8NFPNvE/oFvPNY2jBGrXSIkxCr9dFYzraKC8csPASWb0z9l8swwbIHWgrvb5cuaVuLbtRzesh94sqyh9MmZ5U1xcMrMtlw1S60gK5lPbKPsXzcY74brjt44J7jELMAkGBSsOAwIaBQAwgawGCSqGSIb3DQEHATAUBggqhkiG9w0DBwQIAXtre9K+AiWAgYiJVN0CmxAPscp0u0O8R0mD+cNz/Fe3lNIrqqMPplkri20WbbVxhbRwJTjtOxcLMbmSIeC8oWh14aSy9Jptgm1wNlQYADQQUgMnR/qIlYgHmXjJ4C6wZteqNVJn+RKfM/tS008Ola5SJABaGe9BmRSQCjMKqEyqm3Mx2hoLeWMXeyoMaW3Xteg6oIIDhzCCA4MwggLsoAMCAQICAQAwDQYJKoZIhvcNAQEFBQAwgY4xCzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDQTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEUMBIGA1UEChMLUGF5UGFsIEluYy4xEzARBgNVBAsUCmxpdmVfY2VydHMxETAPBgNVBAMUCGxpdmVfYXBpMRwwGgYJKoZIhvcNAQkBFg1yZUBwYXlwYWwuY29tMB4XDTA0MDIxMzEwMTMxNVoXDTM1MDIxMzEwMTMxNVowgY4xCzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDQTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEUMBIGA1UEChMLUGF5UGFsIEluYy4xEzARBgNVBAsUCmxpdmVfY2VydHMxETAPBgNVBAMUCGxpdmVfYXBpMRwwGgYJKoZIhvcNAQkBFg1yZUBwYXlwYWwuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDBR07d/ETMS1ycjtkpkvjXZe9k+6CieLuLsPumsJ7QC1odNz3sJiCbs2wC0nLE0uLGaEtXynIgRqIddYCHx88pb5HTXv4SZeuv0Rqq4+axW9PLAAATU8w04qqjaSXgbGLP3NmohqM6bV9kZZwZLR/klDaQGo1u9uDb9lr4Yn+rBQIDAQABo4HuMIHrMB0GA1UdDgQWBBSWn3y7xm8XvVk/UtcKG+wQ1mSUazCBuwYDVR0jBIGzMIGwgBSWn3y7xm8XvVk/UtcKG+wQ1mSUa6GBlKSBkTCBjjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtQYXlQYWwgSW5jLjETMBEGA1UECxQKbGl2ZV9jZXJ0czERMA8GA1UEAxQIbGl2ZV9hcGkxHDAaBgkqhkiG9w0BCQEWDXJlQHBheXBhbC5jb22CAQAwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQUFAAOBgQCBXzpWmoBa5e9fo6ujionW1hUhPkOBakTr3YCDjbYfvJEiv/2P+IobhOGJr85+XHhN0v4gUkEDI8r2/rNk1m0GA8HKddvTjyGw/XqXa+LSTlDYkqI8OwR8GEYj4efEtcRpRYBxV8KxAW93YDWzFGvruKnnLbDAF6VR5w/cCMn5hzGCAZowggGWAgEBMIGUMIGOMQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExFjAUBgNVBAcTDU1vdW50YWluIFZpZXcxFDASBgNVBAoTC1BheVBhbCBJbmMuMRMwEQYDVQQLFApsaXZlX2NlcnRzMREwDwYDVQQDFAhsaXZlX2FwaTEcMBoGCSqGSIb3DQEJARYNcmVAcGF5cGFsLmNvbQIBADAJBgUrDgMCGgUAoF0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTEwNTAyMDcwNzQ1WjAjBgkqhkiG9w0BCQQxFgQUgvHyq74JT8DnmViqEqG5KpIW0cAwDQYJKoZIhvcNAQEBBQAEgYAzycmlaZMZjkmYniVBUVTQeywigBo+80toDP2g9+yCzO4mG1Abmfcr/S1XdT8djFA9w37F+F+nSkP857evscUhns30c9wYuPoiNudkJMOkYegqyq+EI4AMNGPuQNZ+4vznmqTgFTn9iQjONC8NGQ/0GuCCQ/AqJZs/0ZiWivlPhA==-----END PKCS7----- " /> <input alt="PayPal - The safer, easier way to pay online." border="0" name="submit" src="https://www.paypalobjects.com/WEBSCR-640-20110401-1/en_AU/i/btn/btn_donateCC_LG.gif" type="image" /> <img alt="" border="0" height="1" src="https://www.paypalobjects.com/WEBSCR-640-20110401-1/en_AU/i/scr/pixel.gif" width="1" />
+  </form>
+</body>
+</html>

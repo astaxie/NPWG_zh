@@ -1,0 +1,700 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Web Sockets</title>
+  <link href="../Styles/stylesheet.css" rel="stylesheet" type="text/css" />
+  <script src="../toc.js" type="text/javascript">
+
+
+
+  //<![CDATA[
+
+   <!-- empty -->
+  //]]>
+  </script>
+  <script type="text/javascript">
+
+
+
+
+  /* <![CDATA[ */
+    (function() {
+        var s = document.createElement("script"), t = document.getElementsByTagName("script")[0];
+        s.type = "text/javascript";
+        s.async = true;
+        s.src = "http://api.flattr.com/js/0.6/load.js?mode=auto";
+        t.parentNode.insertBefore(s, t);
+    })();
+  /* ]]> */
+  </script>
+  <style type="text/css">
+/*<![CDATA[*/
+
+  body { counter-reset: chapter 15; }
+
+  a.sgc-8 {display:none;}
+  span.sgc-7 {color: green}
+  span.sgc-6 {color: darkmagenta}
+  span.sgc-5 {color: black}
+  span.sgc-4 {color: blue}
+  span.sgc-3 {color: DarkRed}
+  span.sgc-2 {color: purple}
+  span.sgc-1 {color: firebrick}
+  /*]]>*/
+  </style>
+</head>
+
+<body>
+  <div class="chapter">
+    <h1 id="heading_id_2">Web sockets</h1>
+  </div>
+
+  <div class="preface">
+    <p>Web sockets are designed to answer a common problem with web systems: the server is unable to initiate or push content to a user agent such as a browser. Web sockets allow a full duplex connection to be established to allow this. Go has nearly complete support for them.</p>
+  </div>
+
+  <div class="generate_from_h2" id="generated-toc"></div>
+
+  <div class="warning">
+    <h2 id="heading_id_3">Warning</h2>
+
+    <p>The Web Sockets package is not currently in the main Go 1 tree and is not included in the current distributions. To use it, you need to install it by</p>
+    <pre>
+    <code>
+go get code.google.com/p/go.net/websocket 
+    </code>
+  </pre>
+  </div>
+
+  <h2 id="heading_id_4">Introduction</h2>
+
+  <p>The websockets model will change for release r61. This describes the new package, not the package in r60 and earlier. If you do not have r61, at the time of writing, use <code>hg pull; hg update weekly</code> to download it.</p>
+
+  <p>The standard model of interaction between a web user agent such as a browser and a web server such as Apache is that the user agent makes HTTP requests and the server makes a single reply to each one. In the case of a browser, the request is made by clicking on a link, entering a URL into the address bar, clicking on the forward or back buttons, etc. The response is treated as a new page and is loaded into a browser window.</p>
+
+  <p>This traditional model has many drawbacks. The first is that each request opens and closes a new TCP connection. HTTP 1.1 solved this by allowing persistent connections, so that a connection could be held open for a short period to allow for multiple requests (e.g. for images) to be made on the same server.</p>
+
+  <p>While HTTP 1.1 persistent connections alleviate the problem of slow loading of a page with many graphics, it does not improve the interaction model. Even with forms, the model is still that of submitting the form and displaying the response as a new page. JavaScript helps in allowing error checking to be performed on form data before submission, but does not change the model.</p>
+
+  <p>AJAX (Asynchronous JavaScript and XML) made a significant advance to the user interaction model. This allows a browser to make a request and just use the response to update the display in place using the HTML Document Object Model (DOM). But again the interaction model is the same. AJAX just affects how the browser manages the returned pages. There is no explicit extra support in Go for AJAX, as none is needed: the HTTP server just sees an ordinary HTTP POST request with possibly some XML or JSON data, and this can be dealt with using techniques already discussed.</p>
+
+  <p>All of these are still browser to server communication. What is missing is server initiated communications to the browser. This can be filled by Web sockets: the browser (or any user agent) keeps open a long-lived TCP connection to a Web sockets server. The TCP connection allows either side to send arbitrary packets, so any application protocol can be used on a web socket.</p>
+
+  <p>How a websocket is started is by the user agent sending a special HTTP request that says "switch to web sockets". The TCP connection underlying the HTTP request is kept open, but both user agent and server switch to using the web sockets protocol instead of getting an HTTP response and closing the socket.</p>
+
+  <p>Note that it is still the browser or user agent that initiates the Web socket connection. The browser does not run a TCP server of its own. While the specification is <a href="http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-17">complex</a>, the protocol is designed to be fairly easy to use. The client opens an HTTP connection and then replaces the HTTP protocol with its own WS protocol, re-using the same TCP connection.</p>
+
+  <h2 id="heading_id_5">Web socket server</h2>
+
+  <p>A web socket server starts off by being an HTTP server, accepting TCP conections and handling the HTTP requests on the TCP connection. When a request comes in that switches that connection to a being a web socket connection, the protocol handler is changed from an HTTP handler to a WebSocket handler. So it is only that TCP connection that gets its role changed: the server continues to be an HTTP server for other requests, while the TCP socket underlying that one connection is used as a web socket.</p>
+
+  <p>One of the simple servers HHTP we discussed in <a hef="../http/chapter.html">Chapter 8: HTTP</a> registered varous handlers such as a file handler or a function handler. To handle web socket requests we simply register a different type of handler - a web socket handler. Which handler the server uses is based on the URL pattern. For example, a file handler might be registered for "/", a function handler for "/cgi-bin/..." and a web sockets handler for "/ws".</p>
+
+  <p>An HTTP server that is only expecting to be used for web sockets might run by</p>
+  <pre>
+<code>
+func main() {
+        http.Handle("/", websocket.Handler(WSHandler))
+        err := http.ListenAndServe(":12345", nil)
+        checkError(err)
+}
+</code>
+</pre>
+
+  <p>A more complex server might handle both HTTP and web socket requests simply by adding in more handlers.</p>
+
+  <h2 id="heading_id_6">The Message object</h2>
+
+  <p>HTTP is a stream protocol. Web sockets are frame-based. You prepare a block of data (of any size) and send it as a set of frames. Frames can contain either strings in UTF-8 encoding or a sequence of bytes.</p>
+
+  <p>The simplest way of using web sockets is just to prepare a block of data and ask the Go websocket library to package it as a set of frame data, send them across the wire and receive it as the same block. The <code>websocket</code> package contains a convenience object <code>Message</code> to do just that. The <code>Message</code> object has two methods, <code>Send</code> and <code>Receive</code> which take a websocket as first parameter. The second parameter is either the address of a variable to store data in, or the data to be sent. Code to send string data would look like</p>
+  <pre>
+<code>
+ msgToSend := "Hello"
+ err := websocket.Message.Send(ws, msgToSend)
+
+ var msgToReceive string
+ err := websocket.Message.Receive(conn, &amp;msgToReceive)
+</code>
+</pre>
+
+  <p>Code to send byte data would look like</p>
+  <pre>
+<code>
+ dataToSend := []byte{0, 1, 2}
+ err := websocket.Message.Send(ws, dataToSend)
+
+ var dataToReceive []byte
+ err := websocket.Message.Receive(conn, &amp;dataToReceive)
+</code>
+</pre>
+
+  <p>An echo server to send and receive string data is given below. Note that in web sockets either side can initiate sending of messages, and in this server we send messages from the server to a client when it connects (send/receive) instead of the more normal receive/send server. The server is</p>
+  <pre><code><span class="sgc-5">
+<span class="sgc-1">/* EchoServer
+ */
+</span><span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"fmt"</span>
+        <span class="sgc-3">"net/http"</span>
+        <span class="sgc-3">"os"</span>
+        <span class="sgc-1">// "io"
+</span> <span class="sgc-3">"code.google.com/p/go.net/websocket"</span>
+)
+
+<span class="sgc-2">func</span> <span class="sgc-4">Echo</span>(ws *websocket.<span class="sgc-4">Conn</span>) {
+        fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Echoing"</span>)
+
+        <span class="sgc-2">for</span> n := 0; n &lt; 10; n++ {
+                msg := <span class="sgc-3">"Hello  "</span> + string(n+48)
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Sending to client: "</span> + msg)
+                err := websocket.<span class="sgc-4">Message</span>.<span class="sgc-4">Send</span>(ws, msg)
+                <span class="sgc-2">if</span> err != nil {
+                        fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Can't send"</span>)
+                        <span class="sgc-2">break</span>
+                }
+
+                <span class="sgc-2">var</span> reply string
+                err = websocket.<span class="sgc-4">Message</span>.<span class="sgc-4">Receive</span>(ws, &amp;reply)
+                <span class="sgc-2">if</span> err != nil {
+                        fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Can't receive"</span>)
+                        <span class="sgc-2">break</span>
+                }
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Received back from client: "</span> + reply)
+        }
+}
+
+<span class="sgc-2">func</span> main() {
+
+        http.<span class="sgc-4">Handle</span>(<span class="sgc-3">"/"</span>, websocket.<span class="sgc-4">Handler</span>(<span class="sgc-4">Echo</span>))
+        err := http.<span class="sgc-4">ListenAndServe</span>(<span class="sgc-3">":12345"</span>, nil)
+        checkError(err)
+}
+
+<span class="sgc-2">func</span> checkError(err error) {
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Fatal error "</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <p>A client that talks to this server is</p>
+  <pre><code><span class="sgc-5">
+<span class="sgc-1">/* EchoClient
+ */
+</span><span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"code.google.com/p/go.net/websocket"</span>
+        <span class="sgc-3">"fmt"</span>
+        <span class="sgc-3">"io"</span>
+        <span class="sgc-3">"os"</span>
+)
+
+<span class="sgc-2">func</span> main() {
+        <span class="sgc-2">if</span> len(os.<span class="sgc-4">Args</span>) != 2 {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Usage: "</span>, os.<span class="sgc-4">Args</span>[0], <span class="sgc-3">"ws://host:port"</span>)
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+        service := os.<span class="sgc-4">Args</span>[1]
+
+        conn, err := websocket.<span class="sgc-4">Dial</span>(service, <span class="sgc-3">""</span>, <span class="sgc-3">"http://localhost"</span>)
+        checkError(err)
+        <span class="sgc-2">var</span> msg string
+        <span class="sgc-2">for</span> {
+                err := websocket.<span class="sgc-4">Message</span>.<span class="sgc-4">Receive</span>(conn, &amp;msg)
+                <span class="sgc-2">if</span> err != nil {
+                        <span class="sgc-2">if</span> err == io.<span class="sgc-4">EOF</span> {
+                                <span class="sgc-1">// graceful shutdown by server
+</span>                         <span class="sgc-2">break</span>
+                        }
+                        fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Couldn't receive msg "</span> + err.<span class="sgc-4">Error</span>())
+                        <span class="sgc-2">break</span>
+                }
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Received from server: "</span> + msg)
+                <span class="sgc-1">// return the msg
+</span>         err = websocket.<span class="sgc-4">Message</span>.<span class="sgc-4">Send</span>(conn, msg)
+                <span class="sgc-2">if</span> err != nil {
+                        fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Coduln't return msg"</span>)
+                        <span class="sgc-2">break</span>
+                }
+        }
+        os.<span class="sgc-4">Exit</span>(0)
+}
+
+<span class="sgc-2">func</span> checkError(err error) {
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Fatal error "</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <p>The url for the client running on the same machine as the server should be <code>ws://localhost:12345/</code></p>
+
+  <h2 id="heading_id_7">The JSON object</h2>
+
+  <p>It is expected that many websocket clients and servers will exchange data in JSON format. For Go programs this means that a Go object will be marshalled into JSON format as described in <a href="../serialisation/chapter.html">Chapter 4: Serialisation</a> and then sent as a UTF-8 string, while the receiver will read this string and unmarshal it back into a Go object.</p>
+
+  <p>The <code>websocket</code> convenience object <code>JSON</code> will do this for you. It has methods <code>Send</code> and <code>Receive</code> for sending and receiving data, just like the <code>Message</code> object.</p>
+
+  <p>A client that sends a <code>Person</code> object in JSON format is</p>
+  <pre><code><span class="sgc-5">
+<span class="sgc-1">/* PersonClientJSON
+ */
+</span><span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"code.google.com/p/go.net/websocket"</span>
+        <span class="sgc-3">"fmt"</span>
+        <span class="sgc-3">"os"</span>
+)
+
+<span class="sgc-2">type</span> <span class="sgc-4">Person</span> <span class="sgc-2">struct</span> {
+        <span class="sgc-4">Name</span>   string
+        <span class="sgc-4">Emails</span> []string
+}
+
+<span class="sgc-2">func</span> main() {
+        <span class="sgc-2">if</span> len(os.<span class="sgc-4">Args</span>) != 2 {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Usage: "</span>, os.<span class="sgc-4">Args</span>[0], <span class="sgc-3">"ws://host:port"</span>)
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+        service := os.<span class="sgc-4">Args</span>[1]
+
+        conn, err := websocket.<span class="sgc-4">Dial</span>(service, <span class="sgc-3">""</span>,
+                <span class="sgc-3">"http://localhost"</span>)
+        checkError(err)
+
+        person := <span class="sgc-4">Person</span>{<span class="sgc-4">Name</span>: <span class="sgc-3">"Jan"</span>,
+                <span class="sgc-4">Emails</span>: []string{<span class="sgc-3">"ja@newmarch.name"</span>, <span class="sgc-3">"jan.newmarch@gmail.com"</span>},
+        }
+
+        err = websocket.<span class="sgc-4">JSON</span>.<span class="sgc-4">Send</span>(conn, person)
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Couldn't send msg "</span> + err.<span class="sgc-4">Error</span>())
+        }
+        os.<span class="sgc-4">Exit</span>(0)
+}
+
+<span class="sgc-2">func</span> checkError(err error) {
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Fatal error "</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <p>and a server that reads it is</p>
+  <pre><code><span class="sgc-5">
+<span class="sgc-1">/* PersonServerJSON
+ */
+</span><span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"code.google.com/p/go.net/websocket"</span>
+        <span class="sgc-3">"fmt"</span>
+        <span class="sgc-3">"net/http"</span>
+        <span class="sgc-3">"os"</span>
+)
+
+<span class="sgc-2">type</span> <span class="sgc-4">Person</span> <span class="sgc-2">struct</span> {
+        <span class="sgc-4">Name</span>   string
+        <span class="sgc-4">Emails</span> []string
+}
+
+<span class="sgc-2">func</span> <span class="sgc-4">ReceivePerson</span>(ws *websocket.<span class="sgc-4">Conn</span>) {
+        <span class="sgc-2">var</span> person <span class="sgc-4">Person</span>
+        err := websocket.<span class="sgc-4">JSON</span>.<span class="sgc-4">Receive</span>(ws, &amp;person)
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Can't receive"</span>)
+        } <span class="sgc-2">else</span> {
+
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Name: "</span> + person.<span class="sgc-4">Name</span>)
+                <span class="sgc-2">for</span> <span class="sgc-6">_</span>, e := range person.<span class="sgc-4">Emails</span> {
+                        fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"An email: "</span> + e)
+                }
+        }
+}
+
+<span class="sgc-2">func</span> main() {
+
+        http.<span class="sgc-4">Handle</span>(<span class="sgc-3">"/"</span>, websocket.<span class="sgc-4">Handler</span>(<span class="sgc-4">ReceivePerson</span>))
+        err := http.<span class="sgc-4">ListenAndServe</span>(<span class="sgc-3">":12345"</span>, nil)
+        checkError(err)
+}
+
+<span class="sgc-2">func</span> checkError(err error) {
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Fatal error "</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <h2 id="heading_id_8">The Codec type</h2>
+
+  <p>The <code>Message</code> and <code>JSON</code> objects are both instances of the type <code>Codec</code>. This type is defined by</p>
+  <pre>
+<code>
+type Codec struct {
+    Marshal   func(v interface{}) (data []byte, payloadType byte, err os.Error)
+    Unmarshal func(data []byte, payloadType byte, v interface{}) (err os.Error)
+}
+</code>
+</pre>
+
+  <p>The type <code>Codec</code> implements the <code>Send</code> and <code>Receive</code> methods used earlier.</p>
+
+  <p>It is likely that websockets will also be used to exchange XML data. We can build an XML <code>Codec</code> object by wrapping the XML marshal and unmarshal methods discussed in <a href="../xml/chapter.html">Chapter 12: XML</a> to give a suitable <code>Codec</code> object.</p>
+
+  <p>We can create a <code>XMLCodec</code> package in this way:</p>
+  <pre><code><span class="sgc-5">
+
+
+<span class="sgc-2">package</span> xmlcodec
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"encoding/xml"</span>
+        <span class="sgc-3">"code.google.com/p/go.net/websocket"</span>
+)
+
+<span class="sgc-2">func</span> xmlMarshal(v <span class="sgc-2">interface</span>{}) (msg []<span class="sgc-7">byte</span>, payloadType <span class="sgc-7">byte</span>, err error) {
+        <span class="sgc-1">//buff := &amp;bytes.Buffer{}
+</span> msg, err = xml.<span class="sgc-4">Marshal</span>(v)
+        <span class="sgc-1">//msgRet := buff.Bytes()
+</span> <span class="sgc-2">return</span> msg, websocket.<span class="sgc-4">TextFrame</span>, nil
+}
+
+<span class="sgc-2">func</span> xmlUnmarshal(msg []<span class="sgc-7">byte</span>, payloadType <span class="sgc-7">byte</span>, v <span class="sgc-2">interface</span>{}) (err error) {
+        <span class="sgc-1">// r := bytes.NewBuffer(msg)
+</span> err = xml.<span class="sgc-4">Unmarshal</span>(msg, v)
+        <span class="sgc-2">return</span> err
+}
+
+<span class="sgc-2">var</span> <span class="sgc-4">XMLCodec</span> = websocket.<span class="sgc-4">Codec</span>{xmlMarshal, xmlUnmarshal}
+
+</span></code></pre>
+
+  <p>We can then serialise Go objects such as a <code>Person</code> into an XML document and send it from a client to a server by</p>
+  <pre><code><span class="sgc-5">
+<span class="sgc-1">/* PersonClientXML
+ */
+</span><span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"code.google.com/p/go.net/websocket"</span>
+        <span class="sgc-3">"fmt"</span>
+        <span class="sgc-3">"os"</span>
+        <span class="sgc-3">"xmlcodec"</span>
+)
+
+<span class="sgc-2">type</span> <span class="sgc-4">Person</span> <span class="sgc-2">struct</span> {
+        <span class="sgc-4">Name</span>   string
+        <span class="sgc-4">Emails</span> []string
+}
+
+<span class="sgc-2">func</span> main() {
+        <span class="sgc-2">if</span> len(os.<span class="sgc-4">Args</span>) != 2 {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Usage: "</span>, os.<span class="sgc-4">Args</span>[0], <span class="sgc-3">"ws://host:port"</span>)
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+        service := os.<span class="sgc-4">Args</span>[1]
+
+        conn, err := websocket.<span class="sgc-4">Dial</span>(service, <span class="sgc-3">""</span>, <span class="sgc-3">"http://localhost"</span>)
+        checkError(err)
+
+        person := <span class="sgc-4">Person</span>{<span class="sgc-4">Name</span>: <span class="sgc-3">"Jan"</span>,
+                <span class="sgc-4">Emails</span>: []string{<span class="sgc-3">"ja@newmarch.name"</span>, <span class="sgc-3">"jan.newmarch@gmail.com"</span>},
+        }
+
+        err = xmlcodec.<span class="sgc-4">XMLCodec</span>.<span class="sgc-4">Send</span>(conn, person)
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Couldn't send msg "</span> + err.<span class="sgc-4">Error</span>())
+        }
+        os.<span class="sgc-4">Exit</span>(0)
+}
+
+<span class="sgc-2">func</span> checkError(err error) {
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Fatal error "</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <p>A server which receives this and just prints information to the console is</p>
+  <pre><code><span class="sgc-5">
+<span class="sgc-1">/* PersonServerXML
+ */
+</span><span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"code.google.com/p/go.net/websocket"</span>
+        <span class="sgc-3">"fmt"</span>
+        <span class="sgc-3">"net/http"</span>
+        <span class="sgc-3">"os"</span>
+        <span class="sgc-3">"xmlcodec"</span>
+)
+
+<span class="sgc-2">type</span> <span class="sgc-4">Person</span> <span class="sgc-2">struct</span> {
+        <span class="sgc-4">Name</span>   string
+        <span class="sgc-4">Emails</span> []string
+}
+
+<span class="sgc-2">func</span> <span class="sgc-4">ReceivePerson</span>(ws *websocket.<span class="sgc-4">Conn</span>) {
+        <span class="sgc-2">var</span> person <span class="sgc-4">Person</span>
+        err := xmlcodec.<span class="sgc-4">XMLCodec</span>.<span class="sgc-4">Receive</span>(ws, &amp;person)
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Can't receive"</span>)
+        } <span class="sgc-2">else</span> {
+
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Name: "</span> + person.<span class="sgc-4">Name</span>)
+                <span class="sgc-2">for</span> <span class="sgc-6">_</span>, e := range person.<span class="sgc-4">Emails</span> {
+                        fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"An email: "</span> + e)
+                }
+        }
+}
+
+<span class="sgc-2">func</span> main() {
+
+        http.<span class="sgc-4">Handle</span>(<span class="sgc-3">"/"</span>, websocket.<span class="sgc-4">Handler</span>(<span class="sgc-4">ReceivePerson</span>))
+        err := http.<span class="sgc-4">ListenAndServe</span>(<span class="sgc-3">":12345"</span>, nil)
+        checkError(err)
+}
+
+<span class="sgc-2">func</span> checkError(err error) {
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Fatal error "</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <h2 id="heading_id_9">Web sockets over TLS</h2>
+
+  <p>A web socket can be built above a secure TLS socket. We discussed in <a href="../http/chapter.html">Chapter 8: HTTP</a> how to use a TLS socket using the certificates from <a href="../security">Chapter 7: Security</a>. That is used unchanged for web sockets. that is, we use <code>http.ListenAndServeTLS</code> instead of <code>http.ListenAndServe</code>.</p>
+
+  <p>Here is the echo server using TLS</p>
+  <pre><code><span class="sgc-5">
+<span class="sgc-1">/* EchoServer
+ */
+</span><span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"code.google.com/p/go.net/websocket"</span>
+        <span class="sgc-3">"fmt"</span>
+        <span class="sgc-3">"net/http"</span>
+        <span class="sgc-3">"os"</span>
+)
+
+<span class="sgc-2">func</span> <span class="sgc-4">Echo</span>(ws *websocket.<span class="sgc-4">Conn</span>) {
+        fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Echoing"</span>)
+
+        <span class="sgc-2">for</span> n := 0; n &lt; 10; n++ {
+                msg := <span class="sgc-3">"Hello  "</span> + string(n+48)
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Sending to client: "</span> + msg)
+                err := websocket.<span class="sgc-4">Message</span>.<span class="sgc-4">Send</span>(ws, msg)
+                <span class="sgc-2">if</span> err != nil {
+                        fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Can't send"</span>)
+                        <span class="sgc-2">break</span>
+                }
+
+                <span class="sgc-2">var</span> reply string
+                err = websocket.<span class="sgc-4">Message</span>.<span class="sgc-4">Receive</span>(ws, &amp;reply)
+                <span class="sgc-2">if</span> err != nil {
+                        fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Can't receive"</span>)
+                        <span class="sgc-2">break</span>
+                }
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Received back from client: "</span> + reply)
+        }
+}
+
+<span class="sgc-2">func</span> main() {
+
+        http.<span class="sgc-4">Handle</span>(<span class="sgc-3">"/"</span>, websocket.<span class="sgc-4">Handler</span>(<span class="sgc-4">Echo</span>))
+        err := http.<span class="sgc-4">ListenAndServeTLS</span>(<span class="sgc-3">":12345"</span>, <span class="sgc-3">"jan.newmarch.name.pem"</span>,
+                <span class="sgc-3">"private.pem"</span>, nil)
+        checkError(err)
+}
+
+<span class="sgc-2">func</span> checkError(err error) {
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Fatal error "</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <p>The client is the same echo client as before. All that changes is the url, which uses the "wss" scheme instead of the "ws" scheme:</p>
+  <pre>
+<code>
+  EchoClient wss://localhost:12345/
+</code>
+</pre><!--
+<h2> Sub-protocol </h2>
+<p>
+  Web sockets use a particular protocol above TCP.
+  This is specified by the IETF.
+  But it is a means for carrying messages, and the
+  messages sent on
+  web sockets must be comprehensible to both the client and server.
+  This is the issue with application layer protocols that this book
+  covered in 
+  <a href="../protocol/chapter.html"> 
+    Chapter 5: Application-Level Protocols</a>.
+</p>
+
+<p>
+  So far in this chapter we have dealt 
+  (in an informal manner) with the situation
+  where both sides have  a shared, known protocol on top of the 
+  web sockets layer: one side sends a particular JSON object, 
+  the other receives it,
+  etc. One thing that should be painfully obvious is that in the 
+  networking world protocols do not stay static. Protocols change
+  versions; new protocols get overlaid on top of old protocols;
+  security and authentication mechanisms change.
+</p>
+
+<p>
+  <em> As an aside, we see the disastrous decision by the HTML 5
+    working groups to eliminate version information in the HTML
+    header information. Justified by a "continuous improvement" model,
+    neither client nor server will have the faintest idea of which
+    micro-point version of HTML 5 they will be dealing with, and code
+    will probably get horrendously complicated with queries as to which
+    HTML 5 features are supported, and workarounds when they aren't.
+    It's quite sad to see sound engineering principles just
+    tossed aside with the phrase: 
+    <a href="http://www.conceivablytech.com/5277/business/no-more-version-numbers-for-html">
+      "A living standard".</a>
+    Really, it's just saying that they've lost control over the process.
+  </em>
+</p>
+
+<p>
+  In setting up a web socket, a <code>Config</code> can be specified.
+  This can contain information about which version of the web sockets
+  protocol which is used, but can also carry information about the 
+  sub-protocols your application can use, in the string array
+  <code>Protocol</code>. For example, this could
+  state which versions of the application protocol are supported,
+  whether a secure or insecure protocol can be used, etc.
+</p>
+
+<p>
+  We note that while there is a parameter in <code>Dial()</code> called
+  <code>protocol</code>, this parameter is ignored so there is no point
+  in setting it.
+</p>
+
+<p>
+  The negotiation about subprotocols takes place during the websocket
+  handshake phase. This is not presently visible in any way through the
+  websocket API, so there is no way that the server can add any
+  negotiation code. The current code base examines the client's request
+  and (incorrectly) rejects it if more than one subprotocol is
+  specified.
+</p>
+
+<p>
+  So right now, this part of websockets can be set for a client,
+  but cannot be handled by a server. Here is an example client:
+  <pre><code><font color="black">
+<font color="firebrick">/* PersonClientProtocol
+ */
+</font><font color="purple">package</font> main
+
+<font color="purple">import</font> (
+        <font color="DarkRed">"fmt"</font>
+        <font color="DarkRed">"websocket"</font>
+        <font color="DarkRed">"os"</font>
+        <font color="DarkRed">"websockets/xml"</font>
+)
+
+<font color="purple">type</font> <font color="blue">Person</font> <font color="purple">struct</font> {
+        <font color="blue">Name</font>   string
+        <font color="blue">Emails</font> []string
+}
+
+<font color="purple">func</font> main() {
+        <font color="purple">if</font> len(os.<font color="blue">Args</font>) != 2 {
+                fmt.<font color="blue">Println</font>(<font color="DarkRed">"Usage: "</font>, os.<font color="blue">Args</font>[0], <font color="DarkRed">"ws://host:port"</font>)
+                os.<font color="blue">Exit</font>(1)
+        }
+        service := os.<font color="blue">Args</font>[1]
+
+        config, err := websocket.<font color="blue">NewConfig</font>(service, <font color="DarkRed">"http://localhost"</font>)
+        checkError(err)
+        config.<font color="blue">Protocol</font> = []string{<font color="DarkRed">"json"</font>, <font color="DarkRed">"xml"</font>}
+        conn, err := websocket.<font color="blue">DialConfig</font>(config)
+        checkError(err)
+
+        person := <font color="blue">Person</font>{<font color="blue">Name</font>: <font color="DarkRed">"Jan"</font>,
+                <font color="blue">Emails</font>: []string{<font color="DarkRed">"ja@newmarch.name"</font>, <font color="DarkRed">"jan.newmarch@gmail.com"</font>},
+        }
+
+        proto := conn.<font color="blue">Config</font>().<font color="blue">Protocol</font>
+        <font color="purple">if</font> len(proto) == 1 {
+                <font color="purple">if</font> proto[0] == <font color="DarkRed">"json"</font> {
+                        err = websocket.<font color="blue"><font color="darkmagenta">JSON</font></font>.<font color="blue">Send</font>(conn, person)
+                        <font color="purple">if</font> err != nil {
+                                fmt.<font color="blue">Println</font>(<font color="DarkRed">"Couldn't send msg "</font> + err.<font color="blue">Error</font>())
+                        }
+                } <font color="purple">else</font> {
+                        err = xml.<font color="blue"><font color="darkmagenta">XML</font></font>.<font color="blue">Send</font>(conn, person)
+                        <font color="purple">if</font> err != nil {
+                                fmt.<font color="blue">Println</font>(<font color="DarkRed">"Couldn't send msg "</font> + err.<font color="blue">Error</font>())
+                        }
+                }
+        }
+        os.<font color="blue">Exit</font>(0)
+}
+
+<font color="purple">func</font> checkError(err error) {
+        <font color="purple">if</font> err != nil {
+                fmt.<font color="blue">Println</font>(<font color="DarkRed">"Fatal error "</font>, err.<font color="blue">Error</font>())
+                os.<font color="blue">Exit</font>(1)
+        }
+}
+</font></code></pre>
+
+
+<!==
+<p>
+  The second field of a web socket client is for the same web socket
+  to carry differing protocols. The (sub)-protocol is carried in the
+  HTTP attribute of <code>Sec-WebSocket-Protocol</code>. The attribute
+  <code>Protocol</code> of the <code>ws.Conn</code> can be
+  used by the server to distinguish between protocols.
+  <code>
+    <pre>
+println("Protocol is", conn.Protocol)
+    </pre>
+  </code>
+  As a toy example, the protocols could be <code>echo</code>, 
+  <code>echoToUpper</code> and <code>echoToLower</code>
+</p>
+-->
+
+  <h2 id="heading_id_10">Conclusion</h2>
+
+  <p>The web sockets standard is nearing completion and no major changes are anticipated. This will allow HTTP user agents and servers to set up bi-directional socket connections and should make certain interaction styles much easier. Go has nearly complete support for web sockets.</p>
+  <hr />
+
+  <p>Copyright &copy; Jan Newmarch, jan@newmarch.name</p>
+
+  <p>If you like this book, please contribute using Flattr <a class="FlattrButton sgc-8" href="http://jan.newmarch.name/go/index.html"></a><br />
+  or donate using PayPal</p>
+
+  <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+    <input name="cmd" type="hidden" value="_s-xclick" /> <input name="encrypted" type="hidden" value="-----BEGIN PKCS7-----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-----END PKCS7----- " /> <input alt="PayPal - The safer, easier way to pay online." border="0" name="submit" src="https://www.paypalobjects.com/WEBSCR-640-20110401-1/en_AU/i/btn/btn_donateCC_LG.gif" type="image" /> <img alt="" border="0" height="1" src="https://www.paypalobjects.com/WEBSCR-640-20110401-1/en_AU/i/scr/pixel.gif" width="1" />
+  </form>
+</body>
+</html>

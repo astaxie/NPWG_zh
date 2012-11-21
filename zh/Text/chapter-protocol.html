@@ -1,0 +1,1983 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Application-Level Protocols</title><!--  #exec cmd="/usr/local/bin/meta.pl" -->
+  <link href="../Styles/stylesheet.css" rel="stylesheet" type="text/css" />
+  <script src="../toc.js" type="text/javascript">
+
+
+
+  //<![CDATA[
+
+   <!-- empty -->
+  //]]>
+  </script>
+  <script type="text/javascript">
+
+
+
+
+  /* <![CDATA[ */
+    (function() {
+        var s = document.createElement("script"), t = document.getElementsByTagName("script")[0];
+        s.type = "text/javascript";
+        s.async = true;
+        s.src = "http://api.flattr.com/js/0.6/load.js?mode=auto";
+        t.parentNode.insertBefore(s, t);
+    })();
+  /* ]]> */
+  </script>
+  <style type="text/css">
+/*<![CDATA[*/
+
+  body { counter-reset: chapter 5; }
+
+  a.sgc-10 {display:none;}
+  span.sgc-9 {color: black}
+  span.sgc-8 {color: darkmagenta}
+  span.sgc-7 {color: green}
+  span.sgc-6 {color: blue}
+  span.sgc-5 {color: DarkRed}
+  span.sgc-4 {color: purple}
+  span.sgc-3 {color: firebrick}
+  li.sgc-2 {list-style: none}
+  div.sgc-1 {text-align: center}
+  /*]]>*/
+  </style>
+</head>
+
+<body>
+  <div class="chapter">
+    <h1 id="heading_id_2">Application-Level Protocols</h1>
+  </div>
+
+  <div class="preface">
+    <p>A client and a server exchange messages consisting of message types and message data. This requires design of a suitable message exchange protocol. This chapter looks at some of the issues involved in this, and gives a complete example of a simple client-server application.</p>
+  </div>
+
+  <div class="generate_from_h2" id="generated-toc"></div>
+
+  <h2 id="heading_id_3">Introduction</h2>
+
+  <p>A client and server need to exchange information via messages. TCP and UDP provide the transport mechanisms to do this. The two processes also need to have a protocol in place so that message exchange can take place meaningfully. A protocol defines what type of conversation can take place between two components of a distributed application, by specifying messages, data types, encoding formats and so on.</p>
+
+  <h2 id="heading_id_4">Protocol Design</h2>
+
+  <p>There are many possibilities and issues to be decided on when designing a protocol. Some of the issues include:</p>
+
+  <ul>
+    <li>Is it to be broadcast or point to point?<br />
+    Broadcast must be UDP, local multicast or the more experimental MBONE. Point to point could be either TCP or UDP.</li>
+
+    <li>Is it to be stateful vs stateless?<br />
+    Is it reasonable for one side to maintain state about the other side? It is often simpler to do so, but what happens if something crashes?</li>
+
+    <li>Is the transport protocol reliable or unreliable?<br />
+    Reliable is often slower, but then you don't have to worry so much about lost messages.</li>
+
+    <li>Are replies needed?<br />
+    If a reply is needed, how do you handle a lost reply? Timeouts may be used.</li>
+
+    <li>What data format do you want?<br />
+    Two common possibilities are MIME or byte encoding.</li>
+
+    <li>Is your communication bursty or steady stream?<br />
+    Ethernet and the Internet are best at bursty traffic. Steady stream is needed for video streams and particularly for voice. If required, how do you manage Quality of Service (QoS)?</li>
+
+    <li>Are there multiple streams with synchronisation required?<br />
+    Does the data need to be synchronised with anything? e.g. video and voice.</li>
+
+    <li>Are you building a standalone application or a library to be used by others?<br />
+    The standards of documentation required might vary.</li>
+  </ul>
+
+  <h2 id="heading_id_5">Version control</h2>
+
+  <p>A protocol used in a client/server system will evolve over time, changing as the system expands. This raises compatability problems: a version 2 client will make requests that a version 1 server doesn't understand, whereas a version 2 server will send replies that a version 1 client won't understand.</p>
+
+  <p>Each side should ideally be able to understand messages for its own version and all earlier ones. It should be able to write replies to old style queries in old style response format.</p>
+
+  <div class="sgc-1"><img alt="" src="../Images/version.png" /></div>
+
+  <p>The ability to talk earlier version formats may be lost if the protocol changes too much. In this case, you need to be able to ensure that no copies of the earlier version still exist - and that is generally imposible.</p>
+
+  <p>Part of the protocol setup should involve version information.</p>
+
+  <h3 id="heading_id_6">The Web</h3>
+
+  <p>The Web is a good example of a system that is messed up by different versions. The protocol has been through three versions, and most servers/browsers now use the latest version. The version is given in each request</p>
+
+  <div class="sgc-1">
+    <table border="1">
+      <tr>
+        <th>request</th>
+
+        <th>version</th>
+      </tr>
+
+      <tr>
+        <td><code>GET /</code></td>
+
+        <td>pre 1.0</td>
+      </tr>
+
+      <tr>
+        <td><code>GET / HTTP/1.0</code></td>
+
+        <td>HTTP 1.0</td>
+      </tr>
+
+      <tr>
+        <td><code>GET / HTTP/1.1</code></td>
+
+        <td>HTTP 1.1</td>
+      </tr>
+    </table>
+  </div>
+
+  <p>But the <em>content</em> of the messages has been through a large number of versions:</p>
+
+  <ul>
+    <li>HTML versions 1-4 (all different), with version 5 on the horizon;</li>
+
+    <li>non-standard tags recognised by different browsers;</li>
+
+    <li>non-HTML documents often require content handlers that may or may not be present - does your browser have a handler for Flash?</li>
+
+    <li>inconsistent treatment of document content (e.g. some stylesheet content will crash some browsers)</li>
+
+    <li>Different support for JavaScript (and different versions of JavaScript)</li>
+
+    <li>Different runtime engines for Java</li>
+
+    <li>Many pages do not conform to <em>any</em> HTML versions (e.g. with syntax errors)</li>
+  </ul>
+
+  <h2 id="heading_id_7">Message Format</h2>
+
+  <p>In the last chapter we discussed some possibilities for representing data to be sent across the wire. Now we look one level up, to the messages which may contain such data.</p>
+
+  <ul>
+    <li>The client and server will exchange messages with different meanings. e.g.
+
+      <ul>
+        <li>Login request,</li>
+
+        <li>get record request,</li>
+
+        <li>login reply,</li>
+
+        <li>record data reply.</li>
+      </ul>
+    </li>
+
+    <li>The client will prepare a request which must be understood by the server.</li>
+
+    <li>The server will prepare a reply which must be understood by the client.</li>
+  </ul>
+
+  <p>Commonly, the first part of the message will be a message type.</p>
+
+  <ul>
+    <li>Client to server
+      <pre><code>
+      LOGIN name passwd
+      GET cpe4001 grade
+      </code></pre>
+    </li>
+
+    <li>Server to client
+      <pre><code>
+      LOGIN succeeded
+      GRADE cpe4001 D
+      </code></pre>
+    </li>
+  </ul>
+
+  <p>The message types can be strings or integers. e.g. HTTP uses integers such as 404 to mean "not found" (although these integers are written as strings). The messages from client to server and vice versa are disjoint: "LOGIN" from client to server is different to "LOGIN" from server to client.</p>
+
+  <h2 id="heading_id_8">Data Format</h2>
+
+  <p>There are two main format choices for messages: byte encoded or character encoded.</p>
+
+  <h3 id="heading_id_9">Byte format</h3>
+
+  <p>In the byte format</p>
+
+  <ul>
+    <li>the first part of the message is typically a byte to distinguish between message types.</li>
+
+    <li>The message handler would examine this first byte to distinguish message type and then perform a switch to select the appropriate handler for that type.</li>
+
+    <li>Further bytes in the message would contain message content according to a pre-defined format (as discussed in the previous chapter).</li>
+  </ul>
+
+  <p>The advantages are compactness and hence speed. The disadvantages are caused by the opaqueness of the data: it may be harder to spot errors, harder to debug, require special purpose decoding functions. There are many examples of byte-encoded formats, including major protocols such as DNS and NFS , upto recent ones such as Skype. Of course, if your protocol is not publicly specified, then a byte format can also make it harder for others to reverse-engineer it!</p>
+
+  <p>Pseudocode for a byte-format server is</p>
+  <pre><code>
+    handleClient(conn) {
+        while (true) {
+            byte b = conn.readByte()
+            switch (b) {
+                case MSG_1: ...
+                case MSG_2: ...
+                ...
+            }
+        }
+    }
+</code></pre>
+
+  <p>Go has basic support for managing byte streams. The interface <code>Conn</code> has methods</p>
+  <pre><code>
+(c Conn) Read(b []byte) (n int, err os.Error)
+(c Conn) Write(b []byte) (n int, err os.Error)
+    </code></pre>
+
+  <p>and these methods are implemented by <code>TCPConn</code> and <code>UDPConn</code>.</p>
+
+  <h3 id="heading_id_10">Character Format</h3>
+
+  <p>In this mode, everything is sent as characters if possible. For example, an integer 234 would be sent as, say, the three characters '2', '3' and '4' instead of the one byte 234. Data that is inherently binary may be base64 encoded to change it into a 7-bit format and then sent as ASCII characters, as discussed in the previous chapter.</p>
+
+  <p>In character format,</p>
+
+  <ul>
+    <li>A message is a sequence of one or more lines</li>
+
+    <li class="sgc-2">The start of the first line of the message is typically a word that represents the message type.</li>
+
+    <li>String handling functions may be used to decode the message type and data.</li>
+
+    <li>The rest of the first line and successive lines contain the data.</li>
+
+    <li>Line-oriented functions and line-oriented conventions are used to manage this.</li>
+  </ul>
+
+  <p>Pseudocode is</p>
+  <pre><code>
+handleClient() {
+    line = conn.readLine()
+    if (line.startsWith(...) {
+        ...
+    } else if (line.startsWith(...) {
+        ...
+    }
+}
+</code></pre>
+
+  <p>Character formats are easier to setup and easier to debug. For example, you can use <code>telnet</code> to connect to a server on any port, and send client requests to that server. It isn't so easy the other way, but you can use tools like <code>tcpdump</code> to snoop on TCP traffic and see immediately what clients are sending to servers.</p>
+
+  <p>There is not the same level of support in Go for managing character streams. There are significant issues with character sets and character encodings, and we will explore these issues in a later chapter.</p>
+
+  <p>If we just pretend everything is ASCII, like it was once upon a time, then character formats are quite straightforward to deal with. The principal complication at this level is the varying status of "newline" across different operating systems. Unix uses the single character '\n'. Windows and others (more correctly) use the pair "\r\n". On the internet, the pair "\r\n" is most common - Unix systems just need to take care that they don't assume '\n'.</p>
+
+  <h2 id="heading_id_11">Simple Example</h2>
+
+  <p>This example deals with a directory browsing protocol - basically a stripped down version of FTP, but without even the file transfer part. We only consider listing a directory name, listing the contents of a directory and changing the current directory - all on the server side, of course. This is a complete worked example of creating all components of a client-server application. It is a simple program which includes messages in both directions, as well as design of messaging protocol.</p>
+
+  <p>Look at a simple non-client-server program that allows you to list files in a directory and change and print the directory on the server. We omit copying files, as that adds to the length of the program without really introducing important concepts. For simplicity, all filenames will be assumed to be in 7-bit ASCII. If we just looked at a standalone application first, then the pseudo-code would be</p>
+  <pre>
+<code>
+read line from user
+while not eof do
+  if line == dir
+    list directory
+  else
+
+  if line == cd &lt;dir&gt;
+    change directory
+  else
+
+  if line == pwd
+    print directory
+  else
+
+  if line == quit
+    quit
+  else
+    complain
+
+  read line from user
+</code>
+</pre>
+
+  <p>A non-distributed application would just link the UI and file access code</p>
+
+  <div class="sgc-1"><img alt="" src="../Images/single.png" /></div>
+
+  <p>In a client-server situation, the client would be at the user end, talking to a server somewhere else. Aspects of this program belong solely at the presentation end, such as getting the commands from the user. Some are messages from the client to the server, some are solely at the server end.</p>
+
+  <div class="sgc-1"><img alt="" src="../Images/dist.png" /></div>
+
+  <p>For a simple directory browser, assume that all directories and files are at the server end, and we are only transferring file information from the server to the client. The client side (including presentation aspects) will become</p>
+  <pre>
+<code>
+read line from user
+while not eof do
+  if line == dir
+    <em>list directory</em>
+  else
+
+  if line == cd &lt;dir&gt;
+    <em>change directory</em>
+  else
+
+  if line == pwd
+    <em>print directory</em>
+  else
+
+  if line == quit
+    quit
+  else
+    complain
+
+  read line from user
+</code>
+</pre>
+
+  <p>where the italicised lines involve communication with the server.</p>
+
+  <h3 id="heading_id_12">Alternative presentation aspects</h3>
+
+  <p>A GUI program would allow directory contents to be displayed as lists, for files to be selected and actions such as change directory to be be performed on them. The client would be controlled by actions associated with various events that take place in graphical objects. The pseudo-code might look like</p>
+  <pre>
+<code>
+change dir button:
+  if there is a selected file
+    <em>change directory</em>
+  if successful
+    update directory label
+    <em>list directory</em>
+    update directory list
+</code></pre>
+
+  <p>The functions called from the different UI's should be the same - changing the presentation should not change the networking code</p>
+
+  <h3 id="heading_id_13">Protocol - informal</h3>
+
+  <div class="sgc-1">
+    <table border="1">
+      <tr>
+        <th>client request</th>
+
+        <th>server response</th>
+      </tr>
+
+      <tr>
+        <td>dir</td>
+
+        <td>send list of files</td>
+      </tr>
+
+      <tr>
+        <td>cd &lt;dir&gt;</td>
+
+        <td>change dir<br />
+        send error if failed<br />
+        send ok if succeed</td>
+      </tr>
+
+      <tr>
+        <td>pwd</td>
+
+        <td>send current directory</td>
+      </tr>
+
+      <tr>
+        <td>quit</td>
+
+        <td>quit</td>
+      </tr>
+    </table>
+  </div>
+
+  <h3 id="heading_id_14">Text protocol</h3>
+
+  <p>This is a simple protocol. The most complicated data structure that we need to send is an array of strings for a directory listing. In this case we don't need the heavy duty serialisation techniques of the last chapter. In this case we can use a simple text format.</p>
+
+  <p>But even if we make the protocol simple, we still have to specify it in detail. We choose the following message format:</p>
+
+  <ul>
+    <li>All messages are in 7-bit US-ASCII</li>
+
+    <li>The messages are case-sensitive</li>
+
+    <li>Each message consists of a sequence of lines</li>
+
+    <li>The first word on the first line of each message describes the message type. All other words are message data</li>
+
+    <li>All words are separated by exactly one space character</li>
+
+    <li>Each line is terminated by CR-LF</li>
+  </ul>
+
+  <p>Some of the choices made above are weaker in real-life protocols. For example</p>
+
+  <ul>
+    <li>Message types could be case-insensitive. This just requires mapping message type strings down to lower-case before decoding</li>
+
+    <li>An arbitrary amount of white space could be left between words. This just adds a little more complication, compressing white space</li>
+
+    <li>Continuation characters such as '\' can be used to break long lines over several lines. This starts to make processing more complex</li>
+
+    <li>Just a '\n' could be used as line terminator, as well as '\r\n'. This makes recognising end of line a bit harder</li>
+  </ul>
+
+  <p>All of these variations exist in real protocols. Cumulatively, they make the string processing just more complex than in our case.</p>
+
+  <div class="sgc-1">
+    <table border="1">
+      <tr>
+        <th>client request</th>
+
+        <th>server response</th>
+      </tr>
+
+      <tr>
+        <td>send "DIR"</td>
+
+        <td>send list of files, one per line<br />
+        terminated by a blank line</td>
+      </tr>
+
+      <tr>
+        <td>send "CD &lt;dir&gt;"</td>
+
+        <td>change dir<br />
+        send "ERROR" if failed<br />
+        send "OK"</td>
+      </tr>
+
+      <tr>
+        <td>send "PWD"</td>
+
+        <td>send current working directory</td>
+      </tr>
+    </table>
+  </div>
+
+  <h3 id="heading_id_15">Server code</h3>
+  <pre><code><span class="sgc-9">
+<span class="sgc-3">/* FTP Server
+ */
+</span><span class="sgc-4">package</span> main
+
+<span class="sgc-4">import</span> (
+        <span class="sgc-5">"fmt"</span>
+        <span class="sgc-5">"net"</span>
+        <span class="sgc-5">"os"</span>
+)
+
+const (
+        <span class="sgc-6">DIR</span> = <span class="sgc-5">"DIR"</span>
+        <span class="sgc-6">CD</span>  = <span class="sgc-5">"CD"</span>
+        <span class="sgc-6">PWD</span> = <span class="sgc-5">"PWD"</span>
+)
+
+<span class="sgc-4">func</span> main() {
+
+        service := <span class="sgc-5">"0.0.0.0:1202"</span>
+        tcpAddr, err := net.<span class="sgc-6">ResolveTCPAddr</span>(<span class="sgc-5">"tcp"</span>, service)
+        checkError(err)
+
+        listener, err := net.<span class="sgc-6">ListenTCP</span>(<span class="sgc-5">"tcp"</span>, tcpAddr)
+        checkError(err)
+
+        <span class="sgc-4">for</span> {
+                conn, err := listener.<span class="sgc-6">Accept</span>()
+                <span class="sgc-4">if</span> err != nil {
+                        <span class="sgc-4">continue</span>
+                }
+                go handleClient(conn)
+        }
+}
+
+<span class="sgc-4">func</span> handleClient(conn net.<span class="sgc-6">Conn</span>) {
+        defer conn.<span class="sgc-6">Close</span>()
+
+        <span class="sgc-4">var</span> buf [512]<span class="sgc-7">byte</span>
+        <span class="sgc-4">for</span> {
+                n, err := conn.<span class="sgc-6">Read</span>(buf[0:])
+                <span class="sgc-4">if</span> err != nil {
+                        conn.<span class="sgc-6">Close</span>()
+                        <span class="sgc-4">return</span>
+                }
+
+                s := string(buf[0:n])
+                <span class="sgc-3">// decode request
+</span>         <span class="sgc-4">if</span> s[0:2] == <span class="sgc-6">CD</span> {
+                        chdir(conn, s[3:])
+                } <span class="sgc-4">else</span> <span class="sgc-4">if</span> s[0:3] == <span class="sgc-6">DIR</span> {
+                        dirList(conn)
+                } <span class="sgc-4">else</span> <span class="sgc-4">if</span> s[0:3] == <span class="sgc-6">PWD</span> {
+                        pwd(conn)
+                }
+
+        }
+}
+
+<span class="sgc-4">func</span> chdir(conn net.<span class="sgc-6">Conn</span>, s string) {
+        <span class="sgc-4">if</span> os.<span class="sgc-6">Chdir</span>(s) == nil {
+                conn.<span class="sgc-6">Write</span>([]<span class="sgc-7">byte</span>(<span class="sgc-5">"OK"</span>))
+        } <span class="sgc-4">else</span> {
+                conn.<span class="sgc-6">Write</span>([]<span class="sgc-7">byte</span>(<span class="sgc-5">"ERROR"</span>))
+        }
+}
+
+<span class="sgc-4">func</span> pwd(conn net.<span class="sgc-6">Conn</span>) {
+        s, err := os.<span class="sgc-6">Getwd</span>()
+        <span class="sgc-4">if</span> err != nil {
+                conn.<span class="sgc-6">Write</span>([]<span class="sgc-7">byte</span>(<span class="sgc-5">""</span>))
+                <span class="sgc-4">return</span>
+        }
+        conn.<span class="sgc-6">Write</span>([]<span class="sgc-7">byte</span>(s))
+}
+
+<span class="sgc-4">func</span> dirList(conn net.<span class="sgc-6">Conn</span>) {
+        defer conn.<span class="sgc-6">Write</span>([]<span class="sgc-7">byte</span>(<span class="sgc-5">"\r\n"</span>))
+
+        dir, err := os.<span class="sgc-6">Open</span>(<span class="sgc-5">"."</span>)
+        <span class="sgc-4">if</span> err != nil {
+                <span class="sgc-4">return</span>
+        }
+
+        names, err := dir.<span class="sgc-6">Readdirnames</span>(-1)
+        <span class="sgc-4">if</span> err != nil {
+                <span class="sgc-4">return</span>
+        }
+        <span class="sgc-4">for</span> <span class="sgc-8">_</span>, nm := range names {
+                conn.<span class="sgc-6">Write</span>([]<span class="sgc-7">byte</span>(nm + <span class="sgc-5">"\r\n"</span>))
+        }
+}
+
+<span class="sgc-4">func</span> checkError(err error) {
+        <span class="sgc-4">if</span> err != nil {
+                fmt.<span class="sgc-6">Println</span>(<span class="sgc-5">"Fatal error "</span>, err.<span class="sgc-6">Error</span>())
+                os.<span class="sgc-6">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <h3 id="heading_id_16">Client code</h3>
+  <pre><code><span class="sgc-9">
+<span class="sgc-3">/* FTPClient
+ */
+</span><span class="sgc-4">package</span> main
+
+<span class="sgc-4">import</span> (
+        <span class="sgc-5">"fmt"</span>
+        <span class="sgc-5">"net"</span>
+        <span class="sgc-5">"os"</span>
+        <span class="sgc-5">"bufio"</span>
+        <span class="sgc-5">"strings"</span>
+        <span class="sgc-5">"bytes"</span>
+)
+
+<span class="sgc-3">// strings used by the user interface
+</span>const (
+        uiDir  = <span class="sgc-5">"dir"</span>
+        uiCd   = <span class="sgc-5">"cd"</span>
+        uiPwd  = <span class="sgc-5">"pwd"</span>
+        uiQuit = <span class="sgc-5">"quit"</span>
+)
+
+<span class="sgc-3">// strings used across the network
+</span>const (
+        <span class="sgc-6">DIR</span> = <span class="sgc-5">"DIR"</span>
+        <span class="sgc-6">CD</span>  = <span class="sgc-5">"CD"</span>
+        <span class="sgc-6">PWD</span> = <span class="sgc-5">"PWD"</span>
+)
+
+<span class="sgc-4">func</span> main() {
+        <span class="sgc-4">if</span> len(os.<span class="sgc-6">Args</span>) != 2 {
+                fmt.<span class="sgc-6">Println</span>(<span class="sgc-5">"Usage: "</span>, os.<span class="sgc-6">Args</span>[0], <span class="sgc-5">"host"</span>)
+                os.<span class="sgc-6">Exit</span>(1)
+        }
+
+        host := os.<span class="sgc-6">Args</span>[1]
+
+        conn, err := net.<span class="sgc-6">Dial</span>(<span class="sgc-5">"tcp"</span>, host+<span class="sgc-5">":1202"</span>)
+        checkError(err)
+
+        reader := bufio.<span class="sgc-6">NewReader</span>(os.<span class="sgc-6">Stdin</span>)
+        <span class="sgc-4">for</span> {
+                line, err := reader.<span class="sgc-6">ReadString</span>('\n')
+                <span class="sgc-3">// lose trailing whitespace
+</span>         line = strings.<span class="sgc-6">TrimRight</span>(line, <span class="sgc-5">" \t\r\n"</span>)
+                <span class="sgc-4">if</span> err != nil {
+                        <span class="sgc-4">break</span>
+                }
+
+                <span class="sgc-3">// split into command + arg
+</span>         strs := strings.<span class="sgc-6">SplitN</span>(line, <span class="sgc-5">" "</span>, 2)
+                <span class="sgc-3">// decode user request
+</span>         <span class="sgc-4">switch</span> strs[0] {
+                <span class="sgc-4">case</span> uiDir:
+                        dirRequest(conn)
+                <span class="sgc-4">case</span> uiCd:
+                        <span class="sgc-4">if</span> len(strs) != 2 {
+                                fmt.<span class="sgc-6">Println</span>(<span class="sgc-5">"cd &lt;dir&gt;"</span>)
+                                <span class="sgc-4">continue</span>
+                        }
+                        fmt.<span class="sgc-6">Println</span>(<span class="sgc-5">"CD \""</span>, strs[1], <span class="sgc-5">"\""</span>)
+                        cdRequest(conn, strs[1])
+                <span class="sgc-4">case</span> uiPwd:
+                        pwdRequest(conn)
+                <span class="sgc-4">case</span> uiQuit:
+                        conn.<span class="sgc-6">Close</span>()
+                        os.<span class="sgc-6">Exit</span>(0)
+                <span class="sgc-4">default</span>:
+                        fmt.<span class="sgc-6">Println</span>(<span class="sgc-5">"Unknown command"</span>)
+                }
+        }
+}
+
+<span class="sgc-4">func</span> dirRequest(conn net.<span class="sgc-6">Conn</span>) {
+        conn.<span class="sgc-6">Write</span>([]<span class="sgc-7">byte</span>(<span class="sgc-6">DIR</span> + <span class="sgc-5">" "</span>))
+
+        <span class="sgc-4">var</span> buf [512]<span class="sgc-7">byte</span>
+        result := bytes.<span class="sgc-6">NewBuffer</span>(nil)
+        <span class="sgc-4">for</span> {
+                <span class="sgc-3">// read till we hit a blank line
+</span>         n, <span class="sgc-8">_</span> := conn.<span class="sgc-6">Read</span>(buf[0:])
+                result.<span class="sgc-6">Write</span>(buf[0:n])
+                length := result.<span class="sgc-6">Len</span>()
+                contents := result.<span class="sgc-6">Bytes</span>()
+                <span class="sgc-4">if</span> string(contents[length-4:]) == <span class="sgc-5">"\r\n\r\n"</span> {
+                        fmt.<span class="sgc-6">Println</span>(string(contents[0 : length-4]))
+                        <span class="sgc-4">return</span>
+                }
+        }
+}
+
+<span class="sgc-4">func</span> cdRequest(conn net.<span class="sgc-6">Conn</span>, dir string) {
+        conn.<span class="sgc-6">Write</span>([]<span class="sgc-7">byte</span>(<span class="sgc-6">CD</span> + <span class="sgc-5">" "</span> + dir))
+        <span class="sgc-4">var</span> response [512]<span class="sgc-7">byte</span>
+        n, <span class="sgc-8">_</span> := conn.<span class="sgc-6">Read</span>(response[0:])
+        s := string(response[0:n])
+        <span class="sgc-4">if</span> s != <span class="sgc-5">"OK"</span> {
+                fmt.<span class="sgc-6">Println</span>(<span class="sgc-5">"Failed to change dir"</span>)
+        }
+}
+
+<span class="sgc-4">func</span> pwdRequest(conn net.<span class="sgc-6">Conn</span>) {
+        conn.<span class="sgc-6">Write</span>([]<span class="sgc-7">byte</span>(<span class="sgc-6">PWD</span>))
+        <span class="sgc-4">var</span> response [512]<span class="sgc-7">byte</span>
+        n, <span class="sgc-8">_</span> := conn.<span class="sgc-6">Read</span>(response[0:])
+        s := string(response[0:n])
+        fmt.<span class="sgc-6">Println</span>(<span class="sgc-5">"Current dir \""</span> + s + <span class="sgc-5">"\""</span>)
+}
+
+<span class="sgc-4">func</span> checkError(err error) {
+        <span class="sgc-4">if</span> err != nil {
+                fmt.<span class="sgc-6">Println</span>(<span class="sgc-5">"Fatal error "</span>, err.<span class="sgc-6">Error</span>())
+                os.<span class="sgc-6">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <h2 id="heading_id_17">State</h2>
+
+  <p>Applications often make use of state information to simplify what is going on. For example</p>
+
+  <ul>
+    <li>Keeping file pointers to current file location</li>
+
+    <li>Keeping current mouse position</li>
+
+    <li>Keeping current customer value.</li>
+  </ul>
+
+  <p>In a distributed system, such state information may be kept in the client, in the server, or in both.</p>
+
+  <p>The important point is to whether one process is keeping state information about <i>itself</i> or about the <i>other</i> process. One process may keep as much state information about itself as it wants, without causing any problems. If it needs to keep information about the state of the other process, then problems arise: the process' actual knowledge of the state of the other may become incorrect. This can be caused by loss of messages (in UDP), by failure to update, or by s/w errors.</p>
+
+  <p>An example is reading a file. In single process applications the file handling code runs as part of the application. It maintains a table of open files and the location in each of them. Each time a read or write is done this file location is updated. In the DCE file system, the file server keeps track of a client's open files, and where the client's file pointer is. If a message could get lost (but DCE uses TCP) these could get out of synch. If the client crashes, the server must eventually timeout on the client's file tables and remove them.</p>
+
+  <div class="sgc-1"><img alt="" src="../Images/dce.png" /></div>
+
+  <p>In NFS, the server does not maintain this state. The client does. Each file access from the client that reaches the server must open the file at the appropriate point, as given by the client, to perform the action.</p>
+
+  <div class="sgc-1"><img alt="" src="../Images/nfs.png" /></div>
+
+  <p>If the server maintains information about the client, then it must be able to recover if the client crashes. If information is not saved, then on each transaction the client must transfer sufficient information for the server to function.</p>
+
+  <p>If the connection is unreliable, then additional handling must be in place to ensure that the two do not get out of synch. The classic example is of bank account transactions where the messages get lost. A transaction server may need to be part of the client-server system.</p>
+
+  <h3 id="heading_id_18">Application State Transition Diagram</h3>
+
+  <p>A state transition diagram keeps track of the current state of an application and the changes that move it to new states.</p>
+
+  <p>Example: file transfer with login:</p>
+
+  <div class="sgc-1"><img alt="" src="../Images/app.png" /></div>
+
+  <p>This can also be expressed as a table</p>
+
+  <div class="sgc-1">
+    <table border="1">
+      <tr>
+        <th>Current state</th>
+
+        <th>Transition</th>
+
+        <th>Next state</th>
+      </tr>
+
+      <tr>
+        <td rowspan="2">login</td>
+
+        <td>login failed</td>
+
+        <td>login</td>
+      </tr>
+
+      <tr>
+        <td>login succeeded</td>
+
+        <td>file transfer</td>
+      </tr>
+
+      <tr>
+        <td rowspan="4">file transfer</td>
+
+        <td>dir</td>
+
+        <td>file transfer</td>
+      </tr>
+
+      <tr>
+        <td>get</td>
+
+        <td>file transfer</td>
+      </tr>
+
+      <tr>
+        <td>logout</td>
+
+        <td>login</td>
+      </tr>
+
+      <tr>
+        <td>quit</td>
+
+        <td>-</td>
+      </tr>
+    </table>
+  </div>
+
+  <h3 id="heading_id_19">Client state transition diagrams</h3>
+
+  <p>The client state diagram must follow the application diagram. It has more detail though: it <em>writes</em> and then <em>reads</em></p>
+
+  <div class="sgc-1">
+    <table border="1">
+      <tr>
+        <th>Current state</th>
+
+        <th>Write</th>
+
+        <th>Read</th>
+
+        <th>Next state</th>
+      </tr>
+
+      <tr>
+        <td rowspan="2">login</td>
+
+        <td rowspan="2">LOGIN name password</td>
+
+        <td>FAILED</td>
+
+        <td>login</td>
+      </tr>
+
+      <tr>
+        <td>SUCCEEDED</td>
+
+        <td>file transfer</td>
+      </tr>
+
+      <tr>
+        <td rowspan="7">file transfer</td>
+
+        <td rowspan="2">CD dir</td>
+
+        <td>SUCCEEDED</td>
+
+        <td>file transfer</td>
+      </tr>
+
+      <tr>
+        <td>FAILED</td>
+
+        <td>file transfer</td>
+      </tr>
+
+      <tr>
+        <td rowspan="2">GET filename</td>
+
+        <td>#lines + contents</td>
+
+        <td>file transfer</td>
+      </tr>
+
+      <tr>
+        <td>ERROR</td>
+
+        <td>file transfer</td>
+      </tr>
+
+      <tr>
+        <td rowspan="2">DIR</td>
+
+        <td>#files + filenames</td>
+
+        <td>file transfer</td>
+      </tr>
+
+      <tr>
+        <td>ERROR</td>
+
+        <td>file transfer</td>
+      </tr>
+
+      <tr>
+        <td>quit</td>
+
+        <td>none</td>
+
+        <td>quit</td>
+      </tr>
+
+      <tr>
+        <td>logout</td>
+
+        <td>none</td>
+
+        <td>login</td>
+      </tr>
+    </table>
+  </div>
+
+  <h3 id="heading_id_20">Server state transition diagrams</h3>
+
+  <p>The server state diagram must also follow the application diagram. It also has more detail: it <em>reads</em> and then <em>writes</em></p>
+
+  <div class="sgc-1">
+    <table border="1">
+      <tr>
+        <th>Current state</th>
+
+        <th>Read</th>
+
+        <th>Write</th>
+
+        <th>Next state</th>
+      </tr>
+
+      <tr>
+        <td rowspan="2">login</td>
+
+        <td rowspan="2">LOGIN name password</td>
+
+        <td>FAILED</td>
+
+        <td>login</td>
+      </tr>
+
+      <tr>
+        <td>SUCCEEDED</td>
+
+        <td>file transfer</td>
+      </tr>
+
+      <tr>
+        <td rowspan="7">file transfer</td>
+
+        <td rowspan="2">CD dir</td>
+
+        <td>SUCCEEDED</td>
+
+        <td>file transfer</td>
+      </tr>
+
+      <tr>
+        <td>FAILED</td>
+
+        <td>file transfer</td>
+      </tr>
+
+      <tr>
+        <td rowspan="2">GET filename</td>
+
+        <td>#lines + contents</td>
+
+        <td>file transfer</td>
+      </tr>
+
+      <tr>
+        <td>ERROR</td>
+
+        <td>file transfer</td>
+      </tr>
+
+      <tr>
+        <td rowspan="2">DIR</td>
+
+        <td>#files + filenames</td>
+
+        <td>file transfer</td>
+      </tr>
+
+      <tr>
+        <td>ERROR</td>
+
+        <td>file transfer</td>
+      </tr>
+
+      <tr>
+        <td>quit</td>
+
+        <td>none</td>
+
+        <td>quit</td>
+      </tr>
+
+      <tr>
+        <td>logout</td>
+
+        <td>none</td>
+
+        <td>login</td>
+      </tr>
+    </table>
+  </div>
+
+  <h3 id="heading_id_21">Server pseudocode</h3>
+  <pre><code>
+state = login
+while true
+    read line
+    switch (state)
+        case login:
+            get NAME from line
+            get PASSWORD from line
+            if NAME and PASSWORD verified
+                write SUCCEEDED
+                state = file_transfer
+            else
+                write FAILED
+                state = login
+        case file_transfer:
+            if line.startsWith CD
+                get DIR from line
+                if chdir DIR okay
+                    write SUCCEEDED
+                    state = file_transfer
+                else
+                    write FAILED
+                    state = file_transfer
+            ...
+</code></pre>
+
+  <p>We don't give the actual code for this server or client since it is pretty straightforward.</p>
+
+  <h2 id="heading_id_22">Summary</h2>
+
+  <p>Building any application requires design decisions before you start writing code. For distributed applications you have a wider range of decisions to make compared to standalone systems. This chapter has considered some of those aspects and demonstrated what the resultant code might look like.</p><!--
+<h2>Internet Mail Format</h2>
+
+The Internet Mail Format is a character based format that has been
+extended in many ways past its original use. For example, it forms the
+underlying representation of the Web.
+
+<h3>Header Format</h3>
+
+A mail message consists of header information followed by the data body.
+The header may contain an open-ended amount of information (for mail,
+From, To, Subject, Date, Sender, CC, References, ...). This makes it useful
+for any other text-based protocol in that by conforming to them you
+satisfy a well-known standard. Intermediate systems also know how to 
+convert to their own format on the way in, and back to standard format
+on the way out.
+
+ <P>
+The header consists of an indefinite number of (logical) lines. The
+header is terminated by a blank line
+<PRE>
+From: jan
+To: you
+
+// body starts after the blank line
+</PRE>
+
+ <P>
+The line terminator in Unix is LF, under DOS is CR-LF. The Internet
+standard is CR-LF. Special rules exist for s/w that breaks this.
+The standard allows long lines to be broken into multiple lines that
+still form one logical line: if the CR-LF is immediately followed by
+a space or tab, then it is still part of the logical line
+<PRE>
+some of a 
+ logical line
+        split over several
+   physical lines
+</PRE>
+Stages may split/reassemble lines for local convenience in the header 
+using this rule. Some s/w doesn't understand this mechanism, apparently.
+
+
+
+<h3>MIME</h3>
+
+(Multipurpose Internet Mail Extensions).
+This is designed for two purposes: firstly to allow messages
+composed of multiple parts (e.g. an archive of messages),
+and secondly to handle non-ASCII data.
+
+ <P>
+Extra fields are added to a message header field:
+<PRE>
+Content-Type:  &lt;toplevel-type/specific-type&gt;
+Content-Transfer-Encoding: &lt;encoding&gt;
+</PRE>
+The standard toplevel types are application, audio, image,
+message, multipart, text, video. All non-standard types 
+<I>must</I> begin with x-, e.g. x-compress.
+For each toplevel type there is a set of minor types, such as
+image/jpeg, image/gif. Non-standard minor types must also
+begin with x-, such as image/x-portable-bitmap.
+
+ <P>
+The encoding is to tell whether it is sent in e.g.7bit,
+case-insensitive, quoted-printable, etc.
+
+ <P>
+To decide when a message part is finished, this RFC uses
+a terminating string. I have also seen a header
+Content-Length in the Web protocol - not sure where that
+fits in.
+
+<h3>Date/Time and Money Format</h3>
+
+There are a large number of date/time formats: US month+day, UK day+month,
+`:' separated 12:00 or `.' separated 12.00. Months and days may be numeric
+or text, in many languages. Years may be two digit or four digit.
+RFC 822 has a time format, updated by RFC 1123. Alternatives are in 
+RFC 1036 and the C standard function acstime().
+
+ <P>
+Money formatting is awful. The currency symbol can appear before, after
+or in the middle. Negative amounts can have the minus sign in lots of
+places. I don't know a standard.
+
+<h3>Customisation</h3>
+
+Based on a Content-Type, a process may need to perform different actions.
+These may involve external programs. For example, a JPEG image would need
+the xv program to run under Unix, an MPEG movie would use mpeg_play.
+RFC 1524 defines a standard file format that a process can look use to
+find the local external program handler. The simplest form is
+<PRE>
+type; external-program
+</PRE>
+as in
+<PRE>
+image/jpeg;             xv %s
+application/x-latex;    latex %s
+</PRE>
+
+
+<h2>Debugging</h2>
+
+Telnet is normally used for remote connection to a telnet "daemon", telnetd,
+to allow a remote terminal session.  However, by specifying the port number,
+telnet can connect to <I>any</I> server with a fixed port number. For
+example, 
+<PRE>
+telnet localhost 13
+</PRE>
+will result in output such as
+<PRE>
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+Mon Apr  1 19:44:18 1996
+Connection closed by foreign host.
+</PRE>
+The message from the daytime server "Mon Apr  1 19:44:18 1996" 
+appears among the telnet messages. 
+
+ <P>
+For daytime, the server sends the time and closes the connection.
+An httpd server will wait for a request, send a reply and then close
+the connection:
+<PRE>
+telnet jan.newmarch.name 80
+GET http://jan.newmarch.name/
+</PRE>
+will result in index.html on pandonia being delivered
+<PRE>
+HTTP/1.0 200 Document follows
+MIME-Version: 1.0
+Server: CERN/3.0
+Date: Monday, 01-Apr-96 09:48:59 GMT
+Content-Type: text/html
+Content-Length: 4832
+Last-Modified: Wednesday, 11-Oct-95 01:30:14 GMT
+
+&lt;HTML&gt;
+&lt;HEAD&gt;
+&lt;TITLE&gt;
+...
+&lt;/BODY&gt;
+Connection closed by foreign host.
+</PRE>
+
+ <P>
+Ohter procotols will accept a different set of messages, maintain the
+connection for longer, etc. With all text-based protocols, telnet gives
+a good way of interactive debugging.
+
+ <P>
+Non-character protocols are harder to debug. One needs to be able to
+analyse the byte stream, which generally requires a separate program.
+To manage this, you usually need to insert a "filter" program between 
+client and server. This filter will read messages from, say, the client
+and forward them to the real server. The client will connect to the
+filter on one port while the server is on a different one. Then the filter
+can print the messages in readable format while still relaying them.
+
+<h2>Security</h2>
+
+In a connectionless system, authorisation may need to be performed on
+every datagram.
+
+ <P>
+In a connection-oriented system, generally authorisation will only need
+to be performed at connection time. Applications with multiple security
+access levels may need finer-grained security access, granted to individual
+transactions or to a session of transactions.
+
+ <P>
+Security may be done by passwords, private key exchange, public key
+messages, or by using a token from a security server. 
+
+<h2>State</h2>
+
+Applications often make use of state information to simplify what is going
+on. For example
+<UL>
+<LI> 
+Keeping file pointers to current file location
+<LI> 
+Keeping current mouse position
+<LI> 
+Keeping current customer value.
+</UL>
+In a distributed system, such state information may be kept in the client,
+in the server, or in both.
+
+ <P>
+The important point is to whether one process is keeping state information
+about <I>itself</I> or about the <I>other</I> process. One process may keep
+as much state information about itself as it wants, without causing any
+problems. If it needs to keep information about the state of the other
+process, then problems arise: the process' actual knowledge of the state
+of the other may become incorrect. This can be caused by loss of messages
+(in UDP), by failure to update, or by s/w errors. 
+
+ <P>
+An example is reading a file. In single process applications the file 
+handling code runs as part of the application. It maintains a table of
+open files and the location in each of them. Each time read or write is done
+this file location is updated. In the DCE file system, the file server
+keeps track of a client's open files, and where the client's file pointer
+is. If a message could get lost (but DCE uses TCP) these could get 
+out of synch. If the client crashes, the server must eventually timeout
+on the client's file tables and remove them. In NFS, the server does
+not maintain this state. The client does.
+Each file access from the client that reaches the server must open the 
+file at the appropriate point, as given by the client, to perform the
+action.
+
+<P>
+If the server maintains information about the client, then it must be
+able to recover if the client crashes. If information is not saved,
+then on each transaction the client must transfer sufficient information
+for the server to function. 
+
+ <P>
+If the connection is unreliable, then additional handling must be in
+place to ensure that the two do not get out of synch. The classic example
+is of bank account transactions where the messages get lost.
+A transaction server may need to be part of the client-server system.
+
+<h2>Handling Errors</h2>
+
+Errors may occur due to timeouts, lost messages, or data in the
+wrong format.
+ 
+<P>
+
+
+
+<h2>
+The Common Client Interface
+</h2>
+CCI was a new interface with Mosaic 2.5 for X. 
+It is designed to allow control of a Mosaic browser so that it can be
+told to fetch documents, and also so that Mosaic can tell an application
+what documents it has fetched.
+<p>
+An example use of this is for a teacher/student environment, where a
+teacher is using an instance of Mosaic, and the student instances are all
+mirroring the master instance. One possible architecture for this is
+where the master is told about the students (somehow) and then sends
+information to each of them whenever it does anything. The student
+instances in turn will have to listen and obey the master.
+This is a case of point to multipoint.
+
+<p>
+While it solves the problem, it has a lot of ``special case'' feel to it.
+It means that the master must be able to maintain a list of clients
+which have to be instances of Mosaic for it to work (why must it be 
+limited in this way?). Similarly, the student instances must be listening
+to something that must be Mosaic again. How should they find each other
+given these types of constraints.
+
+<p>
+The requirements also rule out another related use: an instance of Mosaic
+displaying documents as told to by a script file, for automated
+demonstrations. Should this mechanism also know about files as well
+as networks?
+
+<p>
+A more general solution is for an instance of Mosaic to be able to tell
+an arbitrary application which documents it is fetching, and for an
+arbitrary application to be able to tell Mosaic to fetch some
+documents. The teacher/student will then be solved by a special-purpose
+application sitting between teacher and student instances of Mosaic.
+
+<p>
+The protocol is an ASCII based one, compliant with RFC 822. Data
+is passed in compliance with the MIME 1.0 specification.
+Command lines are terminated with a CR-LF.
+The browser (Mosaic) is regarded as the server, any application talking
+to it is the client.
+The primary components are
+<xmp>
+GET <url>
+SEND ANCHOR [STOP]
+DISCONNECT
+</xmp>
+Each command sent is acknowledged. The acknowledgements are of the form
+<xmp>
+1xx - informative message
+2xx - command ok
+3xx - command ok + additional output
+4xx - client error
+5xx - server error
+</xmp>
+Whenever the user selects an anchor for Mosaic to display, it will also
+send this information to all clients that have sent SEND ANCHOR.
+The format of these messages is
+<xmp>
+301 ANCHOR <url>
+</xmp>
+
+<p>
+The xwebteach application sends a SEND ANCHOR to the teacher Mosaic.
+Each time it receives an anchor by a 301 ANCHOR &lt;url&gt;,
+it sends this on to each student Mosaic that is connected by
+GET &lt;url&gt;.
+
+<p>
+The changes made to Mosaic are quite general.
+It needs to maintain a list of clients that it is connected to and
+that are active in wanting URL information sent.
+Each time a URL is selected, it uses this list to send the anchor.
+In addition, it must also receive messages from each port that used
+by an application.
+
+<p>
+There is no registration part to the protocol. It is assumed that the
+user of xwebteach and all servers will set up the common ports and
+machines that are used. Connections are set up within the CCI library
+and all error checking is done internally to this library.
+
+<p>
+The security side of CCI at present is very weak - almost non-existent.
+Mosaic by default starts off by not listening on any port. The user
+selects by menu which port to listen on. It will only listen on one port
+so can be sent messages from only one client. Because the user has choice of
+port number and whether listening is enabled, the chances are low that
+an intruder will get in. At worst though, it will only be able to
+monitor your choice of URL's, or select its own.
+
+<h2>The X Session Manager</h2>
+The X Session Manager is a new protocol introduced in X11R6.
+It allows one to capture the entire state of your current X Windows
+environment, so that it can be restored to the same point later.
+The intent is that you can save session state before logging off,
+and have it restored when logging on.
+
+<p>
+The heart of this protocol is the SaveYourself command sent from the
+session manager (SM) to any client (application) that it is managing.
+It can also send a Die command to terminate any client, which it will
+do when the session is finishing. It must also be able to query the
+client for how to start it up again later, for its RestartCommand.
+
+<p>
+Clients are expected to locate the server in some unspecified manner.
+The sample implementation uses a Unix environment variable set by
+the session manager, and then read by each client that is forked by
+the session manager.
+
+<p>
+When a client finds the session manager it informs it that it wants to
+be managed by sending a RegisterClient. The SM replies with a
+RegisterClientReply. There are actually two possibilities by the time
+we get to this point: the client is starting for the first time, or is
+being restarted. How they tell the difference is that the client is
+expected to maintain state: it keeps an ID that will be null on first
+startup but non-null afterwards.  The server sends this ID as part
+of the RegisterClientReply.
+This ID is expected to be part of the RestartCommand.
+
+<p>
+When a client is started the first time, no state has been saved about
+it, so the SM sends it a SaveYourself message straight away.
+
+<p>
+When a client receives a SaveYourself message, it is expected to save
+state in such a way that it can be restored. Suppose it is an editor,
+with an unnamed file in the buffer. It should be able to perform
+an interaction with the user to name this file first. Many applications
+may want to do this. To organise the order of these requests, the SM
+will tell a client to have an interaction, but only if the client has
+asked for it.
+
+<p>
+Thus there may be an InteractRequest from the client to
+SM, and an Interact message from SM to client. Only after the client
+sends InteractDone will the SM continue. Finally, a client should
+say that its save is complete by SaveYourselfDone.
+
+<p>
+This is all complex enough that a state transition diagram is useful on
+both client and SM sides. On the client side it is
+<xmp>
+start:
+  ICE protocol setup complete ->
+        register
+
+register:
+  send RegisterClient ->
+        collect-id
+
+collect-id:
+  receive RegisterClientReply ->
+        idle
+
+idle:
+  receive Die -> die
+  receive SaveYourself ->
+        freeze-interaction
+
+freeze-interaction:
+  freeze user interaction ->
+        save-yourself
+
+save-yourself:
+  send InteractRequest ->
+        interact-request
+  send SaveYourselfDone ->
+        idle
+
+interact-request:
+  receive Interact ->
+        interact
+
+interact:
+  send InteractDone ->
+        save-yourself
+</xmp>
+
+<p>
+There is a byte-level encoding of the protocol, with a fixed range of
+data types, such as one-byte, two-byte, four-byte unsigned integers,
+and sequences of integers.
+
+<p>
+Security is managed by the ICE library (see later). This is able to
+implement any security scheme, but the default is the MIT MAGIC-COOKIE
+scheme.
+
+
+<hr>
+<h2>Libraries and callbacks</h2>
+A protocol may be designed for one-off use, where there is only one
+possible client, and only one possible server. Alternatively, it may
+be designed as a reusable library.
+
+<p>
+Examples of one-off are telnet, ftp. In these cases the protocol is a
+quite visible part of the applications, and there will be loops that
+poll the connection port as part of the applications.
+
+<p>
+For a library, there will need to be some interface between the library
+and the application in which it used, so that when certain protocol
+events occur appropriate application-specific code can be called.
+
+<p>
+In the X Window system all of the network interface is hidden behind
+a call XNextEvent(). This returns each time a message is received,
+with a data structure filled in with information about the message.
+The different data structures all have a first field set to the type
+of message. The application sets up a loop around XNextEvent() and
+within that loop branches to application code on the type of event.
+This is similar to the Microsoft Windows event loop, but of course
+that does not use a client-server architecture.
+<xmp>
+while XNextEvent(&event) 
+  switch (event.type) {
+     ...
+     ...
+  }
+</xmp>
+
+<p>
+An alternative, that goes well with an object-oriented approach, is to
+use callback functions. An application registers a function to a message
+handler. Each time the message comes in, the library sorts out which
+message handler to call internally, and the message handler then calls
+each function on its callback list. this reduces the visibility of the
+protocol details, and just means that the library interface is reduced
+to registering callbacks for each message type.
+<xmp>
+XtAddCallback(XmNactivateCallback,
+              my_callback_func,
+              client_data)
+</xmp>
+
+<h3>CCI Library</h3>
+
+The CCI library can be used by any application. It is set up
+specifically to talk the CCI protocol, and nothing else.
+
+ <P>
+Some functions on the client side are
+<PRE>
+MCCIInitialize(void)
+MCCIConnect(serverAddr, port, callback, callbackData)
+MCCIPoll(serverPort)
+MCCISendAnchor(serverPort, on, callback, callbackData)
+MCCIDisconnect(serverPort)
+</PRE>
+
+Two of these functions take callback functions as arguments.
+The callback to MCCIConnect() is called when either the server
+or client disconnects. This can be at some arbitrary time,
+and allows the client to clean up properly. 
+ <P>
+MCCISendAnchor() registers a callback with the library that
+is called whenever the server fetches a new anchor and the client
+wants to know about it.
+The server sends a message 301 ANCHOR &lt;url&gt;.
+The CCI library gets this.
+When MCCIPoll() executes, it sees that there is a message
+and calls the callback function which must be of type
+<PRE>
+void callback(char *anchor, void *callbackData)
+</PRE>
+
+ <P>
+The server side of the library is not public, since it was
+only meant to be used by Mosaic. It is pretty grotty, 
+heavily tied up with Mosaic GUI code, etc.
+
+
+<h3>The ICE library</h3>
+The socket interface is standardised enough so that the real work -
+designing and implementing the protocol for any system - should be
+all that needs to be done. The ICE (Inter Client Exchange) library
+is an X Consortium standard devised for this. This handles the common
+matters of authentication, version negotiation, data typing and
+connection management.
+It also allows an <I>arbitrary</I> protocol to be setup 
+above TCP/IP.
+
+<p>
+ICE gives connection setup, consisting of byte order exchange, 
+authentication and connection information exchange. Then protocol
+negotiation is done. This agrees on the protocol used, and may also
+include authentication (multiple protocols may share a connection).
+This also registers a callback function that is used to handle any
+of the messages of that protocol. When a message arrives this
+callback function, belonging to the application, is called to process
+the message. There are a variety of functions to read message data
+of various sizes.
+
+<hr>
+<h2>Overheads</h2>
+For two processes to communicate over the wire, a message has to be
+constructed, sent, and recognised at the other end. This overhead may
+be quite substantial. It is proposed that this explains why an X Window
+application has a long startup time compared to a Microsoft Windows
+application. It is suggested that X Windows can be made much quicker on local
+systems by mapping the X server into an application's address space and
+making local procedure calls.
+
+
+
+<h2>Ftp protocol</h2>
+The client needs to be able to ask for a directory listing. 
+The server needs to respond to this with the listing of the current
+directory. (More complex: specify the directory as well.)
+So a client to server message is <i> list dir </i>, with response
+being a list of files.
+
+<p>
+The client needs to be able to ask for a directory change, to a directory
+that it specifies. If the client asks the server to something based on
+server state, then the request may be honoured or fail. The client
+needs to be told of this. So this needs a reply, of success or fail.
+
+<p>
+The purpose of this CS setup is to transfer files. So the client needs
+to be able to send a "get" message. The file may or may not exist,
+and may have restrictive permissions. So there is a question of whether
+or not the transfer will go ahead, and if ok, how it takes place.
+
+<p> 
+It may be convenient for the client to be able to determine which
+is the current directory on the server.
+
+<h2>Synchronisity</h2>
+Should the client fire off messages and deal with replies as they come
+in, or send a message and wait for a reply before continuing?
+Several messages need replies, and it is not likely that they will take
+too long in coming, so a synchronous rather than asynchronous model
+would be more appropriate. This is also much simpler.
+
+<h2>State</h2>
+Each time a client wants to talk to a server, it could establish a
+per-message connection that is terminated after each reply.
+Alternatively, it could hold a connection open for the duration of
+a session.
+
+<p>
+In the first mechanism, any state would have to be maintained by the
+client, and sent anew on establising the connection. In the second,
+the server could maintain state that lasts for any one session.
+Is there any state info required? Yes - the current directory on the
+server.
+
+<p>
+If connections are made and dissolved on a per-message basis, then 
+multiple clients could talk "simultaneously" to a single server.
+If a client holds the connection for a session, then other clients
+cannot use that port until the session is over. There is no queuing
+mechanism. If this is a problem, then each session should be done
+using a slave server.
+
+<h2>Encoding</h2>
+Should the messages be sent in as compact a form as possible, or in as
+convenient a form as possible? There are at least two message types,
+"dir" and "get". A compact encoding would be to as separate byte values.
+Both sides would have to agree on these values. A simple encoding
+would be as strings (terminated in some way). Again there would have to be
+agreement on both sides, but less possibility of error.
+
+<h2>Protocol</h2>
+<pre>
+client                     server
+======                     ======
+
+dir
+                           send list of files
+                           terminate with blank
+                           line
+
+cd &lt;dir&gt;
+                           change dir
+                           send blank if failed
+                           send newdir if succeed
+
+get &lt;file&gt;
+                           send file
+</pre>
+
+Here is the client program
+
+<PRE>
+/* TCP client that finds the
+   time from a server */
+
+#include &lt;stdio.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;netinet/in.h&gt;
+#include &lt;sys/param.h&gt;
+
+#define SIZE 1024
+char buf[SIZE];
+
+#define TIME_PORT 2013
+
+#define MAX 1024
+
+char *GetLine(int fd)
+{
+  static char line[MAX];
+  static char netread[MAX] = "";
+  int n, len;
+  char *p;
+
+  len = strlen(netread);
+
+  /* look for \r\n in netread buffer */
+  p = strstr(netread, "\r\n");
+  if (p == NULL) {
+    /* fill buff - no \r\n found */
+    n = read(fd, netread+len, MAX-len);
+    len += n;
+    netread[len] = '\0';
+    p = strstr(netread, "\r\n");
+    if (p == NULL) {
+      /* still cant find line terminator,
+         discard this one and try again
+       */
+      netread[0] = '\0';
+      return GetLine(fd);
+    }
+  }
+  *p = '\0';
+  strcpy(line, netread);
+  
+  /* copy rest of buf down */
+  memmove(netread, p+2, strlen(p+2)+1);
+
+  return line;
+}
+
+void SendDir(int fd)
+{
+  int n;
+  char *s;
+
+  write(fd, "dir\r\n", 5);
+  /* read response */
+  while (1) {
+    s = GetLine(fd);
+    if (*s == '\0')
+      break;
+    printf("%s\n", s);
+  }
+}
+
+void ChangeDir(char *dir, int fd)
+{
+  int n;
+
+  strcat(dir, "\r\n");
+  write(fd, dir, strlen(dir));
+  /* read response */
+  n = read(fd, buf, 1024);
+  write(1, buf, n);
+}
+
+void GetFile(char *file, int fd)
+{
+  int n;
+
+  strcat(file, "\r\n");
+  write(fd, file, strlen(file));
+  /* read response */
+  n = read(fd, buf, 1024);
+  write(1, buf, n);
+}
+
+void HandleMsgs(int fd)
+{
+  char buff[MAXPATHLEN + 4];
+
+  while (gets(buff) != NULL) {
+    if (strncmp(buff, "quit", 4) == 0) {
+      exit(0);
+    }
+
+    if (strncmp(buff, "dir", 3) == 0) {
+      SendDir(fd);
+    } else
+
+    if (strncmp(buff, "cd ", 3) == 0) {
+      ChangeDir(buff, fd);
+    } else
+
+    if (strncmp(buff, "get ", 4) == 0) {
+      GetFile(buff, fd);
+    } else {
+
+      fprintf(stderr, "illegal command\n");
+    }
+  }
+}
+
+
+int main(int argc, 
+         char *argv[])
+{
+  int sockfd;
+  int nread;
+  struct sockaddr_in serv_addr;
+
+  if (argc != 2) {
+    fprintf(stderr,
+        "usage: %s IPaddr\n",
+        argv[0]);
+    exit(1);
+  }
+
+
+  if ((sockfd =
+       socket(AF_INET,
+              SOCK_STREAM, 0))
+      < 0) {
+    perror(NULL);
+    exit(2);
+  }
+
+
+  serv_addr.sin_family =
+            AF_INET;
+  serv_addr.sin_addr.s_addr =
+            inet_addr(argv[1]);
+  serv_addr.sin_port =
+            htons(TIME_PORT);
+  if (connect(sockfd,
+             &serv_addr,
+             sizeof(serv_addr))
+      < 0) {
+    perror(NULL);
+    exit(3);
+  }
+
+  HandleMsgs(sockfd);
+  close(sockfd);
+  exit(0);
+}
+
+</PRE>
+
+
+Here is the server
+
+<PRE>
+#include &lt;stdio.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;netinet/in.h&gt;
+#include &lt;ctype.h&gt;
+#include &lt;sys/dir.h&gt;
+#include &lt;limits.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;sys/param.h&gt;
+
+#define SIZE 1024
+char buf[SIZE];
+
+#define TIME_PORT 2013
+
+#define MAX 1024
+
+char *GetLine(int fd)
+{
+  static char line[MAX];
+  static char netread[MAX] = "";
+  int n, len;
+  char *p;
+
+  len = strlen(netread);
+
+  /* look for \r\n in netread buffer */
+  p = strstr(netread, "\r\n");
+  if (p == NULL) {
+    /* fill buff - no \r\n found */
+    n = read(fd, netread+len, MAX-len);
+    len += n;
+    netread[len] = '\0';
+    p = strstr(netread, "\r\n");
+    if (p == NULL) {
+      /* still cant find line terminator,
+         discard this one and try again
+       */
+      netread[0] = '\0';
+      return GetLine(fd);
+    }
+  }
+  *p = '\0';
+  strcpy(line, netread);
+  
+  /* copy rest of buf down */
+  memmove(netread, p+2, strlen(p+2)+1);
+
+  return line;
+}
+
+void SendDir(int client_fd)
+{
+  DIR *dirp;
+  struct direct *dp;
+  char buff[MAXPATHLEN + 3];
+
+  dirp = opendir(".");
+  for (dp = readdir(dirp); dp != NULL; dp = readdir(dirp)) {
+    strcpy(buff, dp->d_name);
+    strcat(buff, "\r\n");
+    write(client_fd, buff, strlen(buff));
+  }
+  strcpy(buff, "\r\n");
+  write(client_fd, buff, 2);
+}
+
+void ChangeDir(char *dir, int client_fd)
+{
+  char buff[MAXPATHLEN + 3] = "";
+
+  /* remove leading blanks */
+  while (isspace(*dir))
+    dir++;
+
+  if (chdir(dir) == 0)
+    /* success */
+    getcwd(buff, MAXPATHLEN+1);
+
+  strcat(buff, "\r\n");
+  write(client_fd, buff, strlen(buff));
+}
+
+void SendFile(char *filename, int client_fd)
+{
+  /* remove leading blanks */
+  while (isspace(*filename))
+    filename++;
+}
+
+void HandleMsgs(int sockfd, int client_sockfd)
+{
+  char *s;
+
+  s = GetLine(client_sockfd);
+  if (s == NULL)
+    return;
+
+  if (strncmp(s, "dir", 3) == 0) {
+    SendDir(client_sockfd);
+  } else
+
+  if (strncmp(s, "cd ", 3) == 0) {
+    ChangeDir(s+3, client_sockfd);
+  } else
+
+  if (strncmp(s, "get ", 4) == 0) {
+    SendFile(s+4, client_sockfd);
+  } else {
+
+    /* error stub */
+  }
+}
+
+int main(int argc, 
+         char *argv[])
+{
+  int sockfd, client_sockfd;
+  int nread, len;
+  struct sockaddr_in serv_addr,
+                   client_addr;
+  time_t t;
+
+  if ((sockfd =
+       socket(AF_INET,
+              SOCK_STREAM, 0))
+      < 0) {
+    perror(NULL);
+    exit(2);
+  }
+  serv_addr.sin_family =
+            AF_INET;
+  serv_addr.sin_addr.s_addr =
+         htonl(INADDR_ANY);
+  serv_addr.sin_port =
+            htons(TIME_PORT);
+
+  if (bind(sockfd, &serv_addr, sizeof(serv_addr)) < 0) {
+    perror(NULL);
+    exit(3);
+  }
+
+  listen(sockfd, 5);
+  for (;;) {
+    len = sizeof(client_addr);
+    client_sockfd =
+          accept(sockfd,
+                 &client_addr,
+                 &len);
+    if (client_sockfd == -1) {
+      perror(NULL);
+      continue;
+    }
+    for (;;)
+      HandleMsgs(sockfd, client_sockfd);
+    close(client_sockfd);
+  }
+}
+
+</PRE>
+
+
+<h2>References</h2>
+
+Unicode Consortium <I>The Unicode Standard</I> ISBN 0-201-56788-1, 
+QA 268.U55
+
+ <P>
+D. H. Crocker <I>Standard for the Format of ARPA Internet Text Messages</I>
+IETF RFC 822
+
+<P>
+N. Borenstein <I>A User Agent Configuration Mechanism for Multimedia
+Mail Format Information</I>
+IETF RFC 1524
+
+<P>
+N. Borenstein and N. Freed <I>MIME Part One: Mechanisms for Specifying
+and Describing the Format of Internet Message Bodies</I>
+IETF RFC 1521
+ 
+<P>
+CCI specification http://www.ncsa.uiuc.edu/SDG/Software/XMosaic/CCI/cci-spec.html
+ <P>
+The IETF RFC's may be obtained from 
+ftp://ietf.org/internet-drafts/
+or http://www.garlic.com/~lynn/rfcietf.htm
+-->
+
+  <p>Copyright Jan Newmarch, jan@newmarch.name</p>
+
+  <p>If you like this book, please contribute using Flattr <a class="FlattrButton sgc-10" href="http://jan.newmarch.name/go/index.html"></a><br />
+  or donate using PayPal</p>
+
+  <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+    <input name="cmd" type="hidden" value="_s-xclick" /> <input name="encrypted" type="hidden" value="-----BEGIN PKCS7-----MIIHLwYJKoZIhvcNAQcEoIIHIDCCBxwCAQExggEwMIIBLAIBADCBlDCBjjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtQYXlQYWwgSW5jLjETMBEGA1UECxQKbGl2ZV9jZXJ0czERMA8GA1UEAxQIbGl2ZV9hcGkxHDAaBgkqhkiG9w0BCQEWDXJlQHBheXBhbC5jb20CAQAwDQYJKoZIhvcNAQEBBQAEgYCCw7fVj6fuHxYMvE0PBlURcRgBFb1s4TxTUDgsS6BgkdJPt2GF8NFPNvE/oFvPNY2jBGrXSIkxCr9dFYzraKC8csPASWb0z9l8swwbIHWgrvb5cuaVuLbtRzesh94sqyh9MmZ5U1xcMrMtlw1S60gK5lPbKPsXzcY74brjt44J7jELMAkGBSsOAwIaBQAwgawGCSqGSIb3DQEHATAUBggqhkiG9w0DBwQIAXtre9K+AiWAgYiJVN0CmxAPscp0u0O8R0mD+cNz/Fe3lNIrqqMPplkri20WbbVxhbRwJTjtOxcLMbmSIeC8oWh14aSy9Jptgm1wNlQYADQQUgMnR/qIlYgHmXjJ4C6wZteqNVJn+RKfM/tS008Ola5SJABaGe9BmRSQCjMKqEyqm3Mx2hoLeWMXeyoMaW3Xteg6oIIDhzCCA4MwggLsoAMCAQICAQAwDQYJKoZIhvcNAQEFBQAwgY4xCzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDQTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEUMBIGA1UEChMLUGF5UGFsIEluYy4xEzARBgNVBAsUCmxpdmVfY2VydHMxETAPBgNVBAMUCGxpdmVfYXBpMRwwGgYJKoZIhvcNAQkBFg1yZUBwYXlwYWwuY29tMB4XDTA0MDIxMzEwMTMxNVoXDTM1MDIxMzEwMTMxNVowgY4xCzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDQTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEUMBIGA1UEChMLUGF5UGFsIEluYy4xEzARBgNVBAsUCmxpdmVfY2VydHMxETAPBgNVBAMUCGxpdmVfYXBpMRwwGgYJKoZIhvcNAQkBFg1yZUBwYXlwYWwuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDBR07d/ETMS1ycjtkpkvjXZe9k+6CieLuLsPumsJ7QC1odNz3sJiCbs2wC0nLE0uLGaEtXynIgRqIddYCHx88pb5HTXv4SZeuv0Rqq4+axW9PLAAATU8w04qqjaSXgbGLP3NmohqM6bV9kZZwZLR/klDaQGo1u9uDb9lr4Yn+rBQIDAQABo4HuMIHrMB0GA1UdDgQWBBSWn3y7xm8XvVk/UtcKG+wQ1mSUazCBuwYDVR0jBIGzMIGwgBSWn3y7xm8XvVk/UtcKG+wQ1mSUa6GBlKSBkTCBjjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtQYXlQYWwgSW5jLjETMBEGA1UECxQKbGl2ZV9jZXJ0czERMA8GA1UEAxQIbGl2ZV9hcGkxHDAaBgkqhkiG9w0BCQEWDXJlQHBheXBhbC5jb22CAQAwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQUFAAOBgQCBXzpWmoBa5e9fo6ujionW1hUhPkOBakTr3YCDjbYfvJEiv/2P+IobhOGJr85+XHhN0v4gUkEDI8r2/rNk1m0GA8HKddvTjyGw/XqXa+LSTlDYkqI8OwR8GEYj4efEtcRpRYBxV8KxAW93YDWzFGvruKnnLbDAF6VR5w/cCMn5hzGCAZowggGWAgEBMIGUMIGOMQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExFjAUBgNVBAcTDU1vdW50YWluIFZpZXcxFDASBgNVBAoTC1BheVBhbCBJbmMuMRMwEQYDVQQLFApsaXZlX2NlcnRzMREwDwYDVQQDFAhsaXZlX2FwaTEcMBoGCSqGSIb3DQEJARYNcmVAcGF5cGFsLmNvbQIBADAJBgUrDgMCGgUAoF0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTEwNTAyMDcwNzQ1WjAjBgkqhkiG9w0BCQQxFgQUgvHyq74JT8DnmViqEqG5KpIW0cAwDQYJKoZIhvcNAQEBBQAEgYAzycmlaZMZjkmYniVBUVTQeywigBo+80toDP2g9+yCzO4mG1Abmfcr/S1XdT8djFA9w37F+F+nSkP857evscUhns30c9wYuPoiNudkJMOkYegqyq+EI4AMNGPuQNZ+4vznmqTgFTn9iQjONC8NGQ/0GuCCQ/AqJZs/0ZiWivlPhA==-----END PKCS7----- " /> <input alt="PayPal - The safer, easier way to pay online." border="0" name="submit" src="https://www.paypalobjects.com/WEBSCR-640-20110401-1/en_AU/i/btn/btn_donateCC_LG.gif" type="image" /> <img alt="" border="0" height="1" src="https://www.paypalobjects.com/WEBSCR-640-20110401-1/en_AU/i/scr/pixel.gif" width="1" />
+  </form>
+</body>
+</html>

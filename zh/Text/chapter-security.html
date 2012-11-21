@@ -1,0 +1,779 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Security</title>
+  <link href="../Styles/stylesheet.css" rel="stylesheet" type="text/css" />
+  <script src="../toc.js" type="text/javascript">
+
+
+
+  //<![CDATA[
+
+   <!-- empty -->
+  //]]>
+  </script>
+  <script type="text/javascript">
+
+
+
+
+  /* <![CDATA[ */
+    (function() {
+        var s = document.createElement("script"), t = document.getElementsByTagName("script")[0];
+        s.type = "text/javascript";
+        s.async = true;
+        s.src = "http://api.flattr.com/js/0.6/load.js?mode=auto";
+        t.parentNode.insertBefore(s, t);
+    })();
+  /* ]]> */
+  </script>
+  <style type="text/css">
+/*<![CDATA[*/
+
+  body { counter-reset: chapter 7; }
+
+  a.sgc-8 {display:none;}
+  span.sgc-7 {color: darkmagenta}
+  span.sgc-6 {color: black}
+  span.sgc-5 {color: green}
+  span.sgc-4 {color: blue}
+  span.sgc-3 {color: DarkRed}
+  span.sgc-2 {color: purple}
+  span.sgc-1 {color: firebrick}
+  /*]]>*/
+  </style>
+</head>
+
+<body>
+  <div class="chapter">
+    <h1 id="heading_id_2">Security</h1>
+  </div>
+
+  <div class="preface"></div>
+
+  <div class="generate_from_h2" id="generated-toc"></div>
+
+  <h2 id="heading_id_3">Introduction</h2>
+
+  <p>Although the internet was originally designed as a system to withstand atacks by hostile agents, it developed in a co-operative environment of relatively trusted entities. Alas, those days are long gone. Spam mail, denial of service attacks, phishing attempts and so on are indicative that anyone using the internet does so at their own risk.</p>
+
+  <p>Applications have to be built to work correctly in hostile situations. "correctly" no longer means just getting the functional aspects of the program correct, but also means ensuring privacy and integrity of data transferred, access only to legitimate users and other issues.</p>
+
+  <p>This of course makes your programs much more complex. There are <em>difficult</em> and <em>subtle</em> computing problems involved in making applications secure. Attempts to do it yourself (such as making up your own encryption libraries) are usually doomed to failure. Instead, you need to make use of libraries designed by security professionals</p>
+
+  <h2 id="heading_id_4">ISO security architecture</h2>
+
+  <p>The ISO OSI (open systems interconnect) seven-layer model of distributed systems is well known and is repeated in this figure:<br />
+  <img alt="" src="../Images/iso.gif" /></p>
+
+  <p>What is less well known is that ISO built a whole series of documents upon this architecture. For our purposes here, the most important is the ISO Security Architecture model, ISO 7498-2.</p>
+
+  <h3 id="heading_id_5">Functions and levels</h3>
+
+  <p>The principal functions required of a security system are</p>
+
+  <ul>
+    <li>Authentication - proof of identity</li>
+
+    <li>Data integrity - data is not tampered with</li>
+
+    <li>Confidentiality - data is not exposed to others</li>
+
+    <li>Notarization/signature</li>
+
+    <li>Access control</li>
+
+    <li>Assurance/availability</li>
+  </ul>
+
+  <p>These are required at the following levels of the OSI stack:</p>
+
+  <ul>
+    <li>Peer entity authentication (3, 4, 7)</li>
+
+    <li>Data origin authentication (3, 4, 7)</li>
+
+    <li>Access control service (3, 4, 7)</li>
+
+    <li>Connection confidentiality (1, 2, 3, 4, 6, 7)</li>
+
+    <li>Connectionless confidentiality (1, 2, 3, 4, 6, 7)</li>
+
+    <li>Selective field confidentiality (6, 7)</li>
+
+    <li>Traffic flow confidentiality (1, 3, 7)</li>
+
+    <li>Connection integrity with recovery (4, 7)</li>
+
+    <li>Connection integrity without recovery (4, 7)</li>
+
+    <li>Connection integrity selective field (7)</li>
+
+    <li>Connectionless integrity selective field (7)</li>
+
+    <li>Non-repudiation at origin (7)</li>
+
+    <li>Non-repudiation of receipt (7)</li>
+  </ul>
+
+  <h3 id="heading_id_6">Mechanisms</h3>
+
+  <ul>
+    <li>Peer entity authentication
+
+      <ul>
+        <li>encryption</li>
+
+        <li>digital signature</li>
+
+        <li>authentication exchange</li>
+      </ul>
+    </li>
+
+    <li>Data origin authentication
+
+      <ul>
+        <li>encryption</li>
+
+        <li>digital signature</li>
+      </ul>
+    </li>
+
+    <li>Access control service
+
+      <ul>
+        <li>access control lists</li>
+
+        <li>passwords</li>
+
+        <li>capabilities lists</li>
+
+        <li>labels</li>
+      </ul>
+    </li>
+
+    <li>Connection confidentiality
+
+      <ul>
+        <li>ecryption</li>
+
+        <li>routing control</li>
+      </ul>
+    </li>
+
+    <li>Connectionless confidelity
+
+      <ul>
+        <li>encryption</li>
+
+        <li>routing control</li>
+      </ul>
+    </li>
+
+    <li>Selective field confidelity
+
+      <ul>
+        <li>encryption</li>
+      </ul>
+    </li>
+
+    <li>Traffic flow confidelity
+
+      <ul>
+        <li>encryption</li>
+
+        <li>traffic padding</li>
+
+        <li>routing control</li>
+      </ul>
+    </li>
+
+    <li>Connection integrity with recovery
+
+      <ul>
+        <li>encryption</li>
+
+        <li>data integrity</li>
+      </ul>
+    </li>
+
+    <li>Connection integrity without recovery
+
+      <ul>
+        <li>encryption</li>
+
+        <li>data integrity</li>
+      </ul>
+    </li>
+
+    <li>Connection integrity selective field
+
+      <ul>
+        <li>encryption</li>
+
+        <li>data integrity</li>
+      </ul>
+    </li>
+
+    <li>Connectionless integrity
+
+      <ul>
+        <li>encryption</li>
+
+        <li>digital signature</li>
+
+        <li>data integrity</li>
+      </ul>
+    </li>
+
+    <li>Connectionless integrity selective field
+
+      <ul>
+        <li>encryption</li>
+
+        <li>digital signature</li>
+
+        <li>data integrity</li>
+      </ul>
+    </li>
+
+    <li>Non-repudiation at origin
+
+      <ul>
+        <li>digital signature</li>
+
+        <li>data integrity</li>
+
+        <li>notarisation</li>
+      </ul>
+    </li>
+
+    <li>Non-repudiation of receipt
+
+      <ul>
+        <li>digital signature</li>
+
+        <li>data integrity</li>
+
+        <li>notarisation</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h2 id="heading_id_7">Data integrity</h2>
+
+  <p>Ensuring data integrity means supplying a means of testing that the data has not been tampered with. Usually this is done by forming a simple number out of the bytes in the data. This process is called <em>hashing</em> and the resulting number is called a <em>hash</em> or <em>hash value</em>.</p>
+
+  <p>A naive hashing algorithm is just to sum up all the bytes in the data. However, this still allows almost any amount of changing the data around and still preserving the hash values. For example, an attacker could just swap two bytes. This preserves the hash value, but could end up with you owing someone $65,536 instead of $256.</p>
+
+  <p>Hashing algorithms used for security purposes have to be "strong", so that it is very difficult for an attacker to find a different sequence of bytes with the same hash value. This makes it hard to modify the data to the attacker's purposes. Security researchers are constantly testing hash algorithms to see if they can break them - that is, find a simple way of coming up with byte sequences to match a hash value. They have devised a series of <em>cryptographic</em> hashing algorithms which are believed to be strong.</p>
+
+  <p>Go has support for several hashing algorithms, including MD4, MD5, RIPEMD-160, SHA1, SHA224, SHA256, SHA384 and SHA512. They all follow the same pattern as far as the Go programmer is concerned: a function <code>New</code> (or similar) in the appropriate package returns a <code>Hash</code> object from the <code>hash</code> package.</p>
+
+  <p>A <code>Hash</code> has an <code>io.Writer</code>, and you write the data to be hashed to this writer. You can query the number of bytes in the hash value by <code>Size</code> and the hash value by <code>Sum</code>.</p>
+
+  <p>A typical case is MD5 hashing. This uses the <code>md5</code> package. The hash value is a 16 byte array. This is typically printed out in ASCII form as four hexadecimal numbers, each made of 4 bytes. A simple program is</p>
+  <pre><code><span class="sgc-6">
+<span class="sgc-1">/* MD5Hash
+ */
+</span>
+<span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"crypto/md5"</span>
+        <span class="sgc-3">"fmt"</span>
+)
+
+<span class="sgc-2">func</span> main() {
+        hash := md5.<span class="sgc-4">New</span>()
+        bytes := []<span class="sgc-5">byte</span>(<span class="sgc-3">"hello\n"</span>)
+        hash.<span class="sgc-4">Write</span>(bytes)
+        hashValue := hash.<span class="sgc-4">Sum</span>(nil)
+        hashSize := hash.<span class="sgc-4">Size</span>()
+        <span class="sgc-2">for</span> n := 0; n &lt; hashSize; n += 4 {
+                <span class="sgc-2">var</span> val uint32
+                val = uint32(hashValue[n])&lt;&lt;24 +
+                        uint32(hashValue[n+1])&lt;&lt;16 +
+                        uint32(hashValue[n+2])&lt;&lt;8 +
+                        uint32(hashValue[n+3])
+                fmt.<span class="sgc-4">Printf</span>(<span class="sgc-3">"%x "</span>, val)
+        }
+        fmt.<span class="sgc-4">Println</span>()
+}
+</span></code></pre>
+
+  <p>which prints "b1946ac9 2492d234 7c6235b4 d2611184"</p>
+
+  <p>A variation on this is the HMAC (Keyed-Hash Message Authentication Code) which adds a key to the hash algorithm. There is little change in using this. To use MD5 hashing along with a key, replace the call to <code>New</code> by</p>
+  <pre><code>
+func NewMD5(key []byte) hash.Hash
+    </code></pre>
+
+  <h2 id="heading_id_8">Symmetric key encryption</h2>
+
+  <p>There are two major mechanisms used for encrypting data. The first uses a single key that is the same for both encryption and decryption. This key needs to be known to both the encrypting and the decrypting agents. How this key is transmitted between the agents is not discussed.</p>
+
+  <p>As with hashing, there are many encryption algorithms. Many are now known to have weaknesses, and in general algorithms become weaker over time as computers get faster. Go has support for several symmetric key algorithms such as Blowfish and DES.</p>
+
+  <p>The algorithms are <em>block</em> algorithms. That is they work on blocks of data. If you data is not aligned to the block size, then you will have to pad it with extra blanks at the end.</p>
+
+  <p>Each algorith is represented by a <code>Cipher</code> object. This is created by <code>NewCipher</code> in the appropriate package, and takes the symmetric key as parameter.</p>
+
+  <p>Once you have a cipher, you can use it to encrypt and decrypt blocks of data. The blocks have to be 8-bit blocks for Blowfish. A program to illustrate this is</p>
+  <pre><code><span class="sgc-6">
+<span class="sgc-1">/* Blowfish
+ */
+</span>
+<span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"bytes"</span>
+        <span class="sgc-3">"code.google.com/p/go.crypto/blowfish"</span>
+        <span class="sgc-3">"fmt"</span>
+)
+
+<span class="sgc-2">func</span> main() {
+        key := []<span class="sgc-5">byte</span>(<span class="sgc-3">"my key"</span>)
+        cipher, err := blowfish.<span class="sgc-4">NewCipher</span>(key)
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Println</span>(err.<span class="sgc-4">Error</span>())
+        }
+        src := []<span class="sgc-5">byte</span>(<span class="sgc-3">"hello\n\n\n"</span>)
+        <span class="sgc-2">var</span> enc [512]<span class="sgc-5">byte</span>
+
+        cipher.<span class="sgc-4">Encrypt</span>(enc[0:], src)
+
+        <span class="sgc-2">var</span> decrypt [8]<span class="sgc-5">byte</span>
+        cipher.<span class="sgc-4">Decrypt</span>(decrypt[0:], enc[0:])
+        result := bytes.<span class="sgc-4">NewBuffer</span>(nil)
+        result.<span class="sgc-4">Write</span>(decrypt[0:8])
+        fmt.<span class="sgc-4">Println</span>(string(result.<span class="sgc-4">Bytes</span>()))
+}
+</span></code></pre>
+
+  <div class="warning">
+    <p>Blowfish is not in the Go 1 distribution. Instead it is on the http://code.google.com/p/ site. You have to install it by running "go get" in a directory where you have source that needs to use it.</p>
+  </div>
+
+  <h2 id="heading_id_9">Public key encryption</h2>
+
+  <p>Public key encryption and decryption requires <em>two</em> keys: one to encrypt and a second one to decrypt. The encryption key is usually made public in some way so that anyone can encrypt messages to you. The decryption key must stay private, otherwise everyon would be able to decrypt those messages! Public key systems aer asymmetric, with different keys for different uses.</p>
+
+  <p>There are many public key encryption systems supported by Go. A typical one is the RSA scheme.</p>
+
+  <p>A program generating RSA private and public keys is</p>
+  <pre><code><span class="sgc-6">
+<span class="sgc-1">/* GenRSAKeys
+ */
+</span>
+<span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"crypto/rand"</span>
+        <span class="sgc-3">"crypto/rsa"</span>
+        <span class="sgc-3">"crypto/x509"</span>
+        <span class="sgc-3">"encoding/gob"</span>
+        <span class="sgc-3">"encoding/pem"</span>
+        <span class="sgc-3">"fmt"</span>
+        <span class="sgc-3">"os"</span>
+)
+
+<span class="sgc-2">func</span> main() {
+        reader := rand.<span class="sgc-4">Reader</span>
+        bitSize := 512
+        key, err := rsa.<span class="sgc-4">GenerateKey</span>(reader, bitSize)
+        checkError(err)
+
+        fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Private key primes"</span>, key.<span class="sgc-4">Primes</span>[0].<span class="sgc-4">String</span>(), key.<span class="sgc-4">Primes</span>[1].<span class="sgc-4">String</span>())
+        fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Private key exponent"</span>, key.<span class="sgc-7">D</span>.<span class="sgc-4">String</span>())
+
+        publicKey := key.<span class="sgc-4">PublicKey</span>
+        fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Public key modulus"</span>, publicKey.<span class="sgc-7">N</span>.<span class="sgc-4">String</span>())
+        fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Public key exponent"</span>, publicKey.<span class="sgc-7">E</span>)
+
+        saveGobKey(<span class="sgc-3">"private.key"</span>, key)
+        saveGobKey(<span class="sgc-3">"public.key"</span>, publicKey)
+
+        savePEMKey(<span class="sgc-3">"private.pem"</span>, key)
+}
+
+<span class="sgc-2">func</span> saveGobKey(fileName string, key <span class="sgc-2">interface</span>{}) {
+        outFile, err := os.<span class="sgc-4">Create</span>(fileName)
+        checkError(err)
+        encoder := gob.<span class="sgc-4">NewEncoder</span>(outFile)
+        err = encoder.<span class="sgc-4">Encode</span>(key)
+        checkError(err)
+        outFile.<span class="sgc-4">Close</span>()
+}
+
+<span class="sgc-2">func</span> savePEMKey(fileName string, key *rsa.<span class="sgc-4">PrivateKey</span>) {
+
+        outFile, err := os.<span class="sgc-4">Create</span>(fileName)
+        checkError(err)
+
+        <span class="sgc-2">var</span> privateKey = &amp;pem.<span class="sgc-4">Block</span>{<span class="sgc-4">Type</span>: <span class="sgc-3">"RSA PRIVATE KEY"</span>,
+                <span class="sgc-4">Bytes</span>: x509.<span class="sgc-4">MarshalPKCS1PrivateKey</span>(key)}
+
+        pem.<span class="sgc-4">Encode</span>(outFile, privateKey)
+
+        outFile.<span class="sgc-4">Close</span>()
+}
+
+<span class="sgc-2">func</span> checkError(err error) {
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Fatal error "</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <p>The program also saves the certificates using <code>gob</code> serialisation. They can be read back by this program:</p>
+  <pre><code><span class="sgc-6">
+<span class="sgc-1">/* LoadRSAKeys
+ */
+</span>
+<span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"crypto/rsa"</span>
+        <span class="sgc-3">"encoding/gob"</span>
+        <span class="sgc-3">"fmt"</span>
+        <span class="sgc-3">"os"</span>
+)
+
+<span class="sgc-2">func</span> main() {
+        <span class="sgc-2">var</span> key rsa.<span class="sgc-4">PrivateKey</span>
+        loadKey(<span class="sgc-3">"private.key"</span>, &amp;key)
+
+        fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Private key primes"</span>, key.<span class="sgc-4">Primes</span>[0].<span class="sgc-4">String</span>(), key.<span class="sgc-4">Primes</span>[1].<span class="sgc-4">String</span>())
+        fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Private key exponent"</span>, key.<span class="sgc-7">D</span>.<span class="sgc-4">String</span>())
+
+        <span class="sgc-2">var</span> publicKey rsa.<span class="sgc-4">PublicKey</span>
+        loadKey(<span class="sgc-3">"public.key"</span>, &amp;publicKey)
+
+        fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Public key modulus"</span>, publicKey.<span class="sgc-7">N</span>.<span class="sgc-4">String</span>())
+        fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Public key exponent"</span>, publicKey.<span class="sgc-7">E</span>)
+}
+
+<span class="sgc-2">func</span> loadKey(fileName string, key <span class="sgc-2">interface</span>{}) {
+        inFile, err := os.<span class="sgc-4">Open</span>(fileName)
+        checkError(err)
+        decoder := gob.<span class="sgc-4">NewDecoder</span>(inFile)
+        err = decoder.<span class="sgc-4">Decode</span>(key)
+        checkError(err)
+        inFile.<span class="sgc-4">Close</span>()
+}
+
+<span class="sgc-2">func</span> checkError(err error) {
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Fatal error "</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+}
+</span></code></pre><!--
+<h3> PEM </h3>
+<p>
+
+  <code>
+    <pre>
+var pemPrivateKey = `=====BEGIN RSA PRIVATE KEY=====
+MIIBOgIBAAJBALKZD0nEffqM1ACuak0bijtqE2QrI/KLADv7l3kK3ppMyCuLKoF0
+fd7Ai2KW5ToIwzFofvJcS/STa6HA5gQenRUCAwEAAQJBAIq9amn00aS0h/CrjXqu
+/ThglAXJmZhOMPVn4eiu7/ROixi9sex436MaVeMqSNf7Ex9a8fRNfWss7Sqd9eWu
+RTUCIQDasvGASLqmjeffBNLTXV2A5g4t+kLVCpsEIZAycV5GswIhANEPLmax0ME/
+EO+ZJ79TJKN5yiGBRsv5yvx5UiHxajEXAiAhAol5N4EUyq6I9w1rYdhPMGpLfk7A
+IU2snfRJ6Nq2CQIgFrPsWRCkV+gOYcajD17rEqmuLrdIRexpg8N1DOSXoJ8CIGlS
+tAboUGBxTDq3ZroNism3DaMIbKPyYrAqhKov1h5V
+=====END RSA PRIVATE KEY=====
+`
+
+func bigFromString(s string) *big.Int {
+        ret := new(big.Int)
+        ret.SetString(s, 10)
+        return ret
+}
+
+var rsaPrivateKey = &rsa.PrivateKey{
+        PublicKey: rsa.PublicKey{
+                N: bigFromString("9353930466774385905609975137998169297361893554
+14998671685329502257853572497967725295852446635047121036783518748074826886427746
+4700638583474144061408845077"),
+                E: 65537,
+        },
+        D: bigFromString("726639843132811634405769937974922253227934392381906363
+94970490393898993285385430876577337665541558398345195294398516730148002612857577
+59040931985506583861"),
+        P: bigFromString("989203665480846436017288690555926508355729509322669674
+61790948584315647051443"),
+        Q: bigFromString("945602083088470157474985238840633946716066719049446663
+60068158221458669711639"),
+}
+
+        block, _ := pem.Decode([]byte(pemPrivateKey))
+        priv, err := ParsePKCS1PrivateKey(block.Bytes)
+    </pre>
+  </code>
+</p>
+-->
+
+  <h2 id="heading_id_10">X.509 certificates</h2>
+
+  <p>A Public Key Infrastructure (PKI) is a framework for a collection of public keys, along with additional information such as owner name and location, and links between them giving some sort of approval mechanism.</p>
+
+  <p>The principal PKI in use today is based on X.509 certificates. For example, web browsers use them to verify the identity of web sites.</p>
+
+  <p>An example program to generate a self-signed X.509 certificate for my web site and store it in a <code>.cer</code> file is</p>
+  <pre><code><span class="sgc-6">
+<span class="sgc-1">/* GenX509Cert
+ */
+</span>
+<span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"crypto/rand"</span>
+        <span class="sgc-3">"crypto/rsa"</span>
+        <span class="sgc-3">"crypto/x509"</span>
+        <span class="sgc-3">"crypto/x509/pkix"</span>
+        <span class="sgc-3">"encoding/gob"</span>
+        <span class="sgc-3">"encoding/pem"</span>
+        <span class="sgc-3">"fmt"</span>
+        <span class="sgc-3">"math/big"</span>
+        <span class="sgc-3">"os"</span>
+        <span class="sgc-3">"time"</span>
+)
+
+<span class="sgc-2">func</span> main() {
+        random := rand.<span class="sgc-4">Reader</span>
+
+        <span class="sgc-2">var</span> key rsa.<span class="sgc-4">PrivateKey</span>
+        loadKey(<span class="sgc-3">"private.key"</span>, &amp;key)
+
+        now := time.<span class="sgc-4">Now</span>()
+        then := now.<span class="sgc-4">Add</span>(60 * 60 * 24 * 365 * 1000 * 1000 * 1000) <span class="sgc-1">// one year
+</span> template := x509.<span class="sgc-4">Certificate</span>{
+                <span class="sgc-4">SerialNumber</span>: big.<span class="sgc-4">NewInt</span>(1),
+                <span class="sgc-4">Subject</span>: pkix.<span class="sgc-4">Name</span>{
+                        <span class="sgc-4">CommonName</span>:   <span class="sgc-3">"jan.newmarch.name"</span>,
+                        <span class="sgc-4">Organization</span>: []string{<span class="sgc-3">"Jan Newmarch"</span>},
+                },
+                <span class="sgc-1">//      NotBefore: time.Unix(now, 0).UTC(),
+</span>         <span class="sgc-1">//      NotAfter:  time.Unix(now+60*60*24*365, 0).UTC(),
+</span>         <span class="sgc-4">NotBefore</span>: now,
+                <span class="sgc-4">NotAfter</span>:  then,
+
+                <span class="sgc-4">SubjectKeyId</span>: []<span class="sgc-5">byte</span>{1, 2, 3, 4},
+                <span class="sgc-4">KeyUsage</span>:     x509.<span class="sgc-4">KeyUsageCertSign</span> | x509.<span class="sgc-4">KeyUsageKeyEncipherment</span> | x509.<span class="sgc-4">KeyUsageDigitalSignature</span>,
+
+                <span class="sgc-4">BasicConstraintsValid</span>: true,
+                <span class="sgc-4">IsCA</span>:                  true,
+                <span class="sgc-4">DNSNames</span>:              []string{<span class="sgc-3">"jan.newmarch.name"</span>, <span class="sgc-3">"localhost"</span>},
+        }
+        derBytes, err := x509.<span class="sgc-4">CreateCertificate</span>(random, &amp;template,
+                &amp;template, &amp;key.<span class="sgc-4">PublicKey</span>, &amp;key)
+        checkError(err)
+
+        certCerFile, err := os.<span class="sgc-4">Create</span>(<span class="sgc-3">"jan.newmarch.name.cer"</span>)
+        checkError(err)
+        certCerFile.<span class="sgc-4">Write</span>(derBytes)
+        certCerFile.<span class="sgc-4">Close</span>()
+
+        certPEMFile, err := os.<span class="sgc-4">Create</span>(<span class="sgc-3">"jan.newmarch.name.pem"</span>)
+        checkError(err)
+        pem.<span class="sgc-4">Encode</span>(certPEMFile, &amp;pem.<span class="sgc-4">Block</span>{<span class="sgc-4">Type</span>: <span class="sgc-3">"CERTIFICATE"</span>, <span class="sgc-4">Bytes</span>: derBytes})
+        certPEMFile.<span class="sgc-4">Close</span>()
+
+        keyPEMFile, err := os.<span class="sgc-4">Create</span>(<span class="sgc-3">"private.pem"</span>)
+        checkError(err)
+        pem.<span class="sgc-4">Encode</span>(keyPEMFile, &amp;pem.<span class="sgc-4">Block</span>{<span class="sgc-4">Type</span>: <span class="sgc-3">"RSA PRIVATE KEY"</span>,
+                <span class="sgc-4">Bytes</span>: x509.<span class="sgc-4">MarshalPKCS1PrivateKey</span>(&amp;key)})
+        keyPEMFile.<span class="sgc-4">Close</span>()
+}
+
+<span class="sgc-2">func</span> loadKey(fileName string, key <span class="sgc-2">interface</span>{}) {
+        inFile, err := os.<span class="sgc-4">Open</span>(fileName)
+        checkError(err)
+        decoder := gob.<span class="sgc-4">NewDecoder</span>(inFile)
+        err = decoder.<span class="sgc-4">Decode</span>(key)
+        checkError(err)
+        inFile.<span class="sgc-4">Close</span>()
+}
+
+<span class="sgc-2">func</span> checkError(err error) {
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Fatal error "</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <p>This can then be read back in by</p>
+  <pre><code><span class="sgc-6">
+<span class="sgc-1">/* GenX509Cert
+ */
+</span>
+<span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"crypto/x509"</span>
+        <span class="sgc-3">"fmt"</span>
+        <span class="sgc-3">"os"</span>
+)
+
+<span class="sgc-2">func</span> main() {
+        certCerFile, err := os.<span class="sgc-4">Open</span>(<span class="sgc-3">"jan.newmarch.name.cer"</span>)
+        checkError(err)
+        derBytes := make([]<span class="sgc-5">byte</span>, 1000) <span class="sgc-1">// bigger than the file
+</span> count, err := certCerFile.<span class="sgc-4">Read</span>(derBytes)
+        checkError(err)
+        certCerFile.<span class="sgc-4">Close</span>()
+
+        <span class="sgc-1">// trim the bytes to actual length in call
+</span> cert, err := x509.<span class="sgc-4">ParseCertificate</span>(derBytes[0:count])
+        checkError(err)
+
+        fmt.<span class="sgc-4">Printf</span>(<span class="sgc-3">"Name %s\n"</span>, cert.<span class="sgc-4">Subject</span>.<span class="sgc-4">CommonName</span>)
+        fmt.<span class="sgc-4">Printf</span>(<span class="sgc-3">"Not before %s\n"</span>, cert.<span class="sgc-4">NotBefore</span>.<span class="sgc-4">String</span>())
+        fmt.<span class="sgc-4">Printf</span>(<span class="sgc-3">"Not after %s\n"</span>, cert.<span class="sgc-4">NotAfter</span>.<span class="sgc-4">String</span>())
+
+}
+
+<span class="sgc-2">func</span> checkError(err error) {
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Fatal error "</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <h2 id="heading_id_11">TLS</h2>
+
+  <p>Encryption/decryption schemes are of limited use if you have to do all the heavy lifting yourself. The most popular mechanism on the internet to give support for encrypted message passing is currently TLS (Transport Layer Security) which was formerly SSL (Secure Sockets Layer).</p>
+
+  <p>In TLS, a client and a server negotiate identity using X.509 certificates. One this is complete, a secret key is invented between them, and all encryption/decryption is done using this key. The negotiation is relatively slow, but once complete a faster private key mechanism is used.</p>
+
+  <p>A server is</p>
+  <pre><code><span class="sgc-6">
+<span class="sgc-1">/* TLSEchoServer
+ */
+</span><span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"crypto/rand"</span>
+        <span class="sgc-3">"crypto/tls"</span>
+        <span class="sgc-3">"fmt"</span>
+        <span class="sgc-3">"net"</span>
+        <span class="sgc-3">"os"</span>
+        <span class="sgc-3">"time"</span>
+)
+
+<span class="sgc-2">func</span> main() {
+
+        cert, err := tls.<span class="sgc-4">LoadX509KeyPair</span>(<span class="sgc-3">"jan.newmarch.name.pem"</span>, <span class="sgc-3">"private.pem"</span>)
+        checkError(err)
+        config := tls.<span class="sgc-4">Config</span>{<span class="sgc-4">Certificates</span>: []tls.<span class="sgc-4">Certificate</span>{cert}}
+
+        now := time.<span class="sgc-4">Now</span>()
+        config.<span class="sgc-4">Time</span> = <span class="sgc-2">func</span>() time.<span class="sgc-4">Time</span> { <span class="sgc-2">return</span> now }
+        config.<span class="sgc-4">Rand</span> = rand.<span class="sgc-4">Reader</span>
+
+        service := <span class="sgc-3">"0.0.0.0:1200"</span>
+
+        listener, err := tls.<span class="sgc-4">Listen</span>(<span class="sgc-3">"tcp"</span>, service, &amp;config)
+        checkError(err)
+        fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Listening"</span>)
+        <span class="sgc-2">for</span> {
+                conn, err := listener.<span class="sgc-4">Accept</span>()
+                <span class="sgc-2">if</span> err != nil {
+                        fmt.<span class="sgc-4">Println</span>(err.<span class="sgc-4">Error</span>())
+                        <span class="sgc-2">continue</span>
+                }
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Accepted"</span>)
+                go handleClient(conn)
+        }
+}
+
+<span class="sgc-2">func</span> handleClient(conn net.<span class="sgc-4">Conn</span>) {
+        defer conn.<span class="sgc-4">Close</span>()
+
+        <span class="sgc-2">var</span> buf [512]<span class="sgc-5">byte</span>
+        <span class="sgc-2">for</span> {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Trying to read"</span>)
+                n, err := conn.<span class="sgc-4">Read</span>(buf[0:])
+                <span class="sgc-2">if</span> err != nil {
+                        fmt.<span class="sgc-4">Println</span>(err)
+                }
+                <span class="sgc-7">_</span>, err2 := conn.<span class="sgc-4">Write</span>(buf[0:n])
+                <span class="sgc-2">if</span> err2 != nil {
+                        <span class="sgc-2">return</span>
+                }
+        }
+}
+
+<span class="sgc-2">func</span> checkError(err error) {
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Fatal error "</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <p>The server works with the following client:</p>
+  <pre><code><span class="sgc-6">
+<span class="sgc-1">/* TLSEchoClient
+ */
+</span><span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"fmt"</span>
+        <span class="sgc-3">"os"</span>
+        <span class="sgc-3">"crypto/tls"</span>
+)
+
+<span class="sgc-2">func</span> main() {
+        <span class="sgc-2">if</span> len(os.<span class="sgc-4">Args</span>) != 2 {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Usage: "</span>, os.<span class="sgc-4">Args</span>[0], <span class="sgc-3">"host:port"</span>)
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+        service := os.<span class="sgc-4">Args</span>[1]
+
+        conn, err := tls.<span class="sgc-4">Dial</span>(<span class="sgc-3">"tcp"</span>, service, nil)
+        checkError(err)
+
+        <span class="sgc-2">for</span> n := 0; n &lt; 10; n++ {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Writing..."</span>)
+                conn.<span class="sgc-4">Write</span>([]<span class="sgc-5">byte</span>(<span class="sgc-3">"Hello "</span> + string(n+48)))
+
+                <span class="sgc-2">var</span> buf [512]<span class="sgc-5">byte</span>
+                n, err := conn.<span class="sgc-4">Read</span>(buf[0:])
+                checkError(err)
+
+                fmt.<span class="sgc-4">Println</span>(string(buf[0:n]))
+        }
+        os.<span class="sgc-4">Exit</span>(0)
+}
+
+<span class="sgc-2">func</span> checkError(err error) {
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Fatal error "</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <h2 id="heading_id_12">Conclusion</h2>
+
+  <p>Security is a huge area in itself, and in this chapter we have barely touched on it. However, the major concepts have been covered. What has not been stressed is how much security needs to be built into the design phase: security as an afterthought is nearly always a failure.</p>
+
+  <p>Copyright Jan Newmarch, jan@newmarch.name</p>
+
+  <p>If you like this book, please contribute using Flattr <a class="FlattrButton sgc-8" href="http://jan.newmarch.name/go/index.html"></a><br />
+  or donate using PayPal</p>
+
+  <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+    <input name="cmd" type="hidden" value="_s-xclick" /> <input name="encrypted" type="hidden" value="-----BEGIN PKCS7-----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-----END PKCS7----- " /> <input alt="PayPal - The safer, easier way to pay online." border="0" name="submit" src="https://www.paypalobjects.com/WEBSCR-640-20110401-1/en_AU/i/btn/btn_donateCC_LG.gif" type="image" /> <img alt="" border="0" height="1" src="https://www.paypalobjects.com/WEBSCR-640-20110401-1/en_AU/i/scr/pixel.gif" width="1" />
+  </form>
+</body>
+</html>

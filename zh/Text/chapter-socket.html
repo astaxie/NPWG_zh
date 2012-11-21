@@ -1,0 +1,1202 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Sockets</title>
+  <link href="../Styles/stylesheet.css" rel="stylesheet" type="text/css" />
+  <script src="../toc.js" type="text/javascript">
+
+
+
+  //<![CDATA[
+
+   <!-- empty -->
+  //]]>
+  </script>
+  <script type="text/javascript">
+
+
+
+
+  /* <![CDATA[ */
+    (function() {
+        var s = document.createElement("script"), t = document.getElementsByTagName("script")[0];
+        s.type = "text/javascript";
+        s.async = true;
+        s.src = "http://api.flattr.com/js/0.6/load.js?mode=auto";
+        t.parentNode.insertBefore(s, t);
+    })();
+  /* ]]> */
+  </script>
+  <style type="text/css">
+/*<![CDATA[*/
+
+  body { counter-reset: chapter 3; }
+
+  body {
+  background-color: #FFFFFF;
+  }
+  a.sgc-8 {display:none;}
+  span.sgc-7 {color: green}
+  span.sgc-6 {color: darkmagenta}
+  span.sgc-5 {color: black}
+  span.sgc-4 {color: blue}
+  span.sgc-3 {color: DarkRed}
+  span.sgc-2 {color: purple}
+  span.sgc-1 {color: firebrick}
+  /*]]>*/
+  </style>
+</head>
+
+<body>
+  <div class="chapter">
+    <h1 id="heading_id_2">Socket-level Programming</h1>
+  </div>
+
+  <div class="preface">
+    <p>This chapter looks at the basic techniques for network programming. It deals with host and service addressing, and then considers TCP and UDP. It shows how to build both servers and clients using the TCP and UDP Go APIs. It also looks at raw sockets, in case you need to implement your own protocol above IP.</p>
+  </div>
+
+  <div class="generate_from_h2" id="generated-toc"></div>
+
+  <h2 id="heading_id_3">Introduction</h2>
+
+  <p>There are many kinds of networks in the world. These range from the very old such as serial links, through to wide area networks made from copper and fibre, to wireless networks of various kinds, both for computers and for telecommunications devices such as phones. These networks obviously differ at the physical link layer, but in many cases they also differed at higher layers of the OSI stack.</p>
+
+  <p>Over the years there has been a convergence to the "internet stack" of IP and TCP/UDP. For example, Bluetooth defines physical layers and protocol layers, but on top of that is an IP stack so that the same internet programming techniques can be employed on many Bluetooth devices. Similarly, developing 4G wireless phone technologies such as LTE (Long Term Evolution) will also use an IP stack.</p>
+
+  <p>While IP provides the networking layer 3 of the OSI stack, TCP and UDP deal with layer 4. These are not the final word, even in the interenet world: SCTP has come from the telecommunications to challenge both TCP and UDP, while to provide internet services in interplanetary space requires new, under development protocols such as DTN. Nevertheless, IP, TCP and UDP hold sway as principal networking technologies now and at least for a considerable time into the future. Go has full support for this style of programming</p>
+
+  <p>This chapter shows how to do TCP and UDP programming using Go, and how to use a raw socket for other protocols.</p>
+
+  <h2 id="heading_id_4">The TCP/IP stack</h2>
+
+  <p>The OSI model was devised using a committee process wherein the standard was set up and then implemented. Some parts of the OSI standard are obscure, some parts cannot easily be implemented, some parts have not been implemented.</p>
+
+  <p>The TCP/IP protocol was devised through a long-running DARPA project. This worked by implementation followed by RFCs (Request For Comment). TCP/IP is the principal Unix networking protocol. TCP/IP = Transmission Control Protocol/Internet Protocol.</p>
+
+  <p>The TCP/IP stack is shorter than the OSI one:<br />
+  <img alt="" src="../Images/tcp_stack.gif" /><br />
+  TCP is a connection-oriented protocol, UDP (User Datagram Protocol) is a connectionless protocol.</p>
+
+  <h3 id="heading_id_5">IP datagrams</h3>
+
+  <p>The IP layer provides a connectionless and unreliable delivery system. It considers each datagram independently of the others. Any association between datagrams must be supplied by the higher layers.</p>
+
+  <p>The IP layer supplies a checksum that includes its own header. The header includes the source and destination addresses.</p>
+
+  <p>The IP layer handles routing through an Internet. It is also responsible for breaking up large datagrams into smaller ones for transmission and reassembling them at the other end.</p>
+
+  <h3 id="heading_id_6">UDP</h3>
+
+  <p>UDP is also connectionless and unreliable. What it adds to IP is a checksum for the contents of the datagram and <i>port numbers.</i> These are used to give a client/server model - see later.</p>
+
+  <h3 id="heading_id_7">TCP</h3>
+
+  <p>TCP supplies logic to give a reliable connection-oriented protocol above IP. It provides a <i>virtual circuit</i> that two processes can use to communicate. It also uses port numbers to identify services on a host.</p>
+
+  <h2 id="heading_id_8">Internet adddresses</h2>
+
+  <p>In order to use a service you must be able to find it. The Internet uses an address scheme for devices such as computers so that they can be located. This addressing scheme was originally devised when there were only a handful of connected computers, and very generously allowed upto 2^32 addresses, using a 32 bit unsigned integer. These are the so-called IPv4 addresses. In recent years, the number of connected (or at least directly addressable) devices has threatened to exceed this number, and so "any day now" we will switch to IPv6 addressing which will allow upto 2^128 addresses, using an unsigned 128 bit integer. The changeover is most likely to be forced by emerging countries, as the developed world has already taken nearly all of the pool of IPv4 addresses.</p>
+
+  <h3 id="heading_id_9">IPv4 addresses</h3>
+
+  <p>The address is a 32 bit integer which gives the IP address. This addresses down to a network interface card on a single device. The address is usually written as four bytes in decimal with a dot '.' between them, as in "127.0.0.1" or "66.102.11.104".</p>
+
+  <p>The IP address of any device is generally composed of two parts: the address of the network in which the device resides, and the address of the device within that network. Once upon a time, the split between network address and internal address was simple and was based upon the bytes used in the IP address.</p>
+
+  <ul>
+    <li>In a class A network, the first byte identifies the network, while the last three identify the device. There are only 128 class A networks, owned by the very early players in the internet space such as IBM, the General Electric Company and MIT (http://www.iana.org/assignments/ipv4-address-space/ipv4-address-space.xml)</li>
+
+    <li>Class B networks use the first two bytes to identify the network and the last two to identify devices within the subnet. This allows upto 2^16 (65,536) devices on a subnet</li>
+
+    <li>Class C networks use the first three bytes to identify the network and the last one to identify devices within that network. This allows upto 2^8 (actually 254, not 256) devices</li>
+  </ul>
+
+  <p>This scheme doesn't work well if you want, say, 400 computers on a network. 254 is too small, while 65,536 is too large. In binary arithmetic terms, you want about 512. This can be achieved by using a 23 bit network address and 9 bits for the device addresses. Similarly, if you want upto 1024 devices, you use a 22 bit network address and a 10 bit device address.</p>
+
+  <p>Given an IP address of a device, and knowing how many bits N are used for the network address gives a relatively straightforward process for extracting the network address and the device address within that network. Form a "network mask" which is a 32-bit binary number with all ones in the first N places and all zeroes in the remaining ones. For example, if 16 bits are used for the network address, the mask is 11111111111111110000000000000000. It's a little inconvenient using binary, so decimal bytes are usually used. The netmask for 16 bit network addresses is 255.255.0.0, for 24 bit network addresses it is 255.255.255.0, while for 23 bit addresses it would be 255.255.254.0 and for 22 bit addresses it would be 255.255.252.0.</p>
+
+  <p>Then to find the network of a device, bit-wise AND it's IP address with the network mask, while the device address within the subnet is found with bit-wise AND of the 1's complement of the mask with the IP address.</p>
+
+  <h3 id="heading_id_10">IPv6 addresses</h3>
+
+  <p>The internet has grown vastly beyond original expectations. The initially generous 32-bit addressing scheme is on the verge of running out. There are unpleasant workarounds such as NAT addressing, but eventually we will have to switch to a wider address space. IPv6 uses 128-bit addresses. Even bytes becomes cumbersome to express such addresses, so hexadecimal digits are used, grouped into 4 digits and separated by a colon ':'. A typical address might be 2002:c0e8:82e7:0:0:0:c0e8:82e7.</p>
+
+  <p>These addresses are not easy to remember! DNS will become even more important. There are tricks to reducing some addresses, such as eliding zeroes and repeated digits. For example, "localhost" is 0:0:0:0:0:0:0:1, which can be shortened to ::1</p>
+
+  <h2 id="heading_id_11">IP address type</h2>
+
+  <h3 id="heading_id_12">The type IP</h3>
+
+  <p>The package "net" defines many types, functions and methods of use in Go network programming. The type <code>IP</code> is defined as an array of bytes</p>
+  <pre>
+    <code>
+      type IP []byte
+    </code>
+  </pre>
+
+  <p>There are several functions to manipulate a variable of type <code>IP</code>, but you are likely to use only some of them in practice. For example, the function <code>ParseIP(String)</code> will take a dotted IPv4 address or a colon IPv6 address, while the <code>IP</code> method <code>String</code> will return a string. Note that you may not get back what you started with: the string form of 0:0:0:0:0:0:0:1 is ::1.</p>
+
+  <p>A program to illustrate this is</p>
+  <pre><code><span class="sgc-5">
+<span class="sgc-1">/* IP
+ */
+</span>
+<span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"net"</span>
+        <span class="sgc-3">"os"</span>
+        <span class="sgc-3">"fmt"</span>
+)
+
+<span class="sgc-2">func</span> main() {
+        <span class="sgc-2">if</span> len(os.<span class="sgc-4">Args</span>) != 2 {
+                fmt.<span class="sgc-4">Fprintf</span>(os.<span class="sgc-4">Stderr</span>, <span class="sgc-3">"Usage: %s ip-addr\n"</span>, os.<span class="sgc-4">Args</span>[0])
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+        name := os.<span class="sgc-4">Args</span>[1]
+
+        addr := net.<span class="sgc-4">ParseIP</span>(name)
+        <span class="sgc-2">if</span> addr == nil {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Invalid address"</span>)
+        } <span class="sgc-2">else</span> {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"The address is "</span>, addr.<span class="sgc-4">String</span>())
+        }
+        os.<span class="sgc-4">Exit</span>(0)
+}
+</span></code></pre>
+
+  <p>If this is compiled to the executable <code>IP</code> then it can run for example as</p>
+  <pre><code>
+IP 127.0.0.1
+    </code></pre>
+
+  <p>with response</p>
+  <pre><code>
+The address is 127.0.0.1
+    </code></pre>
+
+  <p>or as</p>
+  <pre><code>
+IP 0:0:0:0:0:0:0:1
+    </code></pre>
+
+  <p>with response</p>
+  <pre><code>
+The address is ::1
+    </code></pre>
+
+  <h3 id="heading_id_13">The type IPmask</h3>
+
+  <p>In order to handle masking operations, there is the type</p>
+  <pre>
+    <code>
+type IPMask []byte
+    </code>
+  </pre>
+
+  <p>There is a function to create a mask from a 4-byte IPv4 address</p>
+  <pre>
+    <code>
+func IPv4Mask(a, b, c, d byte) IPMask
+    </code>
+  </pre>
+
+  <p>Alternatively, there is a method of <code>IP</code> which returns the default mask</p>
+  <pre>
+    <code>
+func (ip IP) DefaultMask() IPMask
+    </code>
+  </pre>
+
+  <p>Note that the string form of a mask is a hex number such as ffff0000 for a mask of 255.255.0.0.</p>
+
+  <p>A mask can then be used by a method of an IP address to find the network for that IP address</p>
+  <pre>
+    <code>
+func (ip IP) Mask(mask IPMask) IP
+    </code>
+  </pre>
+
+  <p>An example of the use of this is the following program:</p>
+  <pre><code><span class="sgc-5">
+<span class="sgc-1">/* Mask
+ */
+</span>
+<span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"fmt"</span>
+        <span class="sgc-3">"net"</span>
+        <span class="sgc-3">"os"</span>
+)
+
+<span class="sgc-2">func</span> main() {
+        <span class="sgc-2">if</span> len(os.<span class="sgc-4">Args</span>) != 2 {
+                fmt.<span class="sgc-4">Fprintf</span>(os.<span class="sgc-4">Stderr</span>, <span class="sgc-3">"Usage: %s dotted-ip-addr\n"</span>, os.<span class="sgc-4">Args</span>[0])
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+        dotAddr := os.<span class="sgc-4">Args</span>[1]
+
+        addr := net.<span class="sgc-4">ParseIP</span>(dotAddr)
+        <span class="sgc-2">if</span> addr == nil {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Invalid address"</span>)
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+        mask := addr.<span class="sgc-4">DefaultMask</span>()
+        network := addr.<span class="sgc-4">Mask</span>(mask)
+        ones, bits := mask.<span class="sgc-4">Size</span>()
+        fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Address is "</span>, addr.<span class="sgc-4">String</span>(),
+                <span class="sgc-3">" Default mask length is "</span>, bits,
+                <span class="sgc-3">"Leading ones count is "</span>, ones,
+                <span class="sgc-3">"Mask is (hex) "</span>, mask.<span class="sgc-4">String</span>(),
+                <span class="sgc-3">" Network is "</span>, network.<span class="sgc-4">String</span>())
+        os.<span class="sgc-4">Exit</span>(0)
+}
+</span></code></pre>
+
+  <p>If this is compiled to <code>Mask</code> and run by</p>
+  <pre><code>
+Mask 127.0.0.1
+    </code></pre>
+
+  <p>it will return</p>
+  <pre><code>
+Address is  127.0.0.1  Default mask length is  8  Network is  127.0.0.0
+    </code></pre>
+
+  <h3 id="heading_id_14">The type IPAddr</h3>
+
+  <p>Many of the other functions and methods in the net package return a pointer to an <code>IPAddr</code>. This is simply a structure containing an <code>IP</code>.</p>
+  <pre>
+    <code>
+type IPAddr {
+    IP IP
+}
+    </code>
+  </pre>
+
+  <p>A primary use of this type is to perform DNS lookups on IP host names.</p>
+  <pre>
+    <code>
+func ResolveIPAddr(net, addr string) (*IPAddr, os.Error)
+    </code>
+  </pre>
+
+  <p>where <code>net</code> is one of "ip", "ip4" or "ip6". This is shown in the program</p>
+  <pre><code><span class="sgc-5">
+<span class="sgc-1">/* ResolveIP
+ */
+</span>
+<span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"net"</span>
+        <span class="sgc-3">"os"</span>
+        <span class="sgc-3">"fmt"</span>
+)
+
+<span class="sgc-2">func</span> main() {
+        <span class="sgc-2">if</span> len(os.<span class="sgc-4">Args</span>) != 2 {
+                fmt.<span class="sgc-4">Fprintf</span>(os.<span class="sgc-4">Stderr</span>, <span class="sgc-3">"Usage: %s hostname\n"</span>, os.<span class="sgc-4">Args</span>[0])
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Usage: "</span>, os.<span class="sgc-4">Args</span>[0], <span class="sgc-3">"hostname"</span>)
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+        name := os.<span class="sgc-4">Args</span>[1]
+
+        addr, err := net.<span class="sgc-4">ResolveIPAddr</span>(<span class="sgc-3">"ip"</span>, name)
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Resolution error"</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+        fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Resolved address is "</span>, addr.<span class="sgc-4">String</span>())
+        os.<span class="sgc-4">Exit</span>(0)
+}
+</span></code></pre>
+
+  <p>Running <code>ResolveIP www.google.com</code> returns</p>
+  <pre><code>
+Resolved address is  66.102.11.104
+    </code></pre>
+
+  <h3 id="heading_id_15">Host lookup</h3>
+
+  <p>The function <code>ResolveIPAddr</code> will perform a DNS lookup on a hostname, and return a single IP address. However, hosts may have multiple IP addresses, usually from multiple network interface cards. They may also have multiple host names, acting as aliases.</p>
+  <pre>
+    <code>
+func LookupHost(name string) (cname string, addrs []string, err os.Error)
+    </code>
+  </pre>
+
+  <p>One of these addresses will be labelled as the "canonical" host name. If you wish to find the canonical name, use <code>func LookupCNAME(name string) (cname string, err os.Error)</code></p>
+
+  <p>This is shown in the following program</p>
+  <pre><code><span class="sgc-5">
+<span class="sgc-1">/* LookupHost
+ */
+</span>
+<span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"net"</span>
+        <span class="sgc-3">"os"</span>
+        <span class="sgc-3">"fmt"</span>
+)
+
+<span class="sgc-2">func</span> main() {
+        <span class="sgc-2">if</span> len(os.<span class="sgc-4">Args</span>) != 2 {
+                fmt.<span class="sgc-4">Fprintf</span>(os.<span class="sgc-4">Stderr</span>, <span class="sgc-3">"Usage: %s hostname\n"</span>, os.<span class="sgc-4">Args</span>[0])
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+        name := os.<span class="sgc-4">Args</span>[1]
+
+        addrs, err := net.<span class="sgc-4">LookupHost</span>(name)
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Error: "</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(2)
+        }
+
+        <span class="sgc-2">for</span> <span class="sgc-6">_</span>, s := range addrs {
+                fmt.<span class="sgc-4">Println</span>(s)
+        }
+        os.<span class="sgc-4">Exit</span>(0)
+}
+</span></code></pre>
+
+  <p>Note that this function returns strings, not <code>IPAddress</code> values.</p>
+
+  <h2 id="heading_id_16">Services</h2>
+
+  <p>Services run on host machines. They are typically long lived and are designed to wait for requests and respond to them. There are many types of services, and there are many ways in which they can offer their services to clients. The internet world bases many of these services on two methods of communication, TCP and UDP, although there are other communication protocols such as SCTP waiting in the wings to take over. Many other types of service, such as peer-to-peer, remote procedure calls, communicating agents, and many others are built on top of TCP and UDP.</p>
+
+  <h3 id="heading_id_17">Ports</h3>
+
+  <p>Services live on host machines. The IP address will locate the host. But on each computer may be many services, and a simple way is needed to distinguish between them. The method used by TCP, UDP, SCTP and others is to use a <em>port number</em>. This is an unsigned integer beween 1 and 65,535 and each service will associate itself with one or more of these port numbers.</p>
+
+  <p>There are many "standard" ports. Telnet usually uses port 23 with the TCP protocol. DNS uses port 53, either with TCP or with UDP. FTP uses ports 21 and 20, one for commands, the other for data transfer. HTTP usually uses port 80, but it often uses ports 8000, 8080 and 8088, all with TCP. The X Window System often takes ports 6000-6007, both on TCP and UDP.</p>
+
+  <p>On a Unix system, the commonly used ports are listed in the file <code>/etc/services</code>. Go has a function to interrogate this file</p>
+  <pre>
+    <code>
+func LookupPort(network, service string) (port int, err os.Error)
+    </code>
+  </pre>
+
+  <p>The network argument is a string such as "tcp" or "udp", while the service is a string such as "telnet" or "domain" (for DNS).</p>
+
+  <p>A program using this is</p>
+  <pre><code><span class="sgc-5">
+<span class="sgc-1">/* LookupPort
+ */
+</span>
+<span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"net"</span>
+        <span class="sgc-3">"os"</span>
+        <span class="sgc-3">"fmt"</span>
+)
+
+<span class="sgc-2">func</span> main() {
+        <span class="sgc-2">if</span> len(os.<span class="sgc-4">Args</span>) != 3 {
+                fmt.<span class="sgc-4">Fprintf</span>(os.<span class="sgc-4">Stderr</span>,
+                        <span class="sgc-3">"Usage: %s network-type service\n"</span>,
+                        os.<span class="sgc-4">Args</span>[0])
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+        networkType := os.<span class="sgc-4">Args</span>[1]
+        service := os.<span class="sgc-4">Args</span>[2]
+
+        port, err := net.<span class="sgc-4">LookupPort</span>(networkType, service)
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Error: "</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(2)
+        }
+
+        fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Service port "</span>, port)
+        os.<span class="sgc-4">Exit</span>(0)
+}
+</span></code></pre>
+
+  <p>For example, running <code>LookupPort tcp telnet</code> prints <code>Service port: 23</code></p>
+
+  <h3 id="heading_id_18">The type TCPAddr</h3>
+
+  <p>The type <code>TCPAddr</code> is a structure containing an <code>IP</code> and a <code>port</code>:</p>
+  <pre>
+    <code>
+type TCPAddr struct {
+    IP   IP
+    Port int
+}
+    </code>
+  </pre>
+
+  <p>The function to create a <code>TCPAddr</code> is <code>ResolveTCPAddr</code></p>
+  <pre>
+    <code>
+func ResolveTCPAddr(net, addr string) (*TCPAddr, os.Error)
+    </code>
+  </pre>
+
+  <p>where <code>net</code> is one of "tcp", "tcp4" or "tcp6" and the <code>addr</code> is a string composed of a host name or IP address, followed by the port number after a ":", such as "www.google.com:80" or '127.0.0.1:22". if the address is an IPv6 address, which already has colons in it, then the host part must be enclosed in square brackets, such as "[::1]:23". Another special case is often used for servers, where the host address is zero, so that the TCP address is really just the port name, as in ":80" for an HTTP server.</p>
+
+  <h2 id="heading_id_19">TCP Sockets</h2>
+
+  <p>When you know how to reach a service via its network and port IDs, what then? If you are a client you need an API that will allow you to connect to a service and then to send messages to that service and read replies back from the service.</p>
+
+  <p>If you are a server, you need to be able to bind to a port and listen at it. When a message comes in you need to be able to read it and write back to the client.</p>
+
+  <p>The <code>net.TCPConn</code> is the Go type which allows full duplex communication between the client and the server. Two major methods of interest are</p>
+  <pre><code>
+func (c *TCPConn) Write(b []byte) (n int, err os.Error)
+func (c *TCPConn) Read(b []byte) (n int, err os.Error)   
+    </code></pre>
+
+  <p>A <code>TCPConn</code> is used by both a client and a server to read and write messages.</p>
+
+  <h3 id="heading_id_20">TCP client</h3>
+
+  <p>Once a client has established a TCP address for a service, it "dials" the service. If succesful, the dial returns a <code>TCPConn</code> for communication. The client and the server exchange messages on this. Typically a client writes a request to the server using the <code>TCPConn</code>, and reads a response from the <code>TCPConn</code>. This continues until either (or both) sides close the connection. A TCP connection is established by the client using the function</p>
+  <pre><code>
+func DialTCP(net string, laddr, raddr *TCPAddr) (c *TCPConn, err os.Error)
+    </code></pre>
+
+  <p>where <code>laddr</code> is the local address which is usually set to <code>nil</code> and <code>raddr</code> is the remote address of the service, and the <code>net</code> string is one of "tcp4", "tcp6" or "tcp" depending on whether you want a TCPv4 connection, a TCPv6 connection or don't care.</p>
+
+  <p>A simple example can be provided by a client to a web (HTTP) server. We will deal in substantially more detail with HTTP clients and servers in a later chapter, but for now we will keep it simple.</p>
+
+  <p>One of the possible messages that a client can send is the "HEAD" message. This queries a server for information about the server and a document on that server. The server returns information, but does not return the document itself. The request sent to query an HTTP server could be</p>
+  <pre><code>
+"HEAD / HTTP/1.0\r\n\r\n"
+    </code></pre>
+
+  <p>which asks for information about the root document and the server. A typical response might be</p>
+  <pre><code>
+HTTP/1.0 200 OK
+ETag: "-9985996"
+Last-Modified: Thu, 25 Mar 2010 17:51:10 GMT
+Content-Length: 18074
+Connection: close
+Date: Sat, 28 Aug 2010 00:43:48 GMT
+Server: lighttpd/1.4.23
+    </code></pre>
+
+  <p>We first give the program (GetHeadInfo.go) to establish the connection for a TCP address, send the request string, read and print the response. Once compiled it can be invoked by e.g.</p>
+  <pre><code>
+GetHeadInfo www.google.com:80
+    </code></pre>
+
+  <p>The program is</p>
+  <pre><code><span class="sgc-5">
+<span class="sgc-1">/* GetHeadInfo
+ */
+</span><span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"net"</span>
+        <span class="sgc-3">"os"</span>
+        <span class="sgc-3">"fmt"</span>
+        <span class="sgc-3">"io/ioutil"</span>
+)
+
+<span class="sgc-2">func</span> main() {
+        <span class="sgc-2">if</span> len(os.<span class="sgc-4">Args</span>) != 2 {
+                fmt.<span class="sgc-4">Fprintf</span>(os.<span class="sgc-4">Stderr</span>, <span class="sgc-3">"Usage: %s host:port "</span>, os.<span class="sgc-4">Args</span>[0])
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+        service := os.<span class="sgc-4">Args</span>[1]
+
+        tcpAddr, err := net.<span class="sgc-4">ResolveTCPAddr</span>(<span class="sgc-3">"tcp4"</span>, service)
+        checkError(err)
+
+        conn, err := net.<span class="sgc-4">DialTCP</span>(<span class="sgc-3">"tcp"</span>, nil, tcpAddr)
+        checkError(err)
+
+        <span class="sgc-6">_</span>, err = conn.<span class="sgc-4">Write</span>([]<span class="sgc-7">byte</span>(<span class="sgc-3">"HEAD / HTTP/1.0\r\n\r\n"</span>))
+        checkError(err)
+
+        <span class="sgc-1">//result, err := readFully(conn)
+</span> result, err := ioutil.<span class="sgc-4">ReadAll</span>(conn)
+        checkError(err)
+
+        fmt.<span class="sgc-4">Println</span>(string(result))
+
+        os.<span class="sgc-4">Exit</span>(0)
+}
+
+<span class="sgc-2">func</span> checkError(err error) {
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Fprintf</span>(os.<span class="sgc-4">Stderr</span>, <span class="sgc-3">"Fatal error: %s"</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <p>The first point to note is the almost excessive amount of error checking that is going on. This is normal for networking programs: the opportunities for failure are substantially greater than for standalone programs. Hardware may fail on the client, the server, or on any of the routers and switches in the middle; communication may be blocked by a firewall; timeouts may occur due to network load; the server may crash while the client is talking to it. The following checks are performed:</p>
+
+  <ol>
+    <li>There may be syntax errors in the address specified</li>
+
+    <li>The attempt to connect to the remote service may fail. For example, the service requested might not be running, or there may be no such host connected to the network</li>
+
+    <li>Although a connection has been established, writes to the service might fail if the connection has died suddenly, or the network times out</li>
+
+    <li>Similarly, the reads might fail</li>
+  </ol>
+
+  <p>Reading from the server requires a comment. In this case, we read essentially a single response from the server. This will be terminated by end-of-file on the connection. However, it may consist of several TCP packets, so we need to keep reading till the end of file. The <code>io/ioutil</code> function <code>ReadAll</code> will look after these issues and return the complete response. (Thanks to Roger Peppe on the golang-nuts mailing list.).</p>
+
+  <p>There are some language issues involved. First, most of the functions return a dual value, with possible error as second value. If no error occurs, then this will be <code>nil</code>. In C, the same behaviour is gained by special values such as <code>NULL</code>, or -1, or zero being returned - if that is possible. In Java, the same error checking is managed by throwing and catching exceptions, which can make the code look very messy.</p>
+
+  <p>In earlier versions of this program, I returned the result in the array <code>buf</code>, which is of type <code>[512]byte</code>. Attempts to coerce this to a string failed - only byte arrays of type <code>[]byte</code> can be coerced. This is a bit of a nuisance.</p>
+
+  <h3 id="heading_id_21">A Daytime server</h3>
+
+  <p>About the simplest service that we can build is the daytime service. This is a standard Internet service, defined by RFC 867, with a default port of 13, on both TCP and UDP. Unfortunately, with the (justified) increase in paranoia over security, hardly any sites run a daytime server any more. Never mind, we can build our own. (For those interested, if you install <code>inetd</code> on your system, you usually get a daytime server thrown in.)</p>
+
+  <p>A server registers itself on a port, and listens on that port. Then it blocks on an "accept" operation, waiting for clients to connect. When a client connects, the accept call returns, with a connection object. The daytime service is very simple and just writes the current time to the client, closes the connection, and resumes waiting for the next client.</p>
+
+  <p>The relevant calls are</p>
+  <pre><code>
+func ListenTCP(net string, laddr *TCPAddr) (l *TCPListener, err os.Error)
+func (l *TCPListener) Accept() (c Conn, err os.Error)
+    </code></pre>
+
+  <p>The argument <code>net</code> can be set to one of the strings "tcp", "tcp4" or "tcp6". The IP address should be set to zero if you want to listen on all network interfaces, or to the IP address of a single network interface if you only want to listen on that interface. If the port is set to zero, then the O/S will choose a port for you. Otherwise you can choose your own. Note that on a Unix system, you cannot listen on a port below 1024 unless you are the system supervisor, root, and ports below 128 are standardised by the IETF. The example program chooses port 1200 for no particular reason. The TCP address is given as ":1200" - all interfaces, port 1200.</p>
+
+  <p>The program is</p>
+  <pre><code><span class="sgc-5">
+<span class="sgc-1">/* DaytimeServer
+ */
+</span><span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"fmt"</span>
+        <span class="sgc-3">"net"</span>
+        <span class="sgc-3">"os"</span>
+        <span class="sgc-3">"time"</span>
+)
+
+<span class="sgc-2">func</span> main() {
+
+        service := <span class="sgc-3">":1200"</span>
+        tcpAddr, err := net.<span class="sgc-4">ResolveTCPAddr</span>(<span class="sgc-3">"ip4"</span>, service)
+        checkError(err)
+
+        listener, err := net.<span class="sgc-4">ListenTCP</span>(<span class="sgc-3">"tcp"</span>, tcpAddr)
+        checkError(err)
+
+        <span class="sgc-2">for</span> {
+                conn, err := listener.<span class="sgc-4">Accept</span>()
+                <span class="sgc-2">if</span> err != nil {
+                        <span class="sgc-2">continue</span>
+                }
+
+                daytime := time.<span class="sgc-4">Now</span>().<span class="sgc-4">String</span>()
+                conn.<span class="sgc-4">Write</span>([]<span class="sgc-7">byte</span>(daytime)) <span class="sgc-1">// don't care about return value
+</span>         conn.<span class="sgc-4">Close</span>()                <span class="sgc-1">// we're finished with this client
+</span> }
+}
+
+<span class="sgc-2">func</span> checkError(err error) {
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Fprintf</span>(os.<span class="sgc-4">Stderr</span>, <span class="sgc-3">"Fatal error: %s"</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <p>If you run this server, it will just wait there, not doing much. When a client connects to it, it will respond by sending the daytime string to it and then return to waiting for the next client.</p>
+
+  <p>Note the changed error handling in the server as compared to a client. The server should run forever, so that if any error occurs with a client, the server just ignores that client and carries on. A client could otherwise try to mess up the connection with the server, and bring it down!</p>
+
+  <p>We haven't built a client. That is easy, just changing the previous client to omit the initial write. Alternatively, just open up a <code>telnet</code> connection to that host:</p>
+  <pre><code>
+telnet localhost 1200
+    </code></pre>
+
+  <p>This will produce output such as</p>
+  <pre><code>
+$telnet localhost 1200
+Trying ::1...
+Connected to localhost.
+Escape character is '^]'.
+Sun Aug 29 17:25:19 EST 2010Connection closed by foreign host.
+    </code></pre>
+
+  <p>where "Sun Aug 29 17:25:19 EST 2010" is the output from the server.</p>
+
+  <h3 id="heading_id_22">Multi-threaded server</h3>
+
+  <p>"echo" is another simple IETF service. This just reads what the client types, and sends it back:</p>
+  <pre><code><span class="sgc-5">
+<span class="sgc-1">/* SimpleEchoServer
+ */
+</span><span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"net"</span>
+        <span class="sgc-3">"os"</span>
+        <span class="sgc-3">"fmt"</span>
+)
+
+<span class="sgc-2">func</span> main() {
+
+        service := <span class="sgc-3">":1201"</span>
+        tcpAddr, err := net.<span class="sgc-4">ResolveTCPAddr</span>(<span class="sgc-3">"tcp4"</span>, service)
+        checkError(err)
+
+        listener, err := net.<span class="sgc-4">ListenTCP</span>(<span class="sgc-3">"tcp"</span>, tcpAddr)
+        checkError(err)
+
+        <span class="sgc-2">for</span> {
+                conn, err := listener.<span class="sgc-4">Accept</span>()
+                <span class="sgc-2">if</span> err != nil {
+                        <span class="sgc-2">continue</span>
+                }
+                handleClient(conn)
+                conn.<span class="sgc-4">Close</span>() <span class="sgc-1">// we're finished
+</span> }
+}
+
+<span class="sgc-2">func</span> handleClient(conn net.<span class="sgc-4">Conn</span>) {
+        <span class="sgc-2">var</span> buf [512]<span class="sgc-7">byte</span>
+        <span class="sgc-2">for</span> {
+                n, err := conn.<span class="sgc-4">Read</span>(buf[0:])
+                <span class="sgc-2">if</span> err != nil {
+                        <span class="sgc-2">return</span>
+                }
+                fmt.<span class="sgc-4">Println</span>(string(buf[0:]))
+                <span class="sgc-6">_</span>, err2 := conn.<span class="sgc-4">Write</span>(buf[0:n])
+                <span class="sgc-2">if</span> err2 != nil {
+                        <span class="sgc-2">return</span>
+                }
+        }
+}
+
+<span class="sgc-2">func</span> checkError(err error) {
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Fprintf</span>(os.<span class="sgc-4">Stderr</span>, <span class="sgc-3">"Fatal error: %s"</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <p>While it works, there is a significant issue with this server: it is single-threaded. While a client has a connection open to it, no other cllient can connect. Other clients are blocked, and will probably time out. Fortunately this is easly fixed by making the client handler a go-routine. We have also moved the connection close into the handler, as it now belongs there</p>
+  <pre><code><span class="sgc-5">
+<span class="sgc-1">/* ThreadedEchoServer
+ */
+</span><span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"net"</span>
+        <span class="sgc-3">"os"</span>
+        <span class="sgc-3">"fmt"</span>
+)
+
+<span class="sgc-2">func</span> main() {
+
+        service := <span class="sgc-3">":1201"</span>
+        tcpAddr, err := net.<span class="sgc-4">ResolveTCPAddr</span>(<span class="sgc-3">"ip4"</span>, service)
+        checkError(err)
+
+        listener, err := net.<span class="sgc-4">ListenTCP</span>(<span class="sgc-3">"tcp"</span>, tcpAddr)
+        checkError(err)
+
+        <span class="sgc-2">for</span> {
+                conn, err := listener.<span class="sgc-4">Accept</span>()
+                <span class="sgc-2">if</span> err != nil {
+                        <span class="sgc-2">continue</span>
+                }
+                <span class="sgc-1">// run as a goroutine
+</span>         go handleClient(conn)
+        }
+}
+
+<span class="sgc-2">func</span> handleClient(conn net.<span class="sgc-4">Conn</span>) {
+        <span class="sgc-1">// close connection on exit
+</span> defer conn.<span class="sgc-4">Close</span>()
+
+        <span class="sgc-2">var</span> buf [512]<span class="sgc-7">byte</span>
+        <span class="sgc-2">for</span> {
+                <span class="sgc-1">// read upto 512 bytes
+</span>         n, err := conn.<span class="sgc-4">Read</span>(buf[0:])
+                <span class="sgc-2">if</span> err != nil {
+                        <span class="sgc-2">return</span>
+                }
+
+                <span class="sgc-1">// write the n bytes read
+</span>         <span class="sgc-6">_</span>, err2 := conn.<span class="sgc-4">Write</span>(buf[0:n])
+                <span class="sgc-2">if</span> err2 != nil {
+                        <span class="sgc-2">return</span>
+                }
+        }
+}
+
+<span class="sgc-2">func</span> checkError(err error) {
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Fprintf</span>(os.<span class="sgc-4">Stderr</span>, <span class="sgc-3">"Fatal error: %s"</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <h2 id="heading_id_23">Controlling TCP connections</h2>
+
+  <h3 id="heading_id_24">Timeout</h3>
+
+  <p>The server may wish to timeout a client if it does not respond quickly enough i.e. does not write a request to the server in time. This should be a long period (several minutes), because the user may be taking their time. Conversely, the client may want to timeout the server (after a much shorter time). Both do this by</p>
+  <pre><code>
+func (c *TCPConn) SetTimeout(nsec int64) os.Error
+</code></pre>
+
+  <p>before any reads or writes on the socket.</p>
+
+  <h3 id="heading_id_25">Staying alive</h3>
+
+  <p>A client may wish to stay connected to a server even if it has nothing to send. It can use</p>
+  <pre><code>
+func (c *TCPConn) SetKeepAlive(keepalive bool) os.Error
+  </code></pre>
+
+  <p>There are several other connection control methods, documented in the "net" package.</p>
+
+  <h2 id="heading_id_26">UDP Datagrams</h2>
+
+  <p>In a connectionless protocol each message contains information about its origin and destination. There is no "session" established using a long-lived socket. UDP clients and servers make use of datagrams, which are individual messages containing source and destination information. There is no state maintained by these messages, unless the client or server does so. The messages are not guaranteed to arrive, or may arrive out of order.</p>
+
+  <p>The most common situation for a client is to send a message and hope that a reply arrives. The most common situation for a server would be to receive a message and then send one or more replies back to that client. In a peer-to-peer situation, though, the server may just forward messages to other peers.</p>
+
+  <p>The major difference between TCP and UDP handling for Go is how to deal with packets arriving from possibly multiple clients, without the cushion of a TCP session to manage things. The major calls needed are</p>
+  <pre><code>
+func ResolveUDPAddr(net, addr string) (*UDPAddr, os.Error)
+func DialUDP(net string, laddr, raddr *UDPAddr) (c *UDPConn, err os.Error)
+func ListenUDP(net string, laddr *UDPAddr) (c *UDPConn, err os.Error)
+func (c *UDPConn) ReadFromUDP(b []byte) (n int, addr *UDPAddr, err os.Error
+func (c *UDPConn) WriteToUDP(b []byte, addr *UDPAddr) (n int, err os.Error)
+    </code></pre>
+
+  <p>The client for a UDP time service doesn't need to make many changes, just changing <code>...TCP...</code> calls to <code>...UDP...</code> calls:</p>
+  <pre><code><span class="sgc-5">
+<span class="sgc-1">/* UDPDaytimeClient
+ */
+</span><span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"net"</span>
+        <span class="sgc-3">"os"</span>
+        <span class="sgc-3">"fmt"</span>
+)
+
+<span class="sgc-2">func</span> main() {
+        <span class="sgc-2">if</span> len(os.<span class="sgc-4">Args</span>) != 2 {
+                fmt.<span class="sgc-4">Fprintf</span>(os.<span class="sgc-4">Stderr</span>, <span class="sgc-3">"Usage: %s host:port"</span>, os.<span class="sgc-4">Args</span>[0])
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+        service := os.<span class="sgc-4">Args</span>[1]
+
+        udpAddr, err := net.<span class="sgc-4">ResolveUDPAddr</span>(<span class="sgc-3">"up4"</span>, service)
+        checkError(err)
+
+        conn, err := net.<span class="sgc-4">DialUDP</span>(<span class="sgc-3">"udp"</span>, nil, udpAddr)
+        checkError(err)
+
+        <span class="sgc-6">_</span>, err = conn.<span class="sgc-4">Write</span>([]<span class="sgc-7">byte</span>(<span class="sgc-3">"anything"</span>))
+        checkError(err)
+
+        <span class="sgc-2">var</span> buf [512]<span class="sgc-7">byte</span>
+        n, err := conn.<span class="sgc-4">Read</span>(buf[0:])
+        checkError(err)
+
+        fmt.<span class="sgc-4">Println</span>(string(buf[0:n]))
+
+        os.<span class="sgc-4">Exit</span>(0)
+}
+
+<span class="sgc-2">func</span> checkError(err error) {
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Fprintf</span>(os.<span class="sgc-4">Stderr</span>, <span class="sgc-3">"Fatal error "</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <p>while the server has to make a few more:</p>
+  <pre><code><span class="sgc-5">
+<span class="sgc-1">/* UDPDaytimeServer
+ */
+</span><span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"fmt"</span>
+        <span class="sgc-3">"net"</span>
+        <span class="sgc-3">"os"</span>
+        <span class="sgc-3">"time"</span>
+)
+
+<span class="sgc-2">func</span> main() {
+
+        service := <span class="sgc-3">":1200"</span>
+        udpAddr, err := net.<span class="sgc-4">ResolveUDPAddr</span>(<span class="sgc-3">"up4"</span>, service)
+        checkError(err)
+
+        conn, err := net.<span class="sgc-4">ListenUDP</span>(<span class="sgc-3">"udp"</span>, udpAddr)
+        checkError(err)
+
+        <span class="sgc-2">for</span> {
+                handleClient(conn)
+        }
+}
+
+<span class="sgc-2">func</span> handleClient(conn *net.<span class="sgc-4">UDPConn</span>) {
+
+        <span class="sgc-2">var</span> buf [512]<span class="sgc-7">byte</span>
+
+        <span class="sgc-6">_</span>, addr, err := conn.<span class="sgc-4">ReadFromUDP</span>(buf[0:])
+        <span class="sgc-2">if</span> err != nil {
+                <span class="sgc-2">return</span>
+        }
+
+        daytime := time.<span class="sgc-4">Now</span>().<span class="sgc-4">String</span>()
+
+        conn.<span class="sgc-4">WriteToUDP</span>([]<span class="sgc-7">byte</span>(daytime), addr)
+}
+
+<span class="sgc-2">func</span> checkError(err error) {
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Fprintf</span>(os.<span class="sgc-4">Stderr</span>, <span class="sgc-3">"Fatal error "</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <h2 id="heading_id_27">Server listening on multiple sockets</h2>
+
+  <p>A server may be attempting to listen to multiple clients not just on one port, but on many. In this case it has to use some sort of polling mechanism between the ports.</p>
+
+  <p>In C, the select() call lets the kernel do this work. The call takes a number of file descriptors. The process is suspended. When I/O is ready on one of these, a wakeup is done, and the process can continue. This is cheaper than busy polling. In Go, accomplish the same by using a different goroutine for each port. A thread will become runnable when the lower-level select() discovers that I/O is ready for this thread.</p>
+
+  <h2 id="heading_id_28">The types Conn, PacketConn and Listener</h2>
+
+  <p>So far we have differentiated between the API for TCP and the API for UDP, using for example <code>DialTCP</code> and <code>DialUDP</code> returning a <code>TCPConn</code> and <code>UDPConn</code> respectively. The type <code>Conn</code> is an interface and both <code>TCPConn</code> and <code>UDPConn</code> implement this interface. To a large extent you can deal with this interface rather than the two types.</p>
+
+  <p>Instead of separate dial functions for TCP and UDP, you can use a single function</p>
+  <pre>
+    <code>
+func Dial(net, laddr, raddr string) (c Conn, err os.Error)
+    </code>
+  </pre>
+
+  <p>The <code>net</code> can be any of "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only), "udp", "udp4" (IPv4-only), "udp6" (IPv6-only), "ip", "ip4" (IPv4-only) and "ip6" IPv6-only). It will return an appropriate implementation of the <code>Conn</code> interface. Note that this function takes a string rather than address as <code>raddr</code> argument, so that programs using this can avoid working out the address type first.</p>
+
+  <p>Using this function makes minor changes to programs. For example, the earlier program to get HEAD information from a Web page can be re-written as</p>
+  <pre><code><span class="sgc-5">
+<span class="sgc-1">/* IPGetHeadInfo
+ */
+</span><span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"bytes"</span>
+        <span class="sgc-3">"fmt"</span>
+        <span class="sgc-3">"io"</span>
+        <span class="sgc-3">"net"</span>
+        <span class="sgc-3">"os"</span>
+)
+
+<span class="sgc-2">func</span> main() {
+        <span class="sgc-2">if</span> len(os.<span class="sgc-4">Args</span>) != 2 {
+                fmt.<span class="sgc-4">Fprintf</span>(os.<span class="sgc-4">Stderr</span>, <span class="sgc-3">"Usage: %s host:port"</span>, os.<span class="sgc-4">Args</span>[0])
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+        service := os.<span class="sgc-4">Args</span>[1]
+
+        conn, err := net.<span class="sgc-4">Dial</span>(<span class="sgc-3">"tcp"</span>, service)
+        checkError(err)
+
+        <span class="sgc-6">_</span>, err = conn.<span class="sgc-4">Write</span>([]<span class="sgc-7">byte</span>(<span class="sgc-3">"HEAD / HTTP/1.0\r\n\r\n"</span>))
+        checkError(err)
+
+        result, err := readFully(conn)
+        checkError(err)
+
+        fmt.<span class="sgc-4">Println</span>(string(result))
+
+        os.<span class="sgc-4">Exit</span>(0)
+}
+
+<span class="sgc-2">func</span> checkError(err error) {
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Fprintf</span>(os.<span class="sgc-4">Stderr</span>, <span class="sgc-3">"Fatal error: %s"</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+}
+
+<span class="sgc-2">func</span> readFully(conn net.<span class="sgc-4">Conn</span>) ([]<span class="sgc-7">byte</span>, error) {
+        defer conn.<span class="sgc-4">Close</span>()
+
+        result := bytes.<span class="sgc-4">NewBuffer</span>(nil)
+        <span class="sgc-2">var</span> buf [512]<span class="sgc-7">byte</span>
+        <span class="sgc-2">for</span> {
+                n, err := conn.<span class="sgc-4">Read</span>(buf[0:])
+                result.<span class="sgc-4">Write</span>(buf[0:n])
+                <span class="sgc-2">if</span> err != nil {
+                        <span class="sgc-2">if</span> err == io.<span class="sgc-4">EOF</span> {
+                                <span class="sgc-2">break</span>
+                        }
+                        <span class="sgc-2">return</span> nil, err
+                }
+        }
+        <span class="sgc-2">return</span> result.<span class="sgc-4">Bytes</span>(), nil
+}
+</span></code></pre>
+
+  <p>Writing a server can be similarly simplified using the function</p>
+  <pre>
+    <code>
+func Listen(net, laddr string) (l Listener, err os.Error)
+    </code>
+  </pre>
+
+  <p>which returns an object implementing the <code>Listener</code> interface. This interface has a method</p>
+  <pre><code>
+func (l Listener) Accept() (c Conn, err os.Error)
+    </code></pre>
+
+  <p>which will allow a server to be built. Using this, the multi-threaded Echo server given earlier becomes</p>
+  <pre><code><span class="sgc-5">
+<span class="sgc-1">/* ThreadedIPEchoServer
+ */
+</span><span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"fmt"</span>
+        <span class="sgc-3">"net"</span>
+        <span class="sgc-3">"os"</span>
+)
+
+<span class="sgc-2">func</span> main() {
+
+        service := <span class="sgc-3">":1200"</span>
+        listener, err := net.<span class="sgc-4">Listen</span>(<span class="sgc-3">"tcp"</span>, service)
+        checkError(err)
+
+        <span class="sgc-2">for</span> {
+                conn, err := listener.<span class="sgc-4">Accept</span>()
+                <span class="sgc-2">if</span> err != nil {
+                        <span class="sgc-2">continue</span>
+                }
+                go handleClient(conn)
+        }
+}
+
+<span class="sgc-2">func</span> handleClient(conn net.<span class="sgc-4">Conn</span>) {
+        defer conn.<span class="sgc-4">Close</span>()
+
+        <span class="sgc-2">var</span> buf [512]<span class="sgc-7">byte</span>
+        <span class="sgc-2">for</span> {
+                n, err := conn.<span class="sgc-4">Read</span>(buf[0:])
+                <span class="sgc-2">if</span> err != nil {
+                        <span class="sgc-2">return</span>
+                }
+                <span class="sgc-6">_</span>, err2 := conn.<span class="sgc-4">Write</span>(buf[0:n])
+                <span class="sgc-2">if</span> err2 != nil {
+                        <span class="sgc-2">return</span>
+                }
+        }
+}
+
+<span class="sgc-2">func</span> checkError(err error) {
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Fprintf</span>(os.<span class="sgc-4">Stderr</span>, <span class="sgc-3">"Fatal error: %s"</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <p>If you want to write a UDP server, then there is an interface <code>PacketConn</code> and a method to return an implementation of this:</p>
+  <pre><code>
+func ListenPacket(net, laddr string) (c PacketConn, err os.Error)
+    </code></pre>
+
+  <p>This interface has primary methods <code>ReadFrom</code> and <code>WriteTo</code> to handle packet reads and writes.</p>
+
+  <p>The Go <code>net</code> package recommends using these interface types rather than the concrete ones. But by using them, you lose specific methods such as <code>SetKeepAlive</code> or <code>TCPConn</code> and <code>SetReadBuffer</code> of <code>UDPConn</code>, unless you do a type cast. It is your choice.</p>
+
+  <h2 id="heading_id_29">Raw sockets and the type IPConn</h2>
+
+  <p>This section covers advanced material which most programmers are unlikely to need. it deals with <em>raw sockets</em>, which allow the programmer to build their own IP protocols, or use protocols other than TCP or UDP</p>
+
+  <p>TCP and UDP are not the only protocols built above the IP layer. The site http://www.iana.org/assignments/protocol-numbers lists about 140 of them (this list is often available on Unix systems in the file <code>/etc/protocols</code>). TCP and UDP are only numbers 6 and 17 respectively on this list.</p>
+
+  <p>Go allows you to build so-called raw sockets, to enable you to communicate using one of these other protocols, or even to build your own. But it gives minimal support: it will connect hosts, and write and read packets between the hosts. In the next chapter we will look at designing and implementing your own protocols above TCP; this section considers the same type of problem, but at the IP layer.</p>
+
+  <p>To keep things simple, we shall use almost the simplest possible example: how to send a ping message to a host. Ping uses the "echo" command from the ICMP protocol. This is a byte-oriented protocol, in which the client sends a stream of bytes to another host, and the host replies. the format is:</p>
+
+  <ul>
+    <li>The first byte is 8, standing for the echo message</li>
+
+    <li>The second byte is zero</li>
+
+    <li>The third and fourth bytes are a checksum on the entire message</li>
+
+    <li>The fifth and sixth bytes are an arbitrary indentifier</li>
+
+    <li>The seventh and eight bytes are an arbitrary sequence number</li>
+
+    <li>The rest of the packet is user data</li>
+  </ul>
+
+  <p>The following program will prepare an IP connection, send a ping request to a host and get a reply. You may need to have root access in order to run it successfully.</p>
+  <pre><code><span class="sgc-5">
+<span class="sgc-1">/* Ping
+ */
+</span><span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"bytes"</span>
+        <span class="sgc-3">"fmt"</span>
+        <span class="sgc-3">"io"</span>
+        <span class="sgc-3">"net"</span>
+        <span class="sgc-3">"os"</span>
+)
+
+<span class="sgc-2">func</span> main() {
+        <span class="sgc-2">if</span> len(os.<span class="sgc-4">Args</span>) != 2 {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Usage: "</span>, os.<span class="sgc-4">Args</span>[0], <span class="sgc-3">"host"</span>)
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+
+        addr, err := net.<span class="sgc-4">ResolveIPAddr</span>(<span class="sgc-3">"ip"</span>, os.<span class="sgc-4">Args</span>[1])
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Resolution error"</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+
+        conn, err := net.<span class="sgc-4">DialIP</span>(<span class="sgc-3">"ip4:icmp"</span>, addr, addr)
+        checkError(err)
+
+        <span class="sgc-2">var</span> msg [512]<span class="sgc-7">byte</span>
+        msg[0] = 8  <span class="sgc-1">// echo
+</span> msg[1] = 0  <span class="sgc-1">// code 0
+</span> msg[2] = 0  <span class="sgc-1">// checksum, fix later
+</span> msg[3] = 0  <span class="sgc-1">// checksum, fix later
+</span> msg[4] = 0  <span class="sgc-1">// identifier[0]
+</span> msg[5] = 13 <span class="sgc-1">//identifier[1]
+</span> msg[6] = 0  <span class="sgc-1">// sequence[0]
+</span> msg[7] = 37 <span class="sgc-1">// sequence[1]
+</span> len := 8
+
+        check := checkSum(msg[0:len])
+        msg[2] = <span class="sgc-7">byte</span>(check &gt;&gt; 8)
+        msg[3] = <span class="sgc-7">byte</span>(check &amp; 255)
+
+        <span class="sgc-6">_</span>, err = conn.<span class="sgc-4">Write</span>(msg[0:len])
+        checkError(err)
+
+        <span class="sgc-6">_</span>, err = conn.<span class="sgc-4">Read</span>(msg[0:])
+        checkError(err)
+
+        fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Got response"</span>)
+        <span class="sgc-2">if</span> msg[5] == 13 {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"identifier matches"</span>)
+        }
+        <span class="sgc-2">if</span> msg[7] == 37 {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Sequence matches"</span>)
+        }
+
+        os.<span class="sgc-4">Exit</span>(0)
+}
+
+<span class="sgc-2">func</span> checkSum(msg []<span class="sgc-7">byte</span>) uint16 {
+        sum := 0
+
+        <span class="sgc-1">// assume even for now
+</span> <span class="sgc-2">for</span> n := 1; n &lt; len(msg)-1; n += 2 {
+                sum += <span class="sgc-7">int</span>(msg[n])*256 + <span class="sgc-7">int</span>(msg[n+1])
+        }
+        sum = (sum &gt;&gt; 16) + (sum &amp; 0xffff)
+        sum += (sum &gt;&gt; 16)
+        <span class="sgc-2">var</span> answer uint16 = uint16(^sum)
+        <span class="sgc-2">return</span> answer
+}
+
+<span class="sgc-2">func</span> checkError(err error) {
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Fprintf</span>(os.<span class="sgc-4">Stderr</span>, <span class="sgc-3">"Fatal error: %s"</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+}
+
+<span class="sgc-2">func</span> readFully(conn net.<span class="sgc-4">Conn</span>) ([]<span class="sgc-7">byte</span>, error) {
+        defer conn.<span class="sgc-4">Close</span>()
+
+        result := bytes.<span class="sgc-4">NewBuffer</span>(nil)
+        <span class="sgc-2">var</span> buf [512]<span class="sgc-7">byte</span>
+        <span class="sgc-2">for</span> {
+                n, err := conn.<span class="sgc-4">Read</span>(buf[0:])
+                result.<span class="sgc-4">Write</span>(buf[0:n])
+                <span class="sgc-2">if</span> err != nil {
+                        <span class="sgc-2">if</span> err == io.<span class="sgc-4">EOF</span> {
+                                <span class="sgc-2">break</span>
+                        }
+                        <span class="sgc-2">return</span> nil, err
+                }
+        }
+        <span class="sgc-2">return</span> result.<span class="sgc-4">Bytes</span>(), nil
+}
+</span></code></pre><!--
+
+<h2> Multicast </h2>
+
+<h3> Overview </h3>
+
+<p>
+A multicast packet is broadcast to all possible clients,
+and may be received by any/all of them. A multicast packet is not
+restricted to just one host destination. This is useful for
+e.g. multi-player games, or networks where you know a service
+is available but don't know its address.
+</p>
+
+<p>
+IP addresses in the range 224.0.0.0 to 239.255.255.255 (inclusive)
+are multicast addresses. 
+The address 224.0.0.0 is reserved and should not be used. 
+If you <code>ping</code> 224.0.0.1, all multicast-enabled hosts
+should answer.
+Each of these IP addresses has the full range of 65k ports.
+</p>
+
+<p>
+"Ordinary" TCP and UDP addresses use a field TTL (time to live)
+to control the number of "hops" they are allowed to make.
+For example, a hop count of one will restrict them to the local
+network.
+Multicast packets have the potential to flood the network.
+Most network administrators will restrict the range of multicast
+packets. The TTL is used for this as a hack measure.
+There is no standard, but typically a hopcount of less than 60
+will not be allowed past any gateway, and the default hopcount is
+usually set at 15.
+</p>
+-->
+
+  <h2 id="heading_id_30">Conclusion</h2>
+
+  <p>This chapter has considered programming at the IP, TCP and UDP levels. This is often necessary if you wish to implement your own protocol, or build a client or server for an existing protocol.</p>
+
+  <p>Copyright Jan Newmarch, jan@newmarch.name</p>
+
+  <p>If you like this book, please contribute using Flattr <a class="FlattrButton sgc-8" href="http://jan.newmarch.name/go/index.html"></a><br />
+  or donate using PayPal</p>
+
+  <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+    <input name="cmd" type="hidden" value="_s-xclick" /> <input name="encrypted" type="hidden" value="-----BEGIN PKCS7-----MIIHLwYJKoZIhvcNAQcEoIIHIDCCBxwCAQExggEwMIIBLAIBADCBlDCBjjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtQYXlQYWwgSW5jLjETMBEGA1UECxQKbGl2ZV9jZXJ0czERMA8GA1UEAxQIbGl2ZV9hcGkxHDAaBgkqhkiG9w0BCQEWDXJlQHBheXBhbC5jb20CAQAwDQYJKoZIhvcNAQEBBQAEgYCCw7fVj6fuHxYMvE0PBlURcRgBFb1s4TxTUDgsS6BgkdJPt2GF8NFPNvE/oFvPNY2jBGrXSIkxCr9dFYzraKC8csPASWb0z9l8swwbIHWgrvb5cuaVuLbtRzesh94sqyh9MmZ5U1xcMrMtlw1S60gK5lPbKPsXzcY74brjt44J7jELMAkGBSsOAwIaBQAwgawGCSqGSIb3DQEHATAUBggqhkiG9w0DBwQIAXtre9K+AiWAgYiJVN0CmxAPscp0u0O8R0mD+cNz/Fe3lNIrqqMPplkri20WbbVxhbRwJTjtOxcLMbmSIeC8oWh14aSy9Jptgm1wNlQYADQQUgMnR/qIlYgHmXjJ4C6wZteqNVJn+RKfM/tS008Ola5SJABaGe9BmRSQCjMKqEyqm3Mx2hoLeWMXeyoMaW3Xteg6oIIDhzCCA4MwggLsoAMCAQICAQAwDQYJKoZIhvcNAQEFBQAwgY4xCzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDQTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEUMBIGA1UEChMLUGF5UGFsIEluYy4xEzARBgNVBAsUCmxpdmVfY2VydHMxETAPBgNVBAMUCGxpdmVfYXBpMRwwGgYJKoZIhvcNAQkBFg1yZUBwYXlwYWwuY29tMB4XDTA0MDIxMzEwMTMxNVoXDTM1MDIxMzEwMTMxNVowgY4xCzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDQTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEUMBIGA1UEChMLUGF5UGFsIEluYy4xEzARBgNVBAsUCmxpdmVfY2VydHMxETAPBgNVBAMUCGxpdmVfYXBpMRwwGgYJKoZIhvcNAQkBFg1yZUBwYXlwYWwuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDBR07d/ETMS1ycjtkpkvjXZe9k+6CieLuLsPumsJ7QC1odNz3sJiCbs2wC0nLE0uLGaEtXynIgRqIddYCHx88pb5HTXv4SZeuv0Rqq4+axW9PLAAATU8w04qqjaSXgbGLP3NmohqM6bV9kZZwZLR/klDaQGo1u9uDb9lr4Yn+rBQIDAQABo4HuMIHrMB0GA1UdDgQWBBSWn3y7xm8XvVk/UtcKG+wQ1mSUazCBuwYDVR0jBIGzMIGwgBSWn3y7xm8XvVk/UtcKG+wQ1mSUa6GBlKSBkTCBjjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtQYXlQYWwgSW5jLjETMBEGA1UECxQKbGl2ZV9jZXJ0czERMA8GA1UEAxQIbGl2ZV9hcGkxHDAaBgkqhkiG9w0BCQEWDXJlQHBheXBhbC5jb22CAQAwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQUFAAOBgQCBXzpWmoBa5e9fo6ujionW1hUhPkOBakTr3YCDjbYfvJEiv/2P+IobhOGJr85+XHhN0v4gUkEDI8r2/rNk1m0GA8HKddvTjyGw/XqXa+LSTlDYkqI8OwR8GEYj4efEtcRpRYBxV8KxAW93YDWzFGvruKnnLbDAF6VR5w/cCMn5hzGCAZowggGWAgEBMIGUMIGOMQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExFjAUBgNVBAcTDU1vdW50YWluIFZpZXcxFDASBgNVBAoTC1BheVBhbCBJbmMuMRMwEQYDVQQLFApsaXZlX2NlcnRzMREwDwYDVQQDFAhsaXZlX2FwaTEcMBoGCSqGSIb3DQEJARYNcmVAcGF5cGFsLmNvbQIBADAJBgUrDgMCGgUAoF0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTEwNTAyMDcwNzQ1WjAjBgkqhkiG9w0BCQQxFgQUgvHyq74JT8DnmViqEqG5KpIW0cAwDQYJKoZIhvcNAQEBBQAEgYAzycmlaZMZjkmYniVBUVTQeywigBo+80toDP2g9+yCzO4mG1Abmfcr/S1XdT8djFA9w37F+F+nSkP857evscUhns30c9wYuPoiNudkJMOkYegqyq+EI4AMNGPuQNZ+4vznmqTgFTn9iQjONC8NGQ/0GuCCQ/AqJZs/0ZiWivlPhA==-----END PKCS7----- " /> <input alt="PayPal - The safer, easier way to pay online." border="0" name="submit" src="https://www.paypalobjects.com/WEBSCR-640-20110401-1/en_AU/i/btn/btn_donateCC_LG.gif" type="image" /> <img alt="" border="0" height="1" src="https://www.paypalobjects.com/WEBSCR-640-20110401-1/en_AU/i/scr/pixel.gif" width="1" />
+  </form>
+</body>
+</html>

@@ -1,0 +1,681 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>XML</title>
+  <link href="../Styles/stylesheet.css" rel="stylesheet" type="text/css" />
+  <script src="../toc.js" type="text/javascript">
+
+
+
+  //<![CDATA[
+
+   <!-- empty -->
+  //]]>
+  </script>
+  <script type="text/javascript">
+
+
+
+
+  /* <![CDATA[ */
+    (function() {
+        var s = document.createElement("script"), t = document.getElementsByTagName("script")[0];
+        s.type = "text/javascript";
+        s.async = true;
+        s.src = "http://api.flattr.com/js/0.6/load.js?mode=auto";
+        t.parentNode.insertBefore(s, t);
+    })();
+  /* ]]> */
+  </script>
+  <style type="text/css">
+/*<![CDATA[*/
+
+  body { counter-reset: chapter 12; }
+
+  a.sgc-7 {display:none;}
+  span.sgc-6 {color: black}
+  span.sgc-5 {color: green}
+  span.sgc-4 {color: blue}
+  span.sgc-3 {color: DarkRed}
+  span.sgc-2 {color: purple}
+  span.sgc-1 {color: firebrick}
+  /*]]>*/
+  </style>
+</head>
+
+<body>
+  <div class="chapter">
+    <h1 id="heading_id_2">XML</h1>
+  </div>
+
+  <div class="generate_from_h2" id="generated-toc"></div>
+
+  <div class="preface">
+    <p>XML is a significant markup language mainly intended as a means of serialising data structures as a text document. Go has basic support for XML document processing.</p>
+  </div>
+
+  <h2 id="heading_id_3">Introduction</h2>
+
+  <p>XML is now a widespread way of representing complex data structures serialised into text format. It is used to describe documents such as DocBook and XHTML. It is used in specialised markup languages such as MathML and CML (Chemistry Markup Language). It is used to encode data as SOAP messages for Web Services, and the Web Service can be specified using WSDL (Web Services Description Language).</p>
+
+  <p>At the simplest level, XML allows you to define your own tags for use in text documents. Tags can be nested and can be interspersed with text. Each tag can also contain attributes with values. For example,</p>
+  <pre><code>
+&lt;person&gt;
+  &lt;name&gt;
+    &lt;family&gt; Newmarch &lt;/family&gt;
+    &lt;personal&gt; Jan &lt;/personal&gt;
+  &lt;/name&gt;
+  &lt;email type="personal"&gt;
+    jan@newmarch.name
+  &lt;/email&gt;
+  &lt;email type="work"&gt;
+    j.newmarch@boxhill.edu.au
+  &lt;/email&gt;
+&lt;/person&gt;
+    </code></pre>
+
+  <p>The structure of any XML document can be described in a number of ways:</p>
+
+  <ul>
+    <li>A document type definition DTD is good for describing structure</li>
+
+    <li>XML schema are good for describing the data types used by an XML document</li>
+
+    <li>RELAX NG is proposed as an alternative to both</li>
+  </ul>
+
+  <p>There is argument over the relative value of each way of defining the structure of an XML document. We won't buy into that, as Go does not suport any of them. Go cannot check for validity of any document against a schema, but only for well-formedness.</p>
+
+  <p>Four topics are discussed in this chapter: parsing an XML stream, marshalling and unmarshalling Go data into XML, and XHTML.</p>
+
+  <h2 id="heading_id_4">Parsing XML</h2>
+
+  <p>Go has an XML parser which is created using <code>NewParser</code>. This takes an <code>io.Reader</code> as parameter and returns a pointer to <code>Parser</code>. The main method of this type is <code>Token</code> which returns the next token in the input stream. The token is one of the types <code>StartElement</code>, <code>EndElement</code>, <code>CharData</code>, <code>Comment</code>, <code>ProcInst</code> or <code>Directive</code>.</p>
+
+  <p>The types are</p>
+
+  <dl>
+    <dt><code>StartElement</code></dt>
+
+    <dd>
+      The type <code>StartElement</code> is a structure with two field types:
+      <pre><code>
+type StartElement struct {
+    Name Name
+    Attr []Attr
+}
+
+type Name struct {
+    Space, Local string
+}
+
+type Attr struct {
+    Name  Name
+    Value string
+}
+        </code></pre>
+    </dd>
+
+    <dt><code>EndElement</code></dt>
+
+    <dd>
+      This is also a structure
+      <pre><code>
+type EndElement struct {
+    Name Name
+}
+        </code></pre>
+    </dd>
+
+    <dt><code>CharData</code></dt>
+
+    <dd>
+      This type represents the text content enclosed by a tag and is a simple type
+      <pre><code>
+type CharData []byte
+        </code></pre>
+    </dd>
+
+    <dt><code>Comment</code></dt>
+
+    <dd>
+      Similarly for this type
+      <pre><code>
+type Comment []byte
+        </code></pre>
+    </dd>
+
+    <dt><code>ProcInst</code></dt>
+
+    <dd>
+      A ProcInst represents an XML processing instruction of the form &lt;?target inst?&gt;
+      <pre><code>
+type ProcInst struct {
+    Target string
+    Inst   []byte
+}
+        </code></pre>
+    </dd>
+
+    <dt><code>Directive</code></dt>
+
+    <dd>
+      A Directive represents an XML directive of the form &lt;!text&gt;. The bytes do not include the &lt;! and &gt; markers.
+      <pre><code>
+type Directive []byte
+        </code></pre>
+    </dd>
+  </dl>
+
+  <p>A program to print out the tree structure of an XML document is</p>
+  <pre><code><span class="sgc-6">
+<span class="sgc-1">/* Parse XML
+ */
+</span>
+<span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"encoding/xml"</span>
+        <span class="sgc-3">"fmt"</span>
+        <span class="sgc-3">"io/ioutil"</span>
+        <span class="sgc-3">"os"</span>
+        <span class="sgc-3">"strings"</span>
+)
+
+<span class="sgc-2">func</span> main() {
+        <span class="sgc-2">if</span> len(os.<span class="sgc-4">Args</span>) != 2 {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Usage: "</span>, os.<span class="sgc-4">Args</span>[0], <span class="sgc-3">"file"</span>)
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+        file := os.<span class="sgc-4">Args</span>[1]
+        bytes, err := ioutil.<span class="sgc-4">ReadFile</span>(file)
+        checkError(err)
+        r := strings.<span class="sgc-4">NewReader</span>(string(bytes))
+
+        parser := xml.<span class="sgc-4">NewDecoder</span>(r)
+        depth := 0
+        <span class="sgc-2">for</span> {
+                token, err := parser.<span class="sgc-4">Token</span>()
+                <span class="sgc-2">if</span> err != nil {
+                        <span class="sgc-2">break</span>
+                }
+                <span class="sgc-2">switch</span> t := token.(<span class="sgc-2">type</span>) {
+                <span class="sgc-2">case</span> xml.<span class="sgc-4">StartElement</span>:
+                        elmt := xml.<span class="sgc-4">StartElement</span>(t)
+                        name := elmt.<span class="sgc-4">Name</span>.<span class="sgc-4">Local</span>
+                        printElmt(name, depth)
+                        depth++
+                <span class="sgc-2">case</span> xml.<span class="sgc-4">EndElement</span>:
+                        depth--
+                        elmt := xml.<span class="sgc-4">EndElement</span>(t)
+                        name := elmt.<span class="sgc-4">Name</span>.<span class="sgc-4">Local</span>
+                        printElmt(name, depth)
+                <span class="sgc-2">case</span> xml.<span class="sgc-4">CharData</span>:
+                        bytes := xml.<span class="sgc-4">CharData</span>(t)
+                        printElmt(<span class="sgc-3">"\""</span>+string([]<span class="sgc-5">byte</span>(bytes))+<span class="sgc-3">"\""</span>, depth)
+                <span class="sgc-2">case</span> xml.<span class="sgc-4">Comment</span>:
+                        printElmt(<span class="sgc-3">"Comment"</span>, depth)
+                <span class="sgc-2">case</span> xml.<span class="sgc-4">ProcInst</span>:
+                        printElmt(<span class="sgc-3">"ProcInst"</span>, depth)
+                <span class="sgc-2">case</span> xml.<span class="sgc-4">Directive</span>:
+                        printElmt(<span class="sgc-3">"Directive"</span>, depth)
+                <span class="sgc-2">default</span>:
+                        fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Unknown"</span>)
+                }
+        }
+}
+
+<span class="sgc-2">func</span> printElmt(s string, depth <span class="sgc-5">int</span>) {
+        <span class="sgc-2">for</span> n := 0; n &lt; depth; n++ {
+                fmt.<span class="sgc-4">Print</span>(<span class="sgc-3">"  "</span>)
+        }
+        fmt.<span class="sgc-4">Println</span>(s)
+}
+
+<span class="sgc-2">func</span> checkError(err error) {
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Fatal error "</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <p><em>Note that the parser includes all CharData, including the whitespace between tags.</em></p>
+
+  <p>If we run this program against the <code>person</code> data structure given earlier, it produces</p>
+  <pre><code>
+person
+  "
+  "
+  name
+    "
+    "
+    family
+      " Newmarch "
+    family
+    "
+    "
+    personal
+      " Jan "
+    personal
+    "
+  "
+  name
+  "
+  "
+  email
+    "
+    jan@newmarch.name
+  "
+  email
+  "
+  "
+  email
+    "
+    j.newmarch@boxhill.edu.au
+  "
+  email
+  "
+"
+person
+"
+"
+</code></pre>
+
+  <p>Note that as no DTD or other XML specification has been used, the tokenizer correctly prints out all the white space (a DTD may specify that the whitespace can be ignored, but without it that assumption cannot be made.)</p>
+
+  <p>There is a potential trap in using this parser. It re-uses space for strings, so that once you see a token you need to copy its value if you want to refer to it later. Go has methods such as <code>func (c CharData) Copy() CharData</code> to make a copy of data.</p>
+
+  <h2 id="heading_id_5">Unmarshalling XML</h2>
+
+  <p>Go provides a function <code>Unmarshal</code> and a method <code>func (*Parser) Unmarshal</code> to unmarshal XML into Go data structures. The unmarshalling is not perfect: Go and XML are different languages.</p>
+
+  <p>We consider a simple example before looking at the details. We take the XML document given earlier of</p>
+  <pre><code>
+&lt;person&gt;
+  &lt;name&gt;
+    &lt;family&gt; Newmarch &lt;/family&gt;
+    &lt;personal&gt; Jan &lt;/personal&gt;
+  &lt;/name&gt;
+  &lt;email type="personal"&gt;
+    jan@newmarch.name
+  &lt;/email&gt;
+  &lt;email type="work"&gt;
+    j.newmarch@boxhill.edu.au
+  &lt;/email&gt;
+&lt;/person&gt;
+    </code></pre>
+
+  <p>We would like to map this onto the Go structures</p>
+  <pre><code>
+type Person struct {
+        Name Name
+        Email []Email
+}
+
+type Name struct {
+        Family string
+        Personal string
+}
+
+type Email struct {
+        Type string
+        Address string
+}
+    </code></pre>
+
+  <p>This requires several comments:</p>
+
+  <ol>
+    <li>Unmarshalling uses the Go reflection package. This requires that all fields by public i.e. start with a capital letter. Earlier versions of Go used case-insensitive matching to match fields such as the XML string "name" to the field <code>Name</code>. Now, though, <em>case-sensitive</em> matching is used. To perform a match, the structure fields must be tagged to show the XML string that will be matched against. This changes <code>Person</code> to
+      <pre><code>
+type Person struct {
+        Name Name `xml:"name"`
+        Email []Email `xml:"email"`
+}
+        </code></pre>
+    </li>
+
+    <li>While tagging of fields can attach XML strings to fields, it can't do so with the names of the structures. An additional field is required, with field name "XMLName". This only affects the top-level struct, <code>Person</code>
+      <pre><code>
+type Person struct {
+        XMLName Name `xml:"person"`
+        Name Name `xml:"name"`
+        Email []Email `xml:"email"`
+}
+        </code></pre>
+    </li>
+
+    <li>Repeated tags in the map to a slice in Go</li>
+
+    <li>Attributes within tags will match to fields in a structure only if the Go field has the tag ",attr". This occurs with the field <code>Type</code> of <code>Email</code>, where matching the attribute "type" of the "email" tag requires <code>`xml:"type,attr"`</code></li>
+
+    <li>If an XML tag has no attributes and only has character data, then it matches a <code>string</code> field by the same name (case-sensitive, though). So the tag <code>`xml:"family"`</code> with character data "Newmarch" maps to the string field <code>Family</code></li>
+
+    <li>But if the tag has attributes, then it must map to a structure. Go assigns the character data to the field with tag <code>,chardata</code>. This occurs with the "email" data and the field <code>Address</code> with tag <code>,chardata</code></li>
+  </ol>
+
+  <p>A program to unmarshal the document above is</p>
+  <pre><code><span class="sgc-6">
+<span class="sgc-1">/* Unmarshal
+ */
+</span>
+<span class="sgc-2">package</span> main
+
+<span class="sgc-2">import</span> (
+        <span class="sgc-3">"encoding/xml"</span>
+        <span class="sgc-3">"fmt"</span>
+        <span class="sgc-3">"os"</span>
+        <span class="sgc-1">//"strings"
+</span>)
+
+<span class="sgc-2">type</span> <span class="sgc-4">Person</span> <span class="sgc-2">struct</span> {
+        <span class="sgc-4">XMLName</span> <span class="sgc-4">Name</span>    `xml:<span class="sgc-3">"person"</span>`
+        <span class="sgc-4">Name</span>    <span class="sgc-4">Name</span>    `xml:<span class="sgc-3">"name"</span>`
+        <span class="sgc-4">Email</span>   []<span class="sgc-4">Email</span> `xml:<span class="sgc-3">"email"</span>`
+}
+
+<span class="sgc-2">type</span> <span class="sgc-4">Name</span> <span class="sgc-2">struct</span> {
+        <span class="sgc-4">Family</span>   string `xml:<span class="sgc-3">"family"</span>`
+        <span class="sgc-4">Personal</span> string `xml:<span class="sgc-3">"personal"</span>`
+}
+
+<span class="sgc-2">type</span> <span class="sgc-4">Email</span> <span class="sgc-2">struct</span> {
+        <span class="sgc-4">Type</span>    string `xml:<span class="sgc-3">"type,attr"</span>`
+        <span class="sgc-4">Address</span> string `xml:<span class="sgc-3">",chardata"</span>`
+}
+
+<span class="sgc-2">func</span> main() {
+        str := `&lt;?xml version=<span class="sgc-3">"1.0"</span> encoding=<span class="sgc-3">"utf-8"</span>?&gt;
+&lt;person&gt;
+  &lt;name&gt;
+    &lt;family&gt; <span class="sgc-4">Newmarch</span> &lt;/family&gt;
+    &lt;personal&gt; <span class="sgc-4">Jan</span> &lt;/personal&gt;
+  &lt;/name&gt;
+  &lt;email <span class="sgc-2">type</span>=<span class="sgc-3">"personal"</span>&gt;
+    jan@newmarch.name
+  &lt;/email&gt;
+  &lt;email <span class="sgc-2">type</span>=<span class="sgc-3">"work"</span>&gt;
+    j.newmarch@boxhill.edu.au
+  &lt;/email&gt;
+&lt;/person&gt;`
+
+        <span class="sgc-2">var</span> person <span class="sgc-4">Person</span>
+
+        err := xml.<span class="sgc-4">Unmarshal</span>([]<span class="sgc-5">byte</span>(str), &amp;person)
+        checkError(err)
+
+        <span class="sgc-1">// now use the person structure e.g.
+</span> fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Family name: \""</span> + person.<span class="sgc-4">Name</span>.<span class="sgc-4">Family</span> + <span class="sgc-3">"\""</span>)
+        fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Second email address: \""</span> + person.<span class="sgc-4">Email</span>[1].<span class="sgc-4">Address</span> + <span class="sgc-3">"\""</span>)
+}
+
+<span class="sgc-2">func</span> checkError(err error) {
+        <span class="sgc-2">if</span> err != nil {
+                fmt.<span class="sgc-4">Println</span>(<span class="sgc-3">"Fatal error "</span>, err.<span class="sgc-4">Error</span>())
+                os.<span class="sgc-4">Exit</span>(1)
+        }
+}
+</span></code></pre>
+
+  <p>(Note the spaces are correct.). The strict rules are given in the package specification.</p>
+
+  <h2 id="heading_id_6">Marshalling XML</h2>
+
+  <p>Go 1 also has support for marshalling data structures into an XML document. The function is</p>
+  <pre>
+    <code>
+func Marshal(v interface}{) ([]byte, error)
+    </code>
+  </pre>
+
+  <p>This was used as a check in the last two lines of the previous program. <!--
+<p>
+  At present there is no support for marshalling a Go data structure
+  into XML. In this section we present a simple marshalling
+  function that will give
+  a basic serialisation. The result can be unmarshalled using
+  the Go function <code>Unmarshal</code> of the previous section.
+</p>
+
+<p>
+  A straightforward but naive approach would be to write code that
+  walks over your data structures, printing out results as it goes.
+  But if is customised to your data types, then you wil need to change
+  code each time the types change.
+</p>
+
+<p>
+  A better approach, and one that is used by the Go serialisation
+  libraries is to use the <code> reflection</code> package.
+  This is a package that allows you to examine data types and
+  data structures from within a running program. The idea of
+  reflection has been present in artificial intelligence
+  programming for many years, but is still seen as a rather arcane
+  technique for mainstream languages.
+</p>
+
+<p>
+  Go has two principal reflection types:  
+  <code>reflect.Type</code> gives information about the Go types,
+  while <code>reflect.Value</code> gives information about a
+  particular data value. <code>Value</code> has a method
+  <code>Type()</code> that can return the type.
+</p>
+
+<p>
+  The simplest types and values correspond to primitive types.
+  For example, there is <code>IntType</code>, <code>BoolType</code>
+  etc, which can be used as values in type switches to determine the
+  precise type of a <code>Type</code>. The corresponding value types
+  are <code>IntValue</code> and <code>BoolValue</code> with 
+  methods such as <code>Get</code> to return the value.
+</p>
+
+<p>
+  A <code>StructType</code> is more complex, as it has methods
+  to access the fields by 
+  <code>
+    <pre>
+func (t *StructType) Field(i int) (f StructField)
+    </pre>
+  </code>
+  and a <code>StructField</code> has methods such as
+  <code>Name</code> to return the string value of the field's
+  label. This is useful for examing the type structure.
+</p>
+
+<p>
+  A <code>StructValue</code> is useful for examining the value
+  of fields of a data value. It has a method
+  <code>
+    <pre>
+func (v *StructValue) Field(i int) Value
+    </pre>
+  </code>
+  which can be used to extract the value of each field.
+</p>
+
+<p>
+  The reflection process is basically stsrted by calling
+  <code>NewValue</code> on a data object, and then examining
+  its type and recursively walking through the values.
+  What we do with each value is to surround it by tags,
+  made of field names of the structures encountered.
+</p>
+
+<p>
+  There are two complexities: the first is that the initial
+  data value will tpyically be a structure, and this doesn't
+  have a field name as it is not itself part of a structure.
+  For this starting case, we use the type name of the structure
+  as XML tag name.
+</p>
+
+<p>
+  The second complexity comes with arrays or slices. In this case
+  we need to work through each element of the array/slice,
+  each time repeating the field name from the enclosing
+  structure.
+</p>
+
+<p>
+  We define thre functions: <code>Marshal</code> which takes an
+  initial data value. This prepares the XML document and creates
+  the toplevel tag from the structure's type name.
+  The second function <MarshalValue /> recurses through the
+  type values, switching on data types and writing tags from
+  field names and values as XML character data.
+  The third function handles the special case of slices,
+  as the tag name needs to be kept for all of the elements
+  of this slice.
+</p>
+
+<p>
+  We ignore pointers, channels, etc. We also do not produce
+  attributes, just tags and character data.
+  The program is
+  <pre><code><font color="black">
+<font color="firebrick">/* Marshal
+ */
+</font>
+<font color="purple">package</font> main
+
+<font color="purple">import</font> (
+        <font color="DarkRed">"fmt"</font>
+        <font color="DarkRed">"io"</font>
+        <font color="DarkRed">"os"</font>
+        <font color="DarkRed">"reflect"</font>
+        <font color="DarkRed">"bytes"</font>
+)
+
+<font color="purple">type</font> <font color="blue">Person</font> <font color="purple">struct</font> {
+        <font color="blue">Name</font>  <font color="blue">Name</font>
+        <font color="blue">Email</font> []<font color="blue">Email</font>
+}
+
+<font color="purple">type</font> <font color="blue">Name</font> <font color="purple">struct</font> {
+        <font color="blue">Family</font>   string
+        <font color="blue">Personal</font> string
+}
+
+<font color="purple">type</font> <font color="blue">Email</font> <font color="purple">struct</font> {
+        <font color="blue">Kind</font>    string <font color="DarkRed">"attr"</font>
+        <font color="blue">Address</font> string <font color="DarkRed">"chardata"</font>
+}
+
+<font color="purple">func</font> main() {
+        person := <font color="blue">Person</font>{
+                <font color="blue">Name</font>: <font color="blue">Name</font>{<font color="blue">Family</font>: <font color="DarkRed">"Newmarch"</font>, <font color="blue">Personal</font>: <font color="DarkRed">"Jan"</font>},
+                <font color="blue">Email</font>: []<font color="blue">Email</font>{<font color="blue">Email</font>{<font color="blue">Kind</font>: <font color="DarkRed">"home"</font>, <font color="blue">Address</font>: <font color="DarkRed">"jan"</font>},
+                        <font color="blue">Email</font>{<font color="blue">Kind</font>: <font color="DarkRed">"work"</font>, <font color="blue">Address</font>: <font color="DarkRed">"jan"</font>}}}
+
+        buff := bytes.<font color="blue">NewBuffer</font>(nil)
+        <font color="blue">Marshal</font>(person, buff)
+        fmt.<font color="blue">Println</font>(buff.<font color="blue">String</font>())
+}
+
+<font color="purple">func</font> <font color="blue">Marshal</font>(e <font color="purple">interface</font>{}, w io.<font color="blue">Writer</font>) {
+        <font color="firebrick">// make it a legal XML document
+</font> w.<font color="blue">Write</font>([]<font color="green">byte</font>(<font color="DarkRed">"&lt;?xml version=\"1.1\" encoding=\"UTF-8\" ?&gt;\n"</font>))
+
+        <font color="firebrick">// topvel e is a value and has no structure field, 
+</font> <font color="firebrick">// so use its type
+</font> typ := reflect.<font color="blue">TypeOf</font>(e)
+        name := typ.<font color="blue">Name</font>()
+
+        startTag(name, w)
+        <font color="blue">MarshalValue</font>(reflect.<font color="blue">ValueOf</font>(e), w)
+        endTag(name, w)
+}
+
+<font color="purple">func</font> <font color="blue">MarshalValue</font>(v reflect.<font color="blue">Value</font>, w io.<font color="blue">Writer</font>) {
+        t := v.<font color="blue">Type</font>()
+        <font color="purple">switch</font> t.<font color="blue">Kind</font>() {
+        <font color="purple">case</font> reflect.<font color="blue">Struct</font>:
+                <font color="purple">for</font> n := 0; n &lt; t.<font color="blue">NumField</font>(); n++ {
+                        field := t.<font color="blue">Field</font>(n)
+
+                        vv := v
+
+                        <font color="firebrick">// special case if it is a slice
+</font>
+                        <font color="purple">if</font> vv.<font color="blue">Field</font>(n).<font color="blue">Type</font>().<font color="blue">Kind</font>() == reflect.<font color="blue">Slice</font> {
+                                <font color="firebrick">// slice
+</font>                         <font color="blue">MarshalSliceValue</font>(field.<font color="blue">Name</font>,
+                                        vv.<font color="blue">Field</font>(n), w)
+                        } <font color="purple">else</font> {
+                                <font color="firebrick">// not a slice
+</font>                         startTag(field.<font color="blue">Name</font>, w)
+                                <font color="blue">MarshalValue</font>(vv.<font color="blue">Field</font>(n), w)
+                                endTag(field.<font color="blue">Name</font>, w)
+                        }
+                }
+        <font color="purple">case</font> reflect.<font color="blue">Int</font>, reflect.<font color="blue">Int8</font>, reflect.<font color="blue">Int16</font>, reflect.<font color="blue">Int32</font>, reflect.<font color="blue">Int64</font>, reflect.<font color="blue">Uint</font>, reflect.<font color="blue">Uint8</font>, reflect.<font color="blue">Uint16</font>, reflect.<font color="blue">Uint32</font>, reflect.<font color="blue">Uint64</font>, reflect.<font color="blue">Uintptr</font>:
+        <font color="purple">case</font> reflect.<font color="blue">Bool</font>:
+        <font color="purple">case</font> reflect.<font color="blue">String</font>:
+                vv := v
+                w.<font color="blue">Write</font>([]<font color="green">byte</font>(<font color="DarkRed">"   "</font> + vv.<font color="blue">String</font>() + <font color="DarkRed">"\n"</font>))
+        <font color="purple"><font color="purple">default</font></font>:
+        }
+}
+
+<font color="purple">func</font> <font color="blue">MarshalSliceValue</font>(tag string, v reflect.<font color="blue">Value</font>, w io.<font color="blue">Writer</font>) {
+        <font color="purple">for</font> n := 0; n &lt; v.<font color="blue">Len</font>(); n++ {
+                startTag(tag, w)
+                <font color="blue">MarshalValue</font>(v.<font color="blue">Index</font>(n), w)
+                endTag(tag, w)
+        }
+}
+
+<font color="purple">func</font> startTag(s string, w io.<font color="blue">Writer</font>) {
+        w.<font color="blue">Write</font>([]<font color="green">byte</font>(<font color="DarkRed">"&lt;"</font> + s + <font color="DarkRed">"&gt;\n"</font>))
+}
+
+<font color="purple">func</font> endTag(s string, w io.<font color="blue">Writer</font>) {
+        w.<font color="blue">Write</font>([]<font color="green">byte</font>(<font color="DarkRed">"&lt;/"</font> + s + <font color="DarkRed">"&gt;\n"</font>))
+}
+
+<font color="purple">func</font> checkError(err error) {
+        <font color="purple">if</font> err != nil {
+                fmt.<font color="blue">Println</font>(<font color="DarkRed">"Fatal error "</font>, err.<font color="blue">Error</font>())
+                os.<font color="blue">Exit</font>(1)
+        }
+}
+</font></code></pre>
+
+--></p>
+
+  <h2 id="heading_id_7">XHTML</h2>
+
+  <p>HTML does not conform to XML syntax. It has unterminated tags such as '&lt;br&gt;'. XHTML is a cleanup of HTML to make it compliant to XML. Documents in XHTML can be managed using the techniques above for XML.</p>
+
+  <h2 id="heading_id_8">HTML</h2>
+
+  <p>There is some support in the XML package to handle HTML documents even though they are not XML-compliant. The XML parser discussed earlier can handle many HTML documents if it is modified by</p>
+  <pre>
+    <code>
+        parser := xml.NewDecoder(r)
+        parser.Strict = false
+        parser.AutoClose = xml.HTMLAutoClose
+        parser.Entity = xml.HTMLEntity
+    </code>
+  </pre>
+
+  <h2 id="heading_id_9">Conclusion</h2>
+
+  <p>Go has basic support for dealing with XML strings. It does not as yet have mechanisms for dealing with XML specification languages such as XML Schema or Relax NG.</p>
+
+  <p>Copyright Jan Newmarch, jan@newmarch.name</p>
+
+  <p>If you like this book, please contribute using Flattr <a class="FlattrButton sgc-7" href="http://jan.newmarch.name/go/index.html"></a><br />
+  or donate using PayPal</p>
+
+  <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+    <input name="cmd" type="hidden" value="_s-xclick" /> <input name="encrypted" type="hidden" value="-----BEGIN PKCS7-----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-----END PKCS7----- " /> <input alt="PayPal - The safer, easier way to pay online." border="0" name="submit" src="https://www.paypalobjects.com/WEBSCR-640-20110401-1/en_AU/i/btn/btn_donateCC_LG.gif" type="image" /> <img alt="" border="0" height="1" src="https://www.paypalobjects.com/WEBSCR-640-20110401-1/en_AU/i/scr/pixel.gif" width="1" />
+  </form>
+</body>
+</html>
