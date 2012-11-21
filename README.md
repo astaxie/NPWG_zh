@@ -143,22 +143,24 @@ Network programming with Go 中文翻译版本
 
 第一翻译、first review和最终Review的人需要保留英文
 
-- 英文里面`<p></p>`为一个段落，那么相应的中文也是一个段落`<p class="zh"></p>`
+- 英文里面`<p></p>`为一个段落，那么把这一段修改成`<p class="en"></p>`，那么相应的中文也是一个段落`<p class="zh"></p>`
 
 		<p>Please go to the <a href="..">main index</a> for the content pages for network computing.</p>
 	
-	那么中文应该如下
+	那么加上中文之后应该如下：
 	
+		<p class="en">Please go to the <a href="..">main index</a> for the content pages for network computing.</p>
 		<p class="zh">请访问<a href="..">主页</a>获取网络编程的其他页面</p>
 
-- 英文里面`<h2></h2>`为一个层，那么相应的中文为`<h2 class="zh"><h2>`
+- 英文里面`<h2></h2>`为一个层，首先需要给这个层加上`class="en"`,然后那么相应的中文为`<h2 class="zh"><h2>`
 
 		<h2 id="heading_id_3">Introduction</h2>
 		
-	那么中文应该如下
+	那么加上中文应该如下：
 	
+		<h2 id="heading_id_3" class="en">Introduction</h2>
 		<h2 id="heading_id_3" class="zh">介绍</h2>	
-- 英文里面`<ul></ul>`为一个列表，那么相应的英文为`<ul class="zh"></ul>`
+- 英文里面`<ul></ul>`为一个列表，首先对原来的ul增加一个`class="en"`,然后相应的中文为`<ul class="zh"></ul>`
 
 		<ul>
 		<li><a href="http://golang.org/doc/install.html">Getting started</a></li>
@@ -168,8 +170,15 @@ Network programming with Go 中文翻译版本
 		<li><a href="http://golang.org/doc/effective_go.html">Effective Go</a></li>
 		</ul>
 		
-	那么相应的中文应该：
+	那么加上中文之后应该如下：
 	
+		<ul class="en">
+		<li><a href="http://golang.org/doc/install.html">Getting started</a></li>
+
+		<li><a href="http://golang.org/doc/go_tutorial.html">A Tutorial for the Go Programming Language</a></li>
+
+		<li><a href="http://golang.org/doc/effective_go.html">Effective Go</a></li>
+		</ul>
 		<ul class="zh">
 		<li><a href="http://golang.org/doc/install.html">安装入门</a></li>
 
