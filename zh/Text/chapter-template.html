@@ -4,9 +4,9 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title></title>
+  <title>Templates</title>
   <link href="../Styles/stylesheet.css" rel="stylesheet" type="text/css" />
-  <script type="text/javascript">
+  <script src="../toc.js"  type="text/javascript">
 
 
 
@@ -40,28 +40,53 @@
 
 <body>
   <div class="chapter">
-    <h1 id="heading_id_2">Templates</h1>
+    <h1 class="en" id="heading_id_2">Templates</h1>
+
+  <h1 class="zh" id="heading_id_2">模版</h1>
+
+ 
   </div>
 
   <div class="preface">
-    <p>Many languages have mechanisms to convert strings from one form to another. Go has a template mechanism to convert strings based on the content of an object supplied as an argument. While this is often used in rewriting HTML to insert object values, it can be used in other situations. Note that this material doesn't have anything explicitly to do with networking, but may be useful to network programs.</p>
+    <p  class="en">Many languages have mechanisms to convert strings from one form to another. Go has a template mechanism to convert strings based on the content of an object supplied as an argument. While this is often used in rewriting HTML to insert object values, it can be used in other situations. Note that this material doesn't have anything explicitly to do with networking, but may be useful to network programs.</p>
+
+    <p  class="zh">	很多编程语言都有字符串之间转换的机制，而GO语言则是通过模版来实现将一个对象来作为参数传递。此方式不仅可以在重写HTML时插入对象值，也适用于其他方面。注意，本章内容并没有明确给出网络的工作方式，但对于网络编程方式很有用处。</p>
+
   </div>
+ 
+  <h2 class="en" id="heading_id_3">Introduction</h2>
 
-  <h2 id="heading_id_3">Introduction</h2>
+  <h2 class="zh" id="heading_id_3">介绍</h2>
 
-  <p>Most server-side languages have a mechanism for taking predominantly static pages and inserting a dynamically generated component, such as a list of items. Typical examples are scripts in Java Server Pages, PHP scripting and many others. Go has adopted a relatively simple scripting language in the <code>template</code> package.</p>
+  <p  class="en">Most server-side languages have a mechanism for taking predominantly static pages and inserting a dynamically generated component, such as a list of items. Typical examples are scripts in Java Server Pages, PHP scripting and many others. Go has adopted a relatively simple scripting language in the <code>template</code> package.</p>
 
-  <p>At the time of writing a new template package has been adopted. There is very little documentation on the template packages. There is a small amount on the old package, which is currently still available in the <code>old/template</code>. There is no documentation on the new package as yet apart from the reference page. The template package changed with <a href="http://golang.org/doc/devel/release.html#r60">r60 (released 2011/09/07)</a>.</p>
+  <p  class="zh">大多数服务器端语言的机制主要是在静态页面插入一个动态生成的组件，如清单列表项目。典型的例子是在JSP、PHP和许多其他语言的脚本中。GO的<code>template</code>包中采取了相对简单的脚本化语言。</p>
 
-  <p>We describe the new package here. The package is designed to take text as input and output different text, based on transforming the original text using the values of an object. Unlike JSP or similar, it is not restricted to HTML files but it is likely to find greatest use there.</p>
+  <p class="en">At the time of writing a new template package has been adopted. There is very little documentation on the template packages. There is a small amount on the old package, which is currently still available in the <code>old/template</code>. There is no documentation on the new package as yet apart from the reference page. The template package changed with <a href="http://golang.org/doc/devel/release.html#r60">r60 (released 2011/09/07)</a>.</p>
 
-  <p>The original source is called a <em>template</em> and will consist of text that is transmitted unchanged, and embedded commands which can act on and change text. The commands are delimited by <code>{{ ... }}</code> , similar to the JSP commands <code>&lt;%= ... =%&gt;</code> and PHPs <code>&lt;?php ... ?&gt;</code>.</p>
+  <p class="zh">因为新的template包是刚刚被采用的，所有现在的template包中的文档少的可怜，旧的<code>old/template</code>包中也还存有少量的旧模版。新发布的帮助页面也还没有关于新包的文档。关于template包的更改请参阅<a href="http://golang.org/doc/devel/release.html#r60">r60 (released 2011/09/07)</a>.</p>
 
-  <h2 id="heading_id_4">Inserting object values</h2>
+  <p class="en">We describe the new package here. The package is designed to take text as input and output different text, based on transforming the original text using the values of an object. Unlike JSP or similar, it is not restricted to HTML files but it is likely to find greatest use there.</p>
 
-  <p>A template is applied to a Go object. Fields from that Go object can be inserted into the template, and you can 'dig" into the object to find subfields, etc. The current object is represented as '.', so that to insert the value of the current object as a string, you use <code>{{.}}</code>. The package uses the <code>fmt</code> package by default to work out the string used as inserted values.</p>
+  <p class="zh">在这里，我们描述了这个新包。该包是描述了通过使用对象值改变了原来文本的方式从而在输入和输出时获取不同的文本。与JSP或类似的不同，它的作用不仅限于HTML文件，但在那可能会有更大的作用。</p>
 
-  <p>To insert the value of a field of the current object, you use the field name prefixed by '.'. For example, if the object is of type</p>
+
+
+  <p class="en">The original source is called a <em>template</em> and will consist of text that is transmitted unchanged, and embedded commands which can act on and change text. The commands are delimited by <code>{{ ... }}</code> , similar to the JSP commands <code>&lt;%= ... =%&gt;</code> and PHPs <code>&lt;?php ... ?&gt;</code>.</p>
+
+  <p class="zh">源文件被称作 <em>template</em> ，包括文本传输方式不变，以嵌入命令可以作用于和更改文本. 命令规定如 <code>{{ ... }}</code> ，类似于JSP命令 <code>&lt;%= ... =%&gt;</code> 和PHP命令 <code>&lt;?php ... ?&gt;</code>。</p>
+
+  <h2 class="en"id="heading_id_4">Inserting object values</h2>
+
+  <h2 class="zh"id="heading_id_4">插入对象值</h2>
+
+  <p class="en">A template is applied to a Go object. Fields from that Go object can be inserted into the template, and you can 'dig" into the object to find subfields, etc. The current object is represented as '.', so that to insert the value of the current object as a string, you use <code>{{.}}</code>. The package uses the <code>fmt</code> package by default to work out the string used as inserted values.</p>
+
+  <p class="zh">模板应用于GO对象中.GO对象被注入到模版后，你就能从域中“挖”到他的子域，等等。当前对象以'.'代替, 所以当插入一个字符串到当前对象时，你可以采用<code>{{.}}</code>的方式。这个包默认采用 <code>fmt</code> 包来作为插入值的字符串输出。</p>
+
+  <p class="en">To insert the value of a field of the current object, you use the field name prefixed by '.'. For example, if the object is of type</p>
+  <p class="zh">要插入当前对象的一个字段的值，你使用的字段名前加前缀 '.'. 例如, 如果要插入的对象的类型为</p>
+ 
   <pre>
 <code>
 type Person struct {
@@ -73,7 +98,10 @@ type Person struct {
 </code>
 </pre>
 
-  <p>then you insert the values of <code>Name</code> and <code>Age</code> by</p>
+  <p class="en">then you insert the values of <code>Name</code> and <code>Age</code> by</p>
+
+  <p class="zh">那么你要插入的值 <code>Name</code> 和 <code>Age</code> 如下</p>
+
   <pre>
 <code>
 The name is {{.Name}}.
@@ -81,7 +109,9 @@ The age is {{.Age}}.
 </code>
 </pre>
 
-  <p>We can loop over the elements of an array or other list using the <code>range</code> command. So to access the contents of the <code>Emails</code> array we do</p>
+  <p class="en">We can loop over the elements of an array or other list using the <code>range</code> command. So to access the contents of the <code>Emails</code> array we do</p>
+
+  <p class="zh">我们可以使用<code>range</code>命令来循环一个数组或者链表中的元素。所以要获取 <code>Emails</code> array的信息，我们可以这么干</p>
   <pre>
 <code>
 {{range .Emails}}
@@ -90,7 +120,10 @@ The age is {{.Age}}.
 </code>
 </pre>
 
-  <p>if <code>Job</code> is defined by</p>
+  <p class="en">if <code>Job</code> is defined by</p>
+
+  <p class="zh">如果<code>Job</code>定义为</p>
+
   <pre>
 <code>
 type Job struct {
@@ -100,7 +133,10 @@ type Job struct {
 </code>
 </pre>
 
-  <p>and we want to access the fields of a <code>Person</code>'s <code>Jobs</code>, we can do it as above with a <code>{{range .Jobs}}</code>. An alternative is to switch the current object to the <code>Jobs</code> field. This is done using the <code>{{with ...}} ... {{end}}</code> construction, where now <code>{{.}}</code> is the <code>Jobs</code> field, which is an array:</p>
+  <p class="en">and we want to access the fields of a <code>Person</code>'s <code>Jobs</code>, we can do it as above with a <code>{{range .Jobs}}</code>. An alternative is to switch the current object to the <code>Jobs</code> field. This is done using the <code>{{with ...}} ... {{end}}</code> construction, where now <code>{{.}}</code> is the <code>Jobs</code> field, which is an array:</p>
+
+  <p class="zh">如果我们想访问 <code>Person</code>值域中的 <code>Jobs</code>, 我们可以这么干 <code>{{range .Jobs}}</code>。这是一种可以讲当前对象转化为<code>Jobs</code> 的值域的方式. 通过 <code>{{with ...}} ... {{end}}</code> 这种方式, 那么<code>{{.}}</code> 就可以拿到<code>Jobs</code> 值域了,如下:</p>
+
   <pre>
 <code>
 {{with .Jobs}}
