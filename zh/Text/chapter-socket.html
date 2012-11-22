@@ -86,7 +86,6 @@
 
   <p class="en">The TCP/IP protocol was devised through a long-running DARPA project. This worked by implementation followed by RFCs (Request For Comment). TCP/IP is the principal Unix networking protocol. TCP/IP = Transmission Control Protocol/Internet Protocol.</p>
   <p class="zh">TCP/IP协议由长期运行的一个DARPA（美国国防先进研究项目局）项目设计。该工作其次由RFC (Request For Comment)实施。TCP/IP是Unix的首要网络协议。TCP/IP协议等于传输控制协议/互联网协议。</p>
-  <p class="zh">译者注：Request For Comments (RFC），是一系列以编号排定的文件。文件收集了有关因特网相关资讯，以及UNIX和因特网社群的软件文件。</P>
 
   <p class="en">The TCP/IP stack is shorter than the OSI one:<br />
   <img alt="" src="../Images/tcp_stack.gif" /><br />
@@ -96,23 +95,29 @@
   TCP是一个面向连接的协议，UDP（User Datagram Protocol，用户数据报协议）是一种无连接的协议。</p>
 
   <h3 id="heading_id_5" class="en">IP datagrams</h3>
-  <h3 id="heading_id_5" class="zh">IP数据报</h3>
+  <h3 id="heading_id_5" class="zh">IP数据包</h3>
 
-  <p>The IP layer provides a connectionless and unreliable delivery system. It considers each datagram independently of the others. Any association between datagrams must be supplied by the higher layers.</p>
+  <p class="en">The IP layer provides a connectionless and unreliable delivery system. It considers each datagram independently of the others. Any association between datagrams must be supplied by the higher layers.</p>
+  <p class="zh">IP层提供了无连接的不可靠传输系统，任何数据包之间的关联必须依赖更高的层来提供。</p>
 
-  <p>The IP layer supplies a checksum that includes its own header. The header includes the source and destination addresses.</p>
+  <p class="en">The IP layer supplies a checksum that includes its own header. The header includes the source and destination addresses.</p>
+  <p class="zh">IP层包头包含了校验数据，包头包括源地址和目的地址。</p>
 
-  <p>The IP layer handles routing through an Internet. It is also responsible for breaking up large datagrams into smaller ones for transmission and reassembling them at the other end.</p>
+  <p class="en">The IP layer handles routing through an Internet. It is also responsible for breaking up large datagrams into smaller ones for transmission and reassembling them at the other end.</p>
+  <p class="zh">IP层通过路由连接到因特网，还负责将大数据包分解为更小的包，并传输到另一端后进行重组。</p>
 
   <h3 id="heading_id_6">UDP</h3>
 
-  <p>UDP is also connectionless and unreliable. What it adds to IP is a checksum for the contents of the datagram and <i>port numbers.</i> These are used to give a client/server model - see later.</p>
+  <p class="en">UDP is also connectionless and unreliable. What it adds to IP is a checksum for the contents of the datagram and <i>port numbers.</i> These are used to give a client/server model - see later.</p>
+  <p class="zh">UDP是无连接的，不可靠的。它包括IP数据报的内容和<i>端口号</i>的校验。在后面，我们会用它来构建一些客户端/服务器例子。</p>
 
   <h3 id="heading_id_7">TCP</h3>
 
-  <p>TCP supplies logic to give a reliable connection-oriented protocol above IP. It provides a <i>virtual circuit</i> that two processes can use to communicate. It also uses port numbers to identify services on a host.</p>
+  <p class="en">TCP supplies logic to give a reliable connection-oriented protocol above IP. It provides a <i>virtual circuit</i> that two processes can use to communicate. It also uses port numbers to identify services on a host.</p>
+  <p class="zh">TCP是构建于IP之上的面向链接的协议。它提供了一个<i>虚电路</i>使得两个应用进程可以通过它来通信。它通过端口号来识别主机上的服务。</p>
 
-  <h2 id="heading_id_8">Internet adddresses</h2>
+  <h2 id="heading_id_8" class="en">Internet addresses</h2>
+  <h2 id="heading_id_8" class="zh">互联网地址</h2>
 
   <p>In order to use a service you must be able to find it. The Internet uses an address scheme for devices such as computers so that they can be located. This addressing scheme was originally devised when there were only a handful of connected computers, and very generously allowed upto 2^32 addresses, using a 32 bit unsigned integer. These are the so-called IPv4 addresses. In recent years, the number of connected (or at least directly addressable) devices has threatened to exceed this number, and so "any day now" we will switch to IPv6 addressing which will allow upto 2^128 addresses, using an unsigned 128 bit integer. The changeover is most likely to be forced by emerging countries, as the developed world has already taken nearly all of the pool of IPv4 addresses.</p>
 
