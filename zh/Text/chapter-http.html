@@ -48,65 +48,88 @@
 
 <body>
   <div class="chapter">
-    <h1 id="heading_id_2">HTTP</h1>
+    <h1 id="heading_id_2" class="en">HTTP</h1>
+    <h1 id="heading_id_2" class="zh">关于HTTP</h1>
   </div>
 
   <div class="preface"></div>
 
   <div class="generate_from_h2" id="generated-toc"></div>
 
-  <h2 id="heading_id_3">Introduction</h2>
+  <h2 id="heading_id_3" class="en">Introduction</h2>
+  <h2 id="heading_id_3" class="zh">简介</h2>
 
-  <p>The World Wide Web is a major distributed system, with millions of users. A site may become a Web host by running an HTTP server. While Web clients are typically users with a browser, there are many other "user agents" such as web spiders, web application clients and so on.</p>
+  <p class="en">The World Wide Web is a major distributed system, with millions of users. A site may become a Web host by running an HTTP server. While Web clients are typically users with a browser, there are many other "user agents" such as web spiders, web application clients and so on.</p>
+  <p class="cn">万维网是一个庞大的，拥有数以百万计用户的分布式系统。网站就是一个运行着HTTP服务器的Web主机。而Web客户端通常是浏览器用户，当然也还有许多其他的“用户”，如网络蜘蛛，Web应用程序客户端等。</p>
 
-  <p>The Web is built on top of the HTTP (Hyper-Text Transport Protocol) which is layered on top of TCP. HTTP has been through three publically available versions, but the latest - version 1.1 - is now the most commonly used.</p>
+  <p class="en">The Web is built on top of the HTTP (Hyper-Text Transport Protocol) which is layered on top of TCP. HTTP has been through three publically available versions, but the latest - version 1.1 - is now the most commonly used.</p>
+  <p class="zh">Web使用的HTTP（超文本传输协议）是基于TCP协议的。HTTP有三个公开可用的版本，目前最常用的是最新的版本1.1。</p>
 
-  <p>In this chapter we give an overview of HTTP, followed by the Go APIs to manage HTTP connections.</p>
+  <p class="en">In this chapter we give an overview of HTTP, followed by the Go APIs to manage HTTP connections.</p>
+  <p class="zh">本章首先对HTTP进行概述，然后介绍如何通过Go API管理HTTP连接。</p>
 
-  <h2 id="heading_id_4">Overview of HTTP</h2>
+  <h2 id="heading_id_4" class="en">Overview of HTTP</h2>
+  <h2 id="heading_id_4" class="zh">HTTP概述</h2>
 
-  <h3 id="heading_id_5">URLs and resources</h3>
+  <h3 id="heading_id_5" class="en">URLs and resources</h3>
+  <h3 id="heading_id_5" class="zh">URL和资源</h3>
 
-  <p>URLs specify the location of a <em>resource</em>. A resource is often a static file, such as an HTML document, an image, or a sound file. But increasingly, it may be a dynamically generated object, perhaps based on information stored in a database.</p>
+  <p class="en" class="en">URLs specify the location of a <em>resource</em>. A resource is often a static file, such as an HTML document, an image, or a sound file. But increasingly, it may be a dynamically generated object, perhaps based on information stored in a database.</p>
+  <p class="zh" class="zh">URL指定<em>资源</em>的位置。资源通常是HTML文档、图片、声音文件这样的静态文件，但越来越多的资源是动态生成的对象，比如根据数据库信息生成。</p>
 
-  <p>When a user agent requests a resource, what is returned is not the resource itself, but some <em>representation</em> of that resource. For example, if the resource is a static file, then what is sent to the user agent is a copy of the file.</p>
+  <p class="en">When a user agent requests a resource, what is returned is not the resource itself, but some <em>representation</em> of that resource. For example, if the resource is a static file, then what is sent to the user agent is a copy of the file.</p>
+  <p class="zh">“用户”请求资源时，返回的并不是资源本身，而是资源的<em>代表</em>。如果资源是静态文件，那么返回给用户的就是文件的一个副本。</p>
 
-  <p>Multiple URLs may point to the same resource, and an HTTP server will return appropriate representations of the resource for each URL. For example, an company might make product information available both internally and externally using different URLs for the same product. The internal representation of the product might include information such as internal contact officers for the product, while the external representation might include the location of stores selling the product.</p>
+  <p class="en">Multiple URLs may point to the same resource, and an HTTP server will return appropriate representations of the resource for each URL. For example, an company might make product information available both internally and externally using different URLs for the same product. The internal representation of the product might include information such as internal contact officers for the product, while the external representation might include the location of stores selling the product.</p>
+  <p class="zh">不同的URL可以指向相同的资源，HTTP服务器会给每个URL返回适当的代表。例如，针对同一个产品，某公司可以使用不同的URL给本地和外地的用户查看其产品信息，本地用户可以看到本地产品联系人这类内容，而外地用户看到的内容则包括产品销售门店的地址等等。</p>
 
-  <p>This view of resources means that the HTTP protocol can be fairly simple and straightforward, while an HTTP server can be arbitrarily complex. HTTP has to deliver requests from user agents to servers and return a byte stream, while a server might have to do any amount of processing of the request.</p>
+  <p class="en">This view of resources means that the HTTP protocol can be fairly simple and straightforward, while an HTTP server can be arbitrarily complex. HTTP has to deliver requests from user agents to servers and return a byte stream, while a server might have to do any amount of processing of the request.</p>
+  <p class="zh">这其实就意味着，HTTP协议本身非常简单直接，但HTTP服务器却可能非常复杂。HTTP将用户请求发送到服务器，并返回字节流，而服务器针对该请求可能需要做很多很多处理。</p>
 
-  <h3 id="heading_id_6">HTTP characteristics</h3>
+  <h3 id="heading_id_6" class="en">HTTP characteristics</h3>
+  <h3 id="heading_id_6" class="zh">HTTP的特点</h3>
 
-  <p>HTTP is a stateless, connectionless, reliable protocol. In the simplest form, each request from a user agent is handled reliably and then the connection is broken. Each request involves a separate TCP connection, so if many reources are required (such as images embedded in an HTML page) then many TCP connections have to be set up and torn down in a short space of time.</p>
+  <p class="en">HTTP is a stateless, connectionless, reliable protocol. In the simplest form, each request from a user agent is handled reliably and then the connection is broken. Each request involves a separate TCP connection, so if many reources are required (such as images embedded in an HTML page) then many TCP connections have to be set up and torn down in a short space of time.</p>
+  <p class="zh">HTTP协议是无状态，面向连接和可靠的。最简单的形式是，每个从用户发起的请求被可靠地处理，然后断开连接。每次请求都包括一个独立的TCP连接，所以如果要请求很多资源（如在HTML页面中嵌入的图像），则必须在很短的时间内建立并断开许多TCP连接。</p>
 
-  <p>Thera are many optimisations in HTTP which add complexity to the simple structure, in order to create a more efficient and reliable protocol.</p>
+  <p class="en">Thera are many optimisations in HTTP which add complexity to the simple structure, in order to create a more efficient and reliable protocol.</p>
+  <p class="zh">为构建更高效更可靠的协议，有许多在这种简单结构基础上添加复杂性的优化技术。</p>
 
-  <h3 id="heading_id_7">Versions</h3>
+  <h3 id="heading_id_7" class="en">Versions</h3>
+  <h3 id="heading_id_7" class="zh">版本</h3>
 
-  <p>There are 3 versions of HTTP</p>
+  <p class="en">There are 3 versions of HTTP</p>
+  <p class="zh">HTTP有三个版本</p>
 
-  <ul>
+  <ul class="en">
     <li>Version 0.9 - totally obsolete</li>
-
     <li>Version 1.0 - almost obsolete</li>
-
     <li>Version 1.1 - current</li>
   </ul>
+  <ul class="zh">
+    <li>Version 0.9 - 完全废弃</li>
+    <li>Version 1.0 - 基本废弃</li>
+    <li>Version 1.1 - 当前版本</li>
+  </ul>
 
-  <p>Each version must understand requests and responses of earlier versions.</p>
+  <p class="en">Each version must understand requests and responses of earlier versions.</p>
+  <p class="zh">每个版本必须兼容早期的版本。</p>
 
   <h3 id="heading_id_8">HTTP 0.9</h3>
 
-  <h4 id="heading_id_9">Request format</h4>
+  <h4 id="heading_id_9" class="en">Request format</h4>
+  <h4 id="heading_id_9" class="zh">请求格式</h4>
   <pre>
 Request = Simple-Request
 
 Simple-Request = "GET" SP Request-URI CRLF
   </pre>
 
-  <h4 id="heading_id_10">Response format</h4>
+  <h4 id="heading_id_10" class="en">Response format</h4>
+  <h4 id="heading_id_10" class="zh">响应格式</h4>
 
-  <p>A response is of the form</p>
+  <p class="en">A response is of the form</p>
+  <p class="zh">响应形式类似：</p>
   <pre>
 Response = Simple-Response
 
@@ -115,11 +138,14 @@ Simple-Response = [Entity-Body]
 
   <h3 id="heading_id_11">HTTP 1.0</h3>
 
-  <p>This version added much more information to the requests and responses. Rather than "grow" the 0.9 format, it was just left alongside the new version.</p>
+  <p class="en">This version added much more information to the requests and responses. Rather than "grow" the 0.9 format, it was just left alongside the new version.</p>
+  <p class="zh">该版本在请求和响应中增加了很多信息。与其说是0.9的升级版，还不如说它是一个全新的版本。</p>
 
-  <h4 id="heading_id_12">Request format</h4>
+  <h4 id="heading_id_12" class="en">Request format</h4>
+  <h4 id="heading_id_12" class="zh">请求格式</h4>
 
-  <p>The format of requests from client to server is</p>
+  <p class="en">The format of requests from client to server is</p>
+  <p class="zh">从客户端到服务器端的请求格式：</p>
   <pre>
 Request = Simple-Request | Full-Request
 
@@ -133,51 +159,60 @@ Full-Request = Request-Line
                 [Entity-Body]
 </pre>
 
-  <p>A Simple-Request is an HTTP/0.9 request and must be replied to by a Simple-Response.</p>
+  <p class="en">A Simple-Request is an HTTP/0.9 request and must be replied to by a Simple-Response.</p>
+  <p class="zh">简单请求(Simple-Request)表明是一个 HTTP/0.9 请求，必须回复简单响应(Simple-Response)。</p>
 
-  <p>A Request-Line has format</p>
+  <p class="en">A Request-Line has format</p>
+  <p class="zh">请求行(Request-Line)的格式如下：</p>
   <pre>
 Request-Line = Method SP Request-URI SP HTTP-Version CRLF
 </pre>
 
-  <p>where</p>
+  <p class="en">where</p>
+  <p class="zh">其中</p>
   <pre>
 Method = "GET" | "HEAD" | POST |
          extension-method
 </pre>
 
-  <p>e.g.</p>
+  <p class="en">e.g.</p>
+  <p class="zh">如：</p>
   <pre>
 GET http://jan.newmarch.name/index.html HTTP/1.0
 </pre>
 
-  <h4 id="heading_id_13">Response format</h4>
+  <h4 id="heading_id_13" class="en">Response format</h4>
+  <h4 id="heading_id_13" class="zh">响应格式</h4>
 
   <p>A response is of the form</p>
+  <p>响应的形式如下：</p>
   <pre>
 Response = Simple-Response | Full-Response
 
 Simple-Response = [Entity-Body]
 
 Full-Response = Status-Line
-                *(General-Header 
+                *(General-Header
                 | Response-Header
                 | Entity-Header)
                 CRLF
                 [Entity-Body]
 </pre>
 
-  <p>The Status-Line gives information about the fate of the request:</p>
+  <p class="en">The Status-Line gives information about the fate of the request:</p>
+  <p class="zh">状态行(Status-Line)会给出请求的最后的状态信息:</p>
   <pre>
 Status-Line = HTTP-Version SP Status-Code SP Reason-Phrase CRLF
 </pre>
 
-  <p>e.g.</p>
+  <p class="en">e.g.</p>
+  <p class="zh">如</p>
   <pre>
 HTTP/1.0 200 OK
 </pre>
 
-  <p>The codes are</p>
+  <p class="en">The codes are</p>
+  <p class="zh">状态码：</p>
   <pre>
 Status-Code =     "200" ; OK
                 | "201" ; Created
@@ -197,7 +232,8 @@ Status-Code =     "200" ; OK
                 | extension-code
 </pre>
 
-  <p>The Entity-Header contains useful information about the Entity-Body to follow</p>
+  <p class="en">The Entity-Header contains useful information about the Entity-Body to follow</p>
+  <p class="zh">实体头(Entity-Header)包含了有关实体(Entity-Body)的有用信息</p>
   <pre>
 Entity-Header = Allow
                 | Content-Encoding
@@ -208,7 +244,8 @@ Entity-Header = Allow
                 | extension-header
 </pre>
 
-  <p>For example</p>
+  <p class="en">For example</p>
+  <p class="zh">例如：</p>
   <pre>
 HTTP/1.1 200 OK
 Date: Fri, 29 Aug 2003 00:59:56 GMT
@@ -221,41 +258,56 @@ Content-Type: text/html; charset=ISO-8859-1
 
   <h3 id="heading_id_14">HTTP 1.1</h3>
 
-  <p>HTTP 1.1 fixes many problems with HTTP 1.0, but is more complex because of it. This version is done by extending or refining the options available to HTTP 1.0. e.g.</p>
+  <p class="en">HTTP 1.1 fixes many problems with HTTP 1.0, but is more complex because of it. This version is done by extending or refining the options available to HTTP 1.0. e.g.</p>
+  <p class="zh">HTTP 1.1 修复了 HTTP 1.0 中的很多问题，因此更加复杂。例如此版本中扩展和完善了HTTP 1.0中的可选项。</p>
 
-  <ul>
+  <ul class="en">
     <li>there are more commands such as TRACE and CONNECT</li>
-
     <li>you should use absolute URLs, particularly for connecting by proxies e.g
       <pre><code>
       GET http://www.w3.org/index.html HTTP/1.1
       </code></pre>
     </li>
-
     <li>there are more attributes such as If-Modified-Since, also for use by proxies</li>
   </ul>
-
-  <p>The changes include</p>
-
-  <ul>
-    <li>hostname identification (allows virtual hosts)</li>
-
-    <li>content negotiation (multiple languages)</li>
-
-    <li>persistent connections (reduces TCP overheads - this is very messy)</li>
-
-    <li>chunked transfers</li>
-
-    <li>byte ranges (request parts of documents)</li>
-
-    <li>proxy support</li>
+  <ul class="zh">
+    <li>增加了命令，如 TRACE 和 CONNECT</li>
+    <li>注意在通过代理进行连接时，应当使用绝对路径。如：
+      <pre><code>
+      GET http://www.w3.org/index.html HTTP/1.1
+      </code></pre>
+    </li>
+    <li>增加了更多属性，例如针对代理的 If-Modified-Since。</li>
   </ul>
 
-  <p>The 0.9 protocol took one page. The 1.0 protocol was described in about 20 pages. 1.1 takes 120 pages.</p>
+  <p class="en">The changes include</p>
+  <p class="zh">这些变动包括：</p>
 
-  <h2 id="heading_id_15">Simple user-agents</h2>
+  <ul class="en">
+    <li>hostname identification (allows virtual hosts)</li>
+    <li class="en">content negotiation (multiple languages)</li>
+    <li class="en">persistent connections (reduces TCP overheads - this is very messy)</li>
+    <li class="en">chunked transfers</li>
+    <li class="en">byte ranges (request parts of documents)</li>
+    <li class="en">proxy support</li>
+  </ul>
+  <ul class="zh">
+    <li class="zh">主机名识别(支持虚拟主机)</li>
+    <li class="zh">内容协商(多语言)</li>
+    <li class="zh">持久连接(降低TCP开销)</li>
+    <li class="zh">分块传送</li>
+    <li class="zh">字节范围(请求文件部分内容)</li>
+    <li class="zh">代理支持</li>
+  </ul>
 
-  <p>User agents such as browsers make requests and get responses. The response type is</p>
+  <p class="en">The 0.9 protocol took one page. The 1.0 protocol was described in about 20 pages. 1.1 takes 120 pages.</p>
+  <p class="zh">0.9版本的协议只有一页，1.0版本用了大约20页来说明，而1.1则用了120页。</p>
+
+  <h2 id="heading_id_15" class="en">Simple user-agents</h2>
+  <h2 id="heading_id_15" class="zh">简单用户代理(Simple user-agents)</h2>
+
+  <p class="en">User agents such as browsers make requests and get responses. The response type is</p>
+  <p class="zh">用户代理(User agent)(例如浏览器)用来发起请求和接收响应。代码中的 response type 如下：</p>
   <pre><code>
 type Response struct {
     Status     string // e.g. "200 OK"
@@ -280,14 +332,17 @@ type Response struct {
 }
     </code></pre>
 
-  <p>We shall examine this data structure through examples. The simplest request is from a user agent is "HEAD" which asks for information about a resource and its HTTP server. The function</p>
+  <p class="en">We shall examine this data structure through examples. The simplest request is from a user agent is "HEAD" which asks for information about a resource and its HTTP server. The function</p>
+  <p class="zh">通过实例可以了解其数据结构。最简单的请求是由用户代理发起"HEAD"命令，其中包括请求的资源和HTTP服务器。函数</p>
   <pre><code>
 func Head(url string) (r *Response, err os.Error)
     </code></pre>
 
-  <p>can be used to make this query.</p>
+  <p class="en">can be used to make this query.</p>
+  <p class="zh">可用来发起此请求。</p>
 
-  <p>The status of the response is in the response field <code>Status</code>, while the field <code>Header</code> is a map of the header fields in the HTTP response. A program to make this request and display the results is</p>
+  <p class="en">The status of the response is in the response field <code>Status</code>, while the field <code>Header</code> is a map of the header fields in the HTTP response. A program to make this request and display the results is</p>
+  <p class="zh">响应状态对应response中的<code>Status</code>属性，而<code>Header</code>属性对应HTTP响应的header域。下面的程序用来发起请求和显示结果：</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* Head
  */
@@ -322,7 +377,8 @@ func Head(url string) (r *Response, err os.Error)
 }
 </span></code></pre>
 
-  <p>When run against a resource as in <code>Head http://www.golang.com/</code> it prints something like</p>
+  <p class="en">When run against a resource as in <code>Head http://www.golang.com/</code> it prints something like</p>
+  <p class="zh">程序运行请求资源，<code>Head http://www.golang.com/</code>，输出结果类似：</p>
   <pre><code>
 200 OK
 Content-Type: text/html; charset=utf-8
@@ -332,12 +388,14 @@ Expires: Tue, 14 Sep 2010 06:34:29 GMT
 Server: Google Frontend
     </code></pre>
 
-  <p>Usually, we are want to retrieve a resource rather than just get information about it. The "GET" request will do this, and this can be done using</p>
+  <p class="en">Usually, we are want to retrieve a resource rather than just get information about it. The "GET" request will do this, and this can be done using</p>
+  <p class="zh">通常我们希望接收到一个资源内容而不是其有关信息。"GET"请求就是做来做这个的，使用如下函数即可：</p>
   <pre><code>
 func Get(url string) (r *Response, finalURL string, err os.Error)
     </code></pre>
 
-  <p>The content of the response is in the response field <code>Body</code> which is of type <code>io.ReadCloser</code>. We can print the content to the screen with the following program</p>
+  <p class="en">The content of the response is in the response field <code>Body</code> which is of type <code>io.ReadCloser</code>. We can print the content to the screen with the following program</p>
+  <p class="zh">响应内容为response的<code>Body</code>属性。它是一个<code>io.ReadCloser</code>类型。我们可以用以下程序在屏幕上打印相应内容</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* Get
  */
@@ -392,9 +450,9 @@ func Get(url string) (r *Response, finalURL string, err os.Error)
 }
 
 <span class="sgc-2">func</span> acceptableCharset(contentTypes []string) bool {
-        <span class="sgc-1">// each type is like [text/html; charset=UTF-8]
-</span> <span class="sgc-1">// we want the UTF-8 only
-</span> <span class="sgc-2">for</span> <span class="sgc-6">_</span>, cType := range contentTypes {
+        <span class="sgc-1">// each type is like [text/html; charset=UTF-8]</span>
+        <span class="sgc-1">// we want the UTF-8 only</span>
+        <span class="sgc-2">for</span> <span class="sgc-6">_</span>, cType := range contentTypes {
                 <span class="sgc-2">if</span> strings.<span class="sgc-4">Index</span>(cType, <span class="sgc-3">"UTF-8"</span>) != -1 {
                         <span class="sgc-2">return</span> true
                 }
@@ -403,15 +461,21 @@ func Get(url string) (r *Response, finalURL string, err os.Error)
 }
 </span></code></pre>
 
-  <p>Note that there are important character set issues of the type discussed in the previous chapter. The server will deliver the content using some character set encoding, and possibly some transfer encoding. Usually this is a matter of negotiation between user agent and server, but the simple <code>Get</code> command that we are using does not include the user agent component of the negotiation. So the server can send whatever character encoding it wishes.</p>
+  <p class="en">Note that there are important character set issues of the type discussed in the previous chapter. The server will deliver the content using some character set encoding, and possibly some transfer encoding. Usually this is a matter of negotiation between user agent and server, but the simple <code>Get</code> command that we are using does not include the user agent component of the negotiation. So the server can send whatever character encoding it wishes.</p>
+  <p class="zh">注意这里有一个重要的字符集类型问题，在前面章节也讨论过。服务器提供内容时使用的字符集编码，甚至传输编码，通常是用户代理和服务器之间协商的那结果，但我们使用的<code>Get</code>的命令很简单，它不包括用户代理的内容协商组件。因此，服务器可以自行决定使用什么字符编码。</p>
 
-  <p>At the time of first writing, I was in China. When I tried this program on <code>www.google.com</code>, Google's server tried to be helpful by guessing my location and sending me the text in the Chinese character set Big5! How to tell the server what character encoding is okay for me is discussed later.</p>
+  <p class="en">At the time of first writing, I was in China. When I tried this program on <code>www.google.com</code>, Google's server tried to be helpful by guessing my location and sending me the text in the Chinese character set Big5! How to tell the server what character encoding is okay for me is discussed later.</p>
+  <p class="zh">我第一次写的时候是在中国。当我用这个程序访问<code>www.google.com</code>时，谷歌的服务器尝试猜测我的地理位置，然后很厉害地使用了Big5码给我发送文本！后面会讨论如何告知服务器给我什么字符编码最好。</p>
 
-  <h2 id="heading_id_16">Configuring HTTP requests</h2>
+  <h2 id="heading_id_16" class="en">Configuring HTTP requests</h2>
+  <h2 id="heading_id_16" class="zh">设置HTTP请求</h2>
 
-  <p>Go also supplies a lower-level interface for user agents to communicate with HTTP servers. As you might expect, not only does it give you more control over the client requests, but requires you to spend more effort in building the requests. However, there is only a small increase.</p>
+  <p class="en">Go also supplies a lower-level interface for user agents to communicate with HTTP servers. As you might expect, not only does it give you more control over the client requests, but requires you to spend more effort in building the requests. However, there is only a small increase.</p>
+  <p class="zh">Go还提供一个较低级别的用户代理接口用来与HTTP服务器进行通信。你可能已经想到了，这样可以更灵活地控制客户端请求，当然创建请求也会更费力气。不过这只需要多费一点点力气。</p>
 
-  <p>The data type used to build requests is the type <code>Request</code>. This is a complex type, and is given in the Go documentation as</p>
+
+  <p class="en">The data type used to build requests is the type <code>Request</code>. This is a complex type, and is given in the Go documentation as</p>
+  <p class="zh">用来创建请求的数据类型是<code>Request</code>。这是个复杂的类型，Go语言文档中给出的如下：</p>
   <pre><code>
 type Request struct {
     Method     string // GET, POST, PUT, etc.
@@ -488,31 +552,38 @@ type Request struct {
 }
     </code></pre>
 
-  <p>There is a lot of information that can be stored in a request. You do not need to fill in all fields, only those of interest. The simplest way to create a request with default values is by for example</p>
+  <p class="en">There is a lot of information that can be stored in a request. You do not need to fill in all fields, only those of interest. The simplest way to create a request with default values is by for example</p>
+  <p class="zh">请求中可以存放大量的信息，但你不需要填写所有的内容，只填必要的即可。最简单的使用默认值创建请求的方法如下：</p>
   <pre>
     <code>
 request, err := http.NewRequest("GET", url.String(), nil)
     </code>
   </pre>
 
-  <p>Once a request has been created, you can modify fields. For example, to specify that you only wish to receive UTF-8, add an "Accept-Charset" field to a request by</p>
+  <p class="en">Once a request has been created, you can modify fields. For example, to specify that you only wish to receive UTF-8, add an "Accept-Charset" field to a request by</p>
+  <p class="zh">请求创建后，可以修改其内容字段(field)。比如，需指定只接受UTF-8，可添加一个"Accept-Charset"字段：</p>
   <pre>
     <code>
 request.Header.Add("Accept-Charset", "UTF-8;q=1, ISO-8859-1;q=0")
     </code>
   </pre>
 
-  <p>(Note that the default set ISO-8859-1 always gets a value of one unless mentioned explicitly in the list.).</p>
+  <p class="en">(Note that the default set ISO-8859-1 always gets a value of one unless mentioned explicitly in the list.).</p>
+  <p class="zh">(注意，若没有在列表中提及，则默认设置ISO-8859-1总是返回值1).</p>
 
-  <p>A client setting a charset request is simple by the above. But there is some confusion about what happens with the server's return value of a charset. The returned resource <em>should</em> have a <code>Content-Type</code> which will specify the media type of the content such as <code>text/html</code>. If appropriate the media type should state the charset, such as <code>text/html; charset=UTF-8</code>. If there is no charset specification, then according to the HTTP specification it should be treated as the default ISO8859-1 charset. But the HTML 4 specification states that since many servers don't conform to this, then you can't make any assumptions.</p>
+  <p class="en">A client setting a charset request is simple by the above. But there is some confusion about what happens with the server's return value of a charset. The returned resource <em>should</em> have a <code>Content-Type</code> which will specify the media type of the content such as <code>text/html</code>. If appropriate the media type should state the charset, such as <code>text/html; charset=UTF-8</code>. If there is no charset specification, then according to the HTTP specification it should be treated as the default ISO8859-1 charset. But the HTML 4 specification states that since many servers don't conform to this, then you can't make any assumptions.</p>
+  <p class="zh">客户端设置字符集请求就是这么简单。But there is some confusion about what happens with the server's return value of a charset. The returned resource <em>should</em> have a <code>Content-Type</code> which will specify the media type of the content such as <code>text/html</code>. If appropriate the media type should state the charset, such as <code>text/html; charset=UTF-8</code>. If there is no charset specification, then according to the HTTP specification it should be treated as the default ISO8859-1 charset. But the HTML 4 specification states that since many servers don't conform to this, then you can't make any assumptions.</p>
 
-  <p>If there is a charset specified in the server's <code>Content-Type</code>, then assume it is correct. if there is none specified, since 50% of pages are in UTF-8 and 20% are in ASCII then it is safe to assume UTF-8. Only 30% of pages may be wrong :-(.</p>
+  <p class="en">If there is a charset specified in the server's <code>Content-Type</code>, then assume it is correct. if there is none specified, since 50% of pages are in UTF-8 and 20% are in ASCII then it is safe to assume UTF-8. Only 30% of pages may be wrong :-(.</p>
+  <p class="zh">If there is a charset specified in the server's <code>Content-Type</code>, then assume it is correct. if there is none specified, since 50% of pages are in UTF-8 and 20% are in ASCII then it is safe to assume UTF-8. Only 30% of pages may be wrong :-(.</p>
 
   <h2 id="heading_id_17">The Client object</h2>
 
-  <p>To send a request to a server and get a reply, the convenience object <code>Client</code> is the easiest way. This object can manage multiple requests and will look after issues such as whether the server keeps the TCP connection alive, and so on.</p>
+  <p class="en">To send a request to a server and get a reply, the convenience object <code>Client</code> is the easiest way. This object can manage multiple requests and will look after issues such as whether the server keeps the TCP connection alive, and so on.</p>
+  <p class="zh">To send a request to a server and get a reply, the convenience object <code>Client</code> is the easiest way. This object can manage multiple requests and will look after issues such as whether the server keeps the TCP connection alive, and so on.</p>
 
-  <p>This is illustrated in the following program</p>
+  <p class="en">This is illustrated in the following program</p>
+  <p class="zh">This is illustrated in the following program</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* ClientGet
  */
@@ -591,13 +662,17 @@ request.Header.Add("Accept-Charset", "UTF-8;q=1, ISO-8859-1;q=0")
 }
 </span></code></pre>
 
-  <h2 id="heading_id_18">Proxy handling</h2>
+  <h2 id="heading_id_18" class="en">Proxy handling</h2>
+  <h2 id="heading_id_18" class="zh">Proxy handling</h2>
 
-  <h3 id="heading_id_19">Simple proxy</h3>
+  <h3 id="heading_id_19" class="en">Simple proxy</h3>
+  <h3 id="heading_id_19" class="zh">Simple proxy</h3>
 
-  <p>HTTP 1.1 laid out how HTTP should work through a proxy. A "GET" request should be made to a proxy. However, the URL requested should be the full URL of the destination. In addition the HTTP header should contain a "Host" field, set to the proxy. As long as the proxy is configured to pass such requests through, then that is all that needs to be done.</p>
+  <p class="en">HTTP 1.1 laid out how HTTP should work through a proxy. A "GET" request should be made to a proxy. However, the URL requested should be the full URL of the destination. In addition the HTTP header should contain a "Host" field, set to the proxy. As long as the proxy is configured to pass such requests through, then that is all that needs to be done.</p>
+  <p class="zh">HTTP 1.1 laid out how HTTP should work through a proxy. A "GET" request should be made to a proxy. However, the URL requested should be the full URL of the destination. In addition the HTTP header should contain a "Host" field, set to the proxy. As long as the proxy is configured to pass such requests through, then that is all that needs to be done.</p>
 
-  <p>Go considers this to be part of the HTTP transport layer. To manage this it has a class <code>Transport</code>. This contains a field which can be set to a <em>function</em> that returns a URL for a proxy. If we have a URL as a string for the proxy, the appropriate transport object is created and then given to a client object by</p>
+  <p class="en">Go considers this to be part of the HTTP transport layer. To manage this it has a class <code>Transport</code>. This contains a field which can be set to a <em>function</em> that returns a URL for a proxy. If we have a URL as a string for the proxy, the appropriate transport object is created and then given to a client object by</p>
+  <p class="zh">Go considers this to be part of the HTTP transport layer. To manage this it has a class <code>Transport</code>. This contains a field which can be set to a <em>function</em> that returns a URL for a proxy. If we have a URL as a string for the proxy, the appropriate transport object is created and then given to a client object by</p>
   <pre>
     <code>
 proxyURL, err := url.Parse(proxyString)
@@ -606,9 +681,11 @@ client := &amp;http.Client{Transport: transport}
     </code>
   </pre>
 
-  <p>The client can then continue as before.</p>
+  <p class="en">The client can then continue as before.</p>
+  <p class="zh">The client can then continue as before.</p>
 
-  <p>The following program illustrates this:</p>
+  <p class="en">The following program illustrates this:</p>
+  <p class="zh">The following program illustrates this:</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* ProxyGet
  */
@@ -679,29 +756,36 @@ client := &amp;http.Client{Transport: transport}
 }
 </span></code></pre>
 
-  <p>If you have a proxy at, say, XYZ.com on port 8080, test this by</p>
+  <p class="en">If you have a proxy at, say, XYZ.com on port 8080, test this by</p>
+  <p class="zh">If you have a proxy at, say, XYZ.com on port 8080, test this by</p>
   <pre>
     <code>
 go run ProxyGet.go http://XYZ.com:8080/ http://www.google.com
     </code>
   </pre>
 
-  <p>If you don't have a suitable proxy to test this, then download and install the Squid proxy to your own computer.</p>
+  <p class="en">If you don't have a suitable proxy to test this, then download and install the Squid proxy to your own computer.</p>
+  <p class="zh">If you don't have a suitable proxy to test this, then download and install the Squid proxy to your own computer.</p>
 
-  <p>The above program used a known proxy passed as an argument to the program. There are many ways in which proxies can be made known to applications. Most browsers have a configuration menu in which you can enter proxy information: such information is not available to a Go application. Some applications may get proxy information from an <code>autoproxy.pac</code> file somewhere in your network: Go does not (yet) know how to parse these JavaScript files and so cannot use them. Linux systems using Gnome have a configuration system called <code>gconf</code> in which proxy information can be stored: Go cannot access this. <em>But</em> it can find proxy information if it is set in operating system environment variables such as HTTP_PROXY or http_proxy using the function</p>
+  <p class="en">The above program used a known proxy passed as an argument to the program. There are many ways in which proxies can be made known to applications. Most browsers have a configuration menu in which you can enter proxy information: such information is not available to a Go application. Some applications may get proxy information from an <code>autoproxy.pac</code> file somewhere in your network: Go does not (yet) know how to parse these JavaScript files and so cannot use them. Linux systems using Gnome have a configuration system called <code>gconf</code> in which proxy information can be stored: Go cannot access this. <em>But</em> it can find proxy information if it is set in operating system environment variables such as HTTP_PROXY or http_proxy using the function</p>
+  <p class="zh">The above program used a known proxy passed as an argument to the program. There are many ways in which proxies can be made known to applications. Most browsers have a configuration menu in which you can enter proxy information: such information is not available to a Go application. Some applications may get proxy information from an <code>autoproxy.pac</code> file somewhere in your network: Go does not (yet) know how to parse these JavaScript files and so cannot use them. Linux systems using Gnome have a configuration system called <code>gconf</code> in which proxy information can be stored: Go cannot access this. <em>But</em> it can find proxy information if it is set in operating system environment variables such as HTTP_PROXY or http_proxy using the function</p>
   <pre>
     <code>
 func ProxyFromEnvironment(req *Request) (*url.URL, error)
     </code>
   </pre>
 
-  <p>If your programs are running in such an environment you can use this function instead of having to explicitly know the proxy parameters.</p>
+  <p class="en">If your programs are running in such an environment you can use this function instead of having to explicitly know the proxy parameters.</p>
+  <p class="zh">If your programs are running in such an environment you can use this function instead of having to explicitly know the proxy parameters.</p>
 
-  <h3 id="heading_id_20">Authenticating proxy</h3>
+  <h3 id="heading_id_20" class="en">Authenticating proxy</h3>
+  <h3 id="heading_id_20" class="zh">Authenticating proxy</h3>
 
-  <p>Some proxies will require authentication, by a user name and password in order to pass requests. A common scheme is "basic authentication" in which the user name and password are concatenated into a string "user:password" and then BASE64 encoded. This is then given to the proxy by the HTTP request header "Proxy-Authorisation" with the flag that it is the basic authentication</p>
+  <p class="en">Some proxies will require authentication, by a user name and password in order to pass requests. A common scheme is "basic authentication" in which the user name and password are concatenated into a string "user:password" and then BASE64 encoded. This is then given to the proxy by the HTTP request header "Proxy-Authorisation" with the flag that it is the basic authentication</p>
+  <p class="zh">Some proxies will require authentication, by a user name and password in order to pass requests. A common scheme is "basic authentication" in which the user name and password are concatenated into a string "user:password" and then BASE64 encoded. This is then given to the proxy by the HTTP request header "Proxy-Authorisation" with the flag that it is the basic authentication</p>
 
-  <p>The following program illlustrates this, adding the Proxy-Authentication header to the previous proxy program:</p>
+  <p class="en">The following program illlustrates this, adding the Proxy-Authentication header to the previous proxy program:</p>
+  <p class="zh">The following program illlustrates this, adding the Proxy-Authentication header to the previous proxy program:</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* ProxyAuthGet
  */
@@ -780,27 +864,38 @@ const auth = <span class="sgc-3">"jannewmarch:mypassword"</span>
 }
 </span></code></pre>
 
-  <h2 id="heading_id_21">HTTPS connections by clients</h2>
+  <h2 id="heading_id_21" class="en">HTTPS connections by clients</h2>
+  <h2 id="heading_id_21" class="zh">HTTPS connections by clients</h2>
 
-  <p>For secure, encrypted connections, HTTP uses TLS which is described in the chapter on security. The protocol of HTTP+TLS is called HTTPS and uses https:// urls instead of http:// urls.</p>
+  <p class="en">For secure, encrypted connections, HTTP uses TLS which is described in the chapter on security. The protocol of HTTP+TLS is called HTTPS and uses https:// urls instead of http:// urls.</p>
+  <p class="zh">For secure, encrypted connections, HTTP uses TLS which is described in the chapter on security. The protocol of HTTP+TLS is called HTTPS and uses https:// urls instead of http:// urls.</p>
 
-  <p>Servers are required to return valid X.509 certificates before a client will accept data from them. If the certificate is valid, then Go handles everything under the hood and the clients given previously run okay with https URLs.</p>
+  <p class="en">Servers are required to return valid X.509 certificates before a client will accept data from them. If the certificate is valid, then Go handles everything under the hood and the clients given previously run okay with https URLs.</p>
+  <p class="zh">Servers are required to return valid X.509 certificates before a client will accept data from them. If the certificate is valid, then Go handles everything under the hood and the clients given previously run okay with https URLs.</p>
 
-  <p>Many sites have invalid certificates. They may have expired, they may be self-signed instead of by a recognised Certificate Authority or they may just have errors (such as having an incorrect server name). Browsers such as Firefox put a big warning notice with a "Get me out of here!" button, but you can carry on at your risk - which many people do.</p>
+  <p class="en">Many sites have invalid certificates. They may have expired, they may be self-signed instead of by a recognised Certificate Authority or they may just have errors (such as having an incorrect server name). Browsers such as Firefox put a big warning notice with a "Get me out of here!" button, but you can carry on at your risk - which many people do.</p>
+  <p class="zh">Many sites have invalid certificates. They may have expired, they may be self-signed instead of by a recognised Certificate Authority or they may just have errors (such as having an incorrect server name). Browsers such as Firefox put a big warning notice with a "Get me out of here!" button, but you can carry on at your risk - which many people do.</p>
 
-  <p>Go presently bails out when it encounters certificate errors. There is cautious support for carrying on but I haven't got it working yet. So there is no current example for "carrying on in the face of adversity :-)". Maybe later.</p>
+  <p class="en">Go presently bails out when it encounters certificate errors. There is cautious support for carrying on but I haven't got it working yet. So there is no current example for "carrying on in the face of adversity :-)". Maybe later.</p>
+  <p class="zh">Go presently bails out when it encounters certificate errors. There is cautious support for carrying on but I haven't got it working yet. So there is no current example for "carrying on in the face of adversity :-)". Maybe later.</p>
 
-  <h2 id="heading_id_22">Servers</h2>
+  <h2 id="heading_id_22" class="en">Servers</h2>
+  <h2 id="heading_id_22" class="zh">Servers</h2>
 
-  <p>The other side to building a client is a Web server handling HTTP requests. The simplest - and earliest - servers just returned copies of files. However, any URL can now trigger an arbitrary computation in current servers.</p>
+  <p class="en">The other side to building a client is a Web server handling HTTP requests. The simplest - and earliest - servers just returned copies of files. However, any URL can now trigger an arbitrary computation in current servers.</p>
+  <p class="zh">The other side to building a client is a Web server handling HTTP requests. The simplest - and earliest - servers just returned copies of files. However, any URL can now trigger an arbitrary computation in current servers.</p>
 
-  <h3 id="heading_id_23">File server</h3>
+  <h3 id="heading_id_23" class="en">File server</h3>
+  <h3 id="heading_id_23" class="zh">File server</h3>
 
-  <p>We start with a basic file server. Go supplies a <code>multi-plexer</code>, that is, an object that will read and interpret requests. It hands out requests to <code>handlers</code> which run in their own thread. Thus much of the work of reading HTTP requests, decoding them and branching to suitable functions in their own thread is done for us.</p>
+  <p class="en">We start with a basic file server. Go supplies a <code>multi-plexer</code>, that is, an object that will read and interpret requests. It hands out requests to <code>handlers</code> which run in their own thread. Thus much of the work of reading HTTP requests, decoding them and branching to suitable functions in their own thread is done for us.</p>
+  <p class="zh">We start with a basic file server. Go supplies a <code>multi-plexer</code>, that is, an object that will read and interpret requests. It hands out requests to <code>handlers</code> which run in their own thread. Thus much of the work of reading HTTP requests, decoding them and branching to suitable functions in their own thread is done for us.</p>
 
-  <p>For a file server, Go also gives a <code>FileServer</code> object which knows how to deliver files from the local file system. It takes a "root" directory which is the top of a file tree in the local system, and a pattern to match URLs against. The simplest pattern is "/" which is the top of any URL. This will match all URLs.</p>
+  <p class="en">For a file server, Go also gives a <code>FileServer</code> object which knows how to deliver files from the local file system. It takes a "root" directory which is the top of a file tree in the local system, and a pattern to match URLs against. The simplest pattern is "/" which is the top of any URL. This will match all URLs.</p>
+  <p class="zh">For a file server, Go also gives a <code>FileServer</code> object which knows how to deliver files from the local file system. It takes a "root" directory which is the top of a file tree in the local system, and a pattern to match URLs against. The simplest pattern is "/" which is the top of any URL. This will match all URLs.</p>
 
-  <p>An HTTP server delivering files from the local file system is almost embarrassingly trivial given these objects. It is</p>
+  <p class="en">An HTTP server delivering files from the local file system is almost embarrassingly trivial given these objects. It is</p>
+  <p class="zh">An HTTP server delivering files from the local file system is almost embarrassingly trivial given these objects. It is</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* File Server
  */
@@ -814,7 +909,7 @@ const auth = <span class="sgc-3">"jannewmarch:mypassword"</span>
 )
 
 <span class="sgc-2">func</span> main() {
-        <span class="sgc-1">// deliver files from the directory /var/www 
+        <span class="sgc-1">// deliver files from the directory /var/www
 </span> <span class="sgc-1">//fileServer := http.FileServer(http.Dir("/var/www"))
 </span> fileServer := http.<span class="sgc-4">FileServer</span>(http.<span class="sgc-4">Dir</span>(<span class="sgc-3">"/home/httpd/html/"</span>))
 
@@ -832,19 +927,24 @@ const auth = <span class="sgc-3">"jannewmarch:mypassword"</span>
 }
 </span></code></pre>
 
-  <p>This server even delivers "404 not found" messages for requests for file resources that don't exist!</p>
+  <p class="en">This server even delivers "404 not found" messages for requests for file resources that don't exist!</p>
+  <p class="zh">This server even delivers "404 not found" messages for requests for file resources that don't exist!</p>
 
-  <h3 id="heading_id_24">Handler functions</h3>
+  <h3 id="heading_id_24" class="en">Handler functions</h3>
+  <h3 id="heading_id_24" class="zh">Handler functions</h3>
 
-  <p>In this last program, the handler was given in the second argument to <code>ListenAndServe</code>. Any number of handlers can be registered first by calls to <code>Handle</code> or <code>handleFunc</code>, with signatures</p>
+  <p class="en">In this last program, the handler was given in the second argument to <code>ListenAndServe</code>. Any number of handlers can be registered first by calls to <code>Handle</code> or <code>handleFunc</code>, with signatures</p>
+  <p class="zh">In this last program, the handler was given in the second argument to <code>ListenAndServe</code>. Any number of handlers can be registered first by calls to <code>Handle</code> or <code>handleFunc</code>, with signatures</p>
   <pre><code>
 func Handle(pattern string, handler Handler)
 func HandleFunc(pattern string, handler func(*Conn, *Request))
     </code></pre>
 
-  <p>The second argument to <code>HandleAndServe</code> could be <code>nil</code>, and then calls are dispatched to all registered handlers. Each handler should have a different URL pattern. For example, the file handler might have URL pattern "/" while a function handler might have URL pattern "/cgi-bin". A more specific pattern takes precedence over a more general pattern.</p>
+  <p class="en">The second argument to <code>HandleAndServe</code> could be <code>nil</code>, and then calls are dispatched to all registered handlers. Each handler should have a different URL pattern. For example, the file handler might have URL pattern "/" while a function handler might have URL pattern "/cgi-bin". A more specific pattern takes precedence over a more general pattern.</p>
+  <p class="zh">The second argument to <code>HandleAndServe</code> could be <code>nil</code>, and then calls are dispatched to all registered handlers. Each handler should have a different URL pattern. For example, the file handler might have URL pattern "/" while a function handler might have URL pattern "/cgi-bin". A more specific pattern takes precedence over a more general pattern.</p>
 
-  <p>Common CGI programs are <code>test-cgi</code> (written in the shell) or <code>printenv</code> (written in Perl) which print the values of the environment variables. A handler can be written to work in a similar manner.</p>
+  <p class="en">Common CGI programs are <code>test-cgi</code> (written in the shell) or <code>printenv</code> (written in Perl) which print the values of the environment variables. A handler can be written to work in a similar manner.</p>
+  <p class="zh">Common CGI programs are <code>test-cgi</code> (written in the shell) or <code>printenv</code> (written in Perl) which print the values of the environment variables. A handler can be written to work in a similar manner.</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* Print Env
  */
@@ -888,17 +988,23 @@ func HandleFunc(pattern string, handler func(*Conn, *Request))
 }
 </span></code></pre>
 
-  <p><em>Note: for simplicity this program does not deliver well-formed HTML. It is missing html, head and body tags</em>.</p>
+  <p class="en"><em>Note: for simplicity this program does not deliver well-formed HTML. It is missing html, head and body tags</em>.</p>
+  <p class="zh"><em>Note: for simplicity this program does not deliver well-formed HTML. It is missing html, head and body tags</em>.</p>
 
-  <p>Using the <code>cgi-bin</code> directory in this program is a bit cheeky: it doesn't call an external program like CGI scripts do. It just calls a Go function. Go does have the ability to call external programs using <code>os.ForkExec</code>, but does not yet have support for dynamically linkable modules like Apache's <code>mod_perl</code></p>
+  <p class="en">Using the <code>cgi-bin</code> directory in this program is a bit cheeky: it doesn't call an external program like CGI scripts do. It just calls a Go function. Go does have the ability to call external programs using <code>os.ForkExec</code>, but does not yet have support for dynamically linkable modules like Apache's <code>mod_perl</code></p>
+  <p class="zh">Using the <code>cgi-bin</code> directory in this program is a bit cheeky: it doesn't call an external program like CGI scripts do. It just calls a Go function. Go does have the ability to call external programs using <code>os.ForkExec</code>, but does not yet have support for dynamically linkable modules like Apache's <code>mod_perl</code></p>
 
-  <h3 id="heading_id_25">Bypassing the default multiplexer</h3>
+  <h3 id="heading_id_25" class="en">Bypassing the default multiplexer</h3>
+  <h3 id="heading_id_25" class="zh">Bypassing the default multiplexer</h3>
 
-  <p>HTTP requests received by a Go server are usually handled by a multiplexer the examines the path in the HTTP request and calls the appropriate file handler, etc. You can define your own handlers. These can either be registered with the default multiplexer by calling <code>http.HandleFunc</code> which takes a pattern and a function. The functions such as <code>ListenAndServe</code> then take a <code>nil</code> handler function. This was done in the last example.</p>
+  <p class="en">HTTP requests received by a Go server are usually handled by a multiplexer the examines the path in the HTTP request and calls the appropriate file handler, etc. You can define your own handlers. These can either be registered with the default multiplexer by calling <code>http.HandleFunc</code> which takes a pattern and a function. The functions such as <code>ListenAndServe</code> then take a <code>nil</code> handler function. This was done in the last example.</p>
+  <p class="zh">HTTP requests received by a Go server are usually handled by a multiplexer the examines the path in the HTTP request and calls the appropriate file handler, etc. You can define your own handlers. These can either be registered with the default multiplexer by calling <code>http.HandleFunc</code> which takes a pattern and a function. The functions such as <code>ListenAndServe</code> then take a <code>nil</code> handler function. This was done in the last example.</p>
 
-  <p>If you want to take over the multiplexer role then you can give a non-zero function as the handler function. This function will then be totally responsible for managing the requests and responses.</p>
+  <p class="en">If you want to take over the multiplexer role then you can give a non-zero function as the handler function. This function will then be totally responsible for managing the requests and responses.</p>
+  <p class="zh">If you want to take over the multiplexer role then you can give a non-zero function as the handler function. This function will then be totally responsible for managing the requests and responses.</p>
 
-  <p>The following example is trivial, but illustrates the use of this: the multiplexer function simply returns a "204 No content" for <em>all</em> requests:</p>
+  <p class="en">The following example is trivial, but illustrates the use of this: the multiplexer function simply returns a "204 No content" for <em>all</em> requests:</p>
+  <p class="zh">The following example is trivial, but illustrates the use of this: the multiplexer function simply returns a "204 No content" for <em>all</em> requests:</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* ServerHandler
  */
@@ -920,7 +1026,10 @@ func HandleFunc(pattern string, handler func(*Conn, *Request))
 }
 </span></code></pre>
 
-  <p>Arbitrarily complex behaviour can be built, of course. <!--
+<p class="en">Arbitrarily complex behaviour can be built, of course.</p>
+<p class="zh">当然，想要多复杂的行为都可以。</p>
+
+<!--
 <h2> Low-level servers </h2>
 <p>
   Go also supplies a lower-level interface for servers. Again, this
@@ -943,7 +1052,7 @@ Go has extensive support for HTTP. This is not surprising, since Go
 was partly invented to fill a need by Google for their own servers.
 </p>
 
-<p> 
+<p>
 Copyright Jan Newmarch, jan@newmarch.name
 </p>
 <p>If you like this book, please contribute using Flattr
@@ -957,9 +1066,7 @@ href="http://jan.newmarch.name/go/index.html"></a>
 <input type="image" src="https://www.paypalobjects.com/WEBSCR-640-20110401-1/en_AU/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online.">
 <img alt="" border="0" src="https://www.paypalobjects.com/WEBSCR-640-20110401-1/en_AU/i/scr/pixel.gif" width="1" height="1">
 </form>
+-->
 
-</body>
-
---></p>
 </body>
 </html>
