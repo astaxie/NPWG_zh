@@ -42,7 +42,7 @@
   <div class="chapter">
     <h1 class="en" id="heading_id_2">Templates</h1>
 
-  <h1 class="zh" id="heading_id_2">模版</h1>
+  <h1 class="zh" id="heading_id_2">模板</h1>
 
  
   </div>
@@ -50,7 +50,7 @@
   <div class="preface">
     <p  class="en">Many languages have mechanisms to convert strings from one form to another. Go has a template mechanism to convert strings based on the content of an object supplied as an argument. While this is often used in rewriting HTML to insert object values, it can be used in other situations. Note that this material doesn't have anything explicitly to do with networking, but may be useful to network programs.</p>
 
-    <p  class="zh">	很多编程语言都有字符串之间转换的机制，而GO语言则是通过模版来实现将一个对象来作为参数传递。此方式不仅可以在重写HTML时插入对象值，也适用于其他方面。注意，本章内容并没有明确给出网络的工作方式，但对于网络编程方式很有用处。</p>
+    <p  class="zh">	很多编程语言都有字符串之间转换的机制，而GO语言则是通过模板来实现将一个对象来作为参数传递。此方式不仅可以在重写HTML时插入对象值，也适用于其他方面。注意，本章内容并没有明确给出网络的工作方式，但对于网络编程方式很有用处。</p>
 
   </div>
  
@@ -64,7 +64,7 @@
 
   <p class="en">At the time of writing a new template package has been adopted. There is very little documentation on the template packages. There is a small amount on the old package, which is currently still available in the <code>old/template</code>. There is no documentation on the new package as yet apart from the reference page. The template package changed with <a href="http://golang.org/doc/devel/release.html#r60">r60 (released 2011/09/07)</a>.</p>
 
-  <p class="zh">因为新的template包是刚刚被采用的，所有现在的template包中的文档少的可怜，旧的<code>old/template</code>包中也还存有少量的旧模版。新发布的帮助页面也还没有关于新包的文档。关于template包的更改请参阅<a href="http://golang.org/doc/devel/release.html#r60">r60 (released 2011/09/07)</a>.</p>
+  <p class="zh">因为新的template包是刚刚被采用的，所有现在的template包中的文档少的可怜，旧的<code>old/template</code>包中也还存有少量的旧模板。新发布的帮助页面也还没有关于新包的文档。关于template包的更改请参阅<a href="http://golang.org/doc/devel/release.html#r60">r60 (released 2011/09/07)</a>.</p>
 
   <p class="en">We describe the new package here. The package is designed to take text as input and output different text, based on transforming the original text using the values of an object. Unlike JSP or similar, it is not restricted to HTML files but it is likely to find greatest use there.</p>
 
@@ -74,7 +74,7 @@
 
   <p class="en">The original source is called a <em>template</em> and will consist of text that is transmitted unchanged, and embedded commands which can act on and change text. The commands are delimited by <code>{{ ... }}</code> , similar to the JSP commands <code>&lt;%= ... =%&gt;</code> and PHPs <code>&lt;?php ... ?&gt;</code>.</p>
 
-  <p class="zh">源文件被称作 <em>template</em> ，包括文本传输方式不变，以嵌入命令可以作用于和更改文本. 命令规定如 <code>{{ ... }}</code> ，类似于JSP命令 <code>&lt;%= ... =%&gt;</code> 和PHP命令 <code>&lt;?php ... ?&gt;</code>。</p>
+  <p class="zh">源文件被称作 <em>template</em> ，包括文本传输方式不变，以嵌入命令可以作用于和更改文本。命令规定如 <code>{{ ... }}</code> ，类似于JSP命令 <code>&lt;%= ... =%&gt;</code> 和PHP命令 <code>&lt;?php ... ?&gt;</code>。</p>
 
   <h2 class="en"id="heading_id_4">Inserting object values</h2>
 
@@ -82,10 +82,11 @@
 
   <p class="en">A template is applied to a Go object. Fields from that Go object can be inserted into the template, and you can 'dig" into the object to find subfields, etc. The current object is represented as '.', so that to insert the value of the current object as a string, you use <code>{{.}}</code>. The package uses the <code>fmt</code> package by default to work out the string used as inserted values.</p>
 
-  <p class="zh">模板应用于GO对象中.GO对象被注入到模版后，你就能从域中“挖”到他的子域，等等。当前对象以'.'代替, 所以当插入一个字符串到当前对象时，你可以采用<code>{{.}}</code>的方式。这个包默认采用 <code>fmt</code> 包来作为插入值的字符串输出。</p>
+  <p class="zh">模板应用于GO对象中.GO对象被插入到模板后，你就能从域中“挖”到他的子域，等等。当前对象以'.'代替, 所以把当前对象当做字符串插入时，你可以采用<code>{{.}}</code>的方式。这个包默认采用 <code>fmt</code> 包来作为插入值的字符串输出。</p>
 
   <p class="en">To insert the value of a field of the current object, you use the field name prefixed by '.'. For example, if the object is of type</p>
-  <p class="zh">要插入当前对象的一个字段的值，你使用的字段名前加前缀 '.'. 例如, 如果要插入的对象的类型为</p>
+
+  <p class="zh">要插入当前对象的一个字段的值，你使用的字段名前加前缀 '.'。 例如, 如果要插入的对象的类型为</p>
  
   <pre>
 <code>
@@ -100,7 +101,7 @@ type Person struct {
 
   <p class="en">then you insert the values of <code>Name</code> and <code>Age</code> by</p>
 
-  <p class="zh">那么你要插入的值 <code>Name</code> 和 <code>Age</code> 如下</p>
+  <p class="zh">那么你要插入的字段 <code>Name</code> 和 <code>Age</code> 如下</p>
 
   <pre>
 <code>
@@ -111,7 +112,7 @@ The age is {{.Age}}.
 
   <p class="en">We can loop over the elements of an array or other list using the <code>range</code> command. So to access the contents of the <code>Emails</code> array we do</p>
 
-  <p class="zh">我们可以使用<code>range</code>命令来循环一个数组或者链表中的元素。所以要获取 <code>Emails</code> array的信息，我们可以这么干</p>
+  <p class="zh">我们可以使用<code>range</code>命令来循环一个数组或者链表中的元素。所以要获取 <code>Emails</code> 数组的信息，我们可以这么干</p>
   <pre>
 <code>
 {{range .Emails}}
@@ -135,7 +136,7 @@ type Job struct {
 
   <p class="en">and we want to access the fields of a <code>Person</code>'s <code>Jobs</code>, we can do it as above with a <code>{{range .Jobs}}</code>. An alternative is to switch the current object to the <code>Jobs</code> field. This is done using the <code>{{with ...}} ... {{end}}</code> construction, where now <code>{{.}}</code> is the <code>Jobs</code> field, which is an array:</p>
 
-  <p class="zh">如果我们想访问 <code>Person</code>值域中的 <code>Jobs</code>, 我们可以这么干 <code>{{range .Jobs}}</code>。这是一种可以讲当前对象转化为<code>Jobs</code> 的值域的方式. 通过 <code>{{with ...}} ... {{end}}</code> 这种方式, 那么<code>{{.}}</code> 就可以拿到<code>Jobs</code> 值域了,如下:</p>
+  <p class="zh">如果我们想访问 <code>Person</code>字段中的 <code>Jobs</code>, 我们可以这么干 <code>{{range .Jobs}}</code>。这是一种可以将当前对象转化为<code>Jobs</code> 字段的方式. 通过 <code>{{with ...}} ... {{end}}</code> 这种方式, 那么<code>{{.}}</code> 就可以拿到<code>Jobs</code> 字段了,如下:</p>
 
   <pre>
 <code>
@@ -148,9 +149,14 @@ type Job struct {
 </code>
 </pre>
 
-  <p>You can use this with any field, not just an array. Using templates</p>
+  <p class="en">You can use this with any field, not just an array. Using templates</p>
 
-  <p>Once we have a template, we can apply it to an object to generate a new string, using the object to fill in the template values. This is a two-step process which involves parsing the template and then applying it to an object. The result is output to a <code>Writer</code>, as in</p>
+  <p class="zh">你可以用这种方法操作任何类型的字段，而不仅限于数组。亲，用模板吧！</p>
+
+  <p class="en">Once we have a template, we can apply it to an object to generate a new string, using the object to fill in the template values. This is a two-step process which involves parsing the template and then applying it to an object. The result is output to a <code>Writer</code>, as in</p>
+
+  <p class="zh">当我们拥有了模板,我们将它应用在对象中生成一个字符串，用这个对象来填充这个模板的值。分两步来实现模块的转化和应用，并且输出一个<code>Writer</code>, 如下</p>
+
   <pre>
 <code>
 t := template.New("Person template")
@@ -162,7 +168,10 @@ if err == nil {
 </code>
 </pre>
 
-  <p>An example program to apply a template to an object and print to standard output is</p>
+  <p class="en">An example program to apply a template to an object and print to standard output is</p>
+
+  <p class="zh">下面是一个列子来演示模块应用在对象上并且标准输入：</p>
+
   <pre><code><span class="sgc-6">
 <span class="sgc-1">/**
  * PrintPerson
@@ -229,7 +238,10 @@ const templ = `<span class="sgc-4">The</span> name is {{.<span class="sgc-4">Nam
 }
 </span></code></pre>
 
-  <p>The output from this is</p>
+  <p class="en">The output from this is</p>
+
+  <p class="zh">输出如下：</p>
+
   <pre>
 <code>
 The name is jan.
@@ -251,56 +263,88 @@ The age is 50.
 </code>
 </pre>
 
-  <p>Note that there is plenty of whitespace as newlines in this printout. This is due to the whitespace we have in our template. If we wish to reduce this, eliminate newlines in the template as in</p>
+  <p class="en">Note that there is plenty of whitespace as newlines in this printout. This is due to the whitespace we have in our template. If we wish to reduce this, eliminate newlines in the template as in</p>
+
+  <p class="zh">注意，上面有很多空白的输出，这是因为我们的模板中有很多空白。如果想消除它, 模板设置如下：</p>
+
   <pre>
 <code>
 {{range .Emails}} An email is {{.}} {{end}}
 </code>
 </pre>
 
-  <p>In the example, we used a string in the program as the template. You can also load templates from a file using the function <code>template.ParseFiles()</code>. For some reason that I don't understand (and which wasn't required in earlier versions), the name assigned to the template must be the same as the basename of the first file in the list of files. Is this a bug?</p>
+  <p class="en">In the example, we used a string in the program as the template. You can also load templates from a file using the function <code>template.ParseFiles()</code>. For some reason that I don't understand (and which wasn't required in earlier versions), the name assigned to the template must be the same as the basename of the first file in the list of files. Is this a bug?</p>
 
-  <h2 id="heading_id_5">Pipelines</h2>
+  <p class="zh">在这个示例例中，我们用字符串应用于模板。你同样也可以用方法<code>template.ParseFiles()</code>来从文件中下载模板。因为某些原因，我还不没搞清楚(在早期版本没有强制要求),关联模板的名字必须要与文件列表的第一个文件的基名相同。话说，这个是BUG吗?</p>
 
-  <p>The above transformations insert pieces of text into a template. Those pieces of text are essentially arbitrary, whatever the string values of the fields are. If we want them to appear as part of an HTML document (or other specialised form) then we will have to escape particular sequences of characters. For example, to display arbitrary text in an HTML document we have to change "&lt;" to "&amp;lt;". The Go templates have a number of builtin functions, and one of these is the function <code>html</code>. These functions act in a similar manner to Unix pipelines, reading from standard input and writing to standard output.</p>
+  <h2 class="en" id="heading_id_5">Pipelines</h2>
 
-  <p>To take the value of the current object '.' and apply HTML escapes to it, you write a "pipeline" in the template</p>
+  <h2 class="zh" id="heading_id_5">管道</h2>
+
+  <p class="en">The above transformations insert pieces of text into a template. Those pieces of text are essentially arbitrary, whatever the string values of the fields are. If we want them to appear as part of an HTML document (or other specialised form) then we will have to escape particular sequences of characters. For example, to display arbitrary text in an HTML document we have to change "&lt;" to "&amp;lt;". The Go templates have a number of builtin functions, and one of these is the function <code>html</code>. These functions act in a similar manner to Unix pipelines, reading from standard input and writing to standard output.</p>
+
+  <p class="zh">上述转换到模板中插入的文本块。这些字符基本上是任意的，是任何字符串的字段值。如果我们希望它们出现的是HTML文档（或其他的特殊形式）的一部分，那么我们将不得不脱离特定的字符序列。例如，要显示任意文本在HTML文档中，我们要将“&lt;”改成“&amp;lt”。GO模板有一些内建函数，其中之一是<code>html</code>。这些函数的作用与Unix的管道类似，从标准输入读取和写入到标准输出。</p>
+
+  <p class="en">To take the value of the current object '.' and apply HTML escapes to it, you write a "pipeline" in the template</p>
+
+  <p class="zh">如果想用“.”来获取当前对象值并且应用于HTML转义，你可以在模板里写个“管道”:</p>
+
   <pre>
 <code>
 {{. | html}}
 </code>
 </pre>
 
-  <p>and similarly for other functions.</p>
+  <p class="en">and similarly for other functions.</p>
+  
+  <p class="zh">其他方法类似。</p>
 
-  <p>Mike Samuel has pointed out a convenience function currently in the <code>exp/template/html</code> package. If all of the entries in a template need to be passed through the <code>html</code> template function, then the Go function <code>Escape(t *template.Template)</code> can take a template and add the <code>html</code> function to each node in the template that doesn't already have one. This will be useful for templates used for HTML documents and can form a pattern for similar function uses elsewhere.</p>
+  <p  class="en">Mike Samuel has pointed out a convenience function currently in the <code>exp/template/html</code> package. If all of the entries in a template need to be passed through the <code>html</code> template function, then the Go function <code>Escape(t *template.Template)</code> can take a template and add the <code>html</code> function to each node in the template that doesn't already have one. This will be useful for templates used for HTML documents and can form a pattern for similar function uses elsewhere.</p>
 
-  <h2 id="heading_id_6">Defining functions</h2>
+  <p  class="zh">Mike Samuel指出，目前在<code>exp/template/html</code> 包里有一个方便的方法。如果所有的模板中的条目需要通过<code>html</code> 模板函数，那么Go语言方法 <code>Escape(t *template.Template)</code>就能获取模板而后将<code>html</code> 函数添加到模板中不存在该函数的每个节点中。用于HTML文档的模板是非常有用的，并能在其他使用场合生成相似的方法模式。</p>
 
-  <p>The templates use the string representation of an object to insert values, using the <code>fmt</code> package to convert the object to a string. Sometimes this isn't what is needed. For example, to avoid spammers getting hold of email addresses it is quite common to see the symbol '@' replaced by the word " at ", as in "jan at newmarch.name". If we want to use a template to display email addresses in that form, then we have to build a custom function to do this transformation.</p>
+  <h2  class="en" id="heading_id_6">Defining functions</h2>
 
-  <p>Each template function has a name that is used in the templates themselves, and an associated Go function. These are linked by the type</p>
+  <h2  class="zh" id="heading_id_6">定义方法</h2>
+
+  <p class="en" >The templates use the string representation of an object to insert values, using the <code>fmt</code> package to convert the object to a string. Sometimes this isn't what is needed. For example, to avoid spammers getting hold of email addresses it is quite common to see the symbol '@' replaced by the word " at ", as in "jan at newmarch.name". If we want to use a template to display email addresses in that form, then we have to build a custom function to do this transformation.</p>
+
+  <p class="zh" >模板使用对象化的字符串表示形式插入值，使用<code>fmt</code>包将对象转换为字符串。有时候，这并不是必需。例如，为了避免被垃圾邮件发送者掌握电子邮件地址，常见的方式是把字符号“@”替换为“at”，如“jan at newmarch.name”。如果我们要使用一个模板，显示在该表单中的电子邮件地址，那么我们就必须建立一个自定义的功能做这种转变。</p>
+
+  <p  class="en" >Each template function has a name that is used in the templates themselves, and an associated Go function. These are linked by the type</p>
+
+  <p  class="zh" >每个模板函数中使用的模板本身有的一个名称，以及相关联的函数。他们用下面方式进行关联如下</p>
+
   <pre>
 <code>
 type FuncMap map[string]interface{}
 </code>
 </pre>
 
-  <p>For example, if we want our template function to be "emailExpand" which is linked to the Go function <code>EmailExpander</code> then we add this to the functions in a template by</p>
+  <p class="en" >For example, if we want our template function to be "emailExpand" which is linked to the Go function <code>EmailExpander</code> then we add this to the functions in a template by</p>
+
+  <p class="zh" >例如，如果我们希望我们的模板函数是“emailExpand”，用来关联到Go函数<code>EmailExpander</code>，然后，我们像这样添加函数到到模板中</p>
+
   <pre>
 <code>
 t = t.Funcs(template.FuncMap{"emailExpand": EmailExpander})
 </code>
 </pre>
 
-  <p>The signature for <code>EmailExpander</code> is typically</p>
+  <p class="en" >The signature for <code>EmailExpander</code> is typically</p>
+
+  <p class="zh" ><code>EmailExpander</code>通常像这样标记：</p>
+
   <pre>
 <code>
 func EmailExpander(args ...interface{}) string
 </code>
 </pre>
 
-  <p>In the use we are interested in, there should only be one argument to the function which will be a string. Existing functions in the Go template library have some initial code to handle non-conforming cases, so we just copy that. Then it is just simple string manipulation to change the format of the email address. A program is</p>
+  <p  class="en" >In the use we are interested in, there should only be one argument to the function which will be a string. Existing functions in the Go template library have some initial code to handle non-conforming cases, so we just copy that. Then it is just simple string manipulation to change the format of the email address. A program is</p>
+
+  <p  class="zh" >我们感兴趣的是在使用过程中，那是一个只有一个参数的函数，并且是个字符串。在Go模板库的现有功能有初步的代码来处理不符合要求的情况，所以我们只需要复制。然后，它就能通过简单的字符串操作来改变格式的电子邮件地址。程序如</p>
+
   <pre><code><span class="sgc-6">
 <span class="sgc-1">/**
  * PrintEmails
@@ -372,7 +416,9 @@ const templ = `<span class="sgc-4">The</span> name is {{.<span class="sgc-4">Nam
 }
 </span></code></pre>
 
-  <p>The output is</p>
+  <p  class="en">The output is</p>
+
+  <p  class="zh">输出为：</p>
   <pre>
 <code>
 The name is jan.
@@ -383,9 +429,14 @@ The name is jan.
 </code>
 </pre>
 
-  <h2 id="heading_id_7">Variables</h2>
+  <h2 class="en" id="heading_id_7">Variables</h2>
 
-  <p>The template package allows you to define and use variables. As motivation for this, consider how we might print each person's email address <em>prefixed</em> by their name. The type we use is again</p>
+  <h2  class="zh" id="heading_id_7">变量</h2>
+
+  <p  class="en">The template package allows you to define and use variables. As motivation for this, consider how we might print each person's email address <em>prefixed</em> by their name. The type we use is again</p>
+
+  <p  class="zh">template包，允许您定义和使用变量。这样做的动机，可能我们会考虑通过把他们的名字当做电子邮件地址<em>前缀</em>打印出来。我们又使用这个类型</p>
+
   <pre>
 <code>
 type Person struct {
@@ -395,7 +446,10 @@ type Person struct {
 </code>
 </pre>
 
-  <p>To access the email strings, we use a <code>range</code> statement such as</p>
+  <p class="en">To access the email strings, we use a <code>range</code> statement such as</p>
+
+  <p class="zh">为了访问email的所有字符串, 可以用 <code>range</code>，如下</p>
+
   <pre>
 <code>
 {{range .Emails}}
@@ -404,7 +458,10 @@ type Person struct {
 </code>
 </pre>
 
-  <p>But at that point we cannot access the <code>Name</code> field as '.' is now traversing the array elements and the <code>Name</code> is outside of this scope. The solution is to save the value of the <code>Name</code> field in a variable that can be accessed anywhere in its scope. Variables in templates are prefixed by '$'. So we write</p>
+  <p class="en">But at that point we cannot access the <code>Name</code> field as '.' is now traversing the array elements and the <code>Name</code> is outside of this scope. The solution is to save the value of the <code>Name</code> field in a variable that can be accessed anywhere in its scope. Variables in templates are prefixed by '$'. So we write</p>
+
+  <p class="zh">但是需要指出的是，我们无法用'.' 的形式来访问字段 <code>Name</code>，因为当他被转化成数组元素时，字段<code>Name</code>并不包括其中。解决方法是，将字段<code>Name</code> 存储为一个变量，那么它就能在任意范围内被访问。变量在模板中用法是加前缀'$'。所以可以这样</p>
+
   <pre>
 <code>
 {{$name := .Name}}
@@ -414,7 +471,10 @@ type Person struct {
 </code>
 </pre>
 
-  <p>The program is</p>
+  <p class="en">The program is</p>
+
+  <p class="zh">程序如下：</p>
+
   <pre><code><span class="sgc-6">
 <span class="sgc-1">/**
  * PrintNameEmails
@@ -461,7 +521,10 @@ const templ = `{{$name := .<span class="sgc-4">Name</span>}}
 }
 </span></code></pre>
 
-  <p>with output</p>
+  <p  class="en">with output</p>
+
+  <p  class="zh">输出为</p>
+
   <pre>
 <code>
     Name is jan, email is jan@newmarch.name
@@ -470,9 +533,16 @@ const templ = `{{$name := .<span class="sgc-4">Name</span>}}
 </code>
 </pre>
 
-  <h2 id="heading_id_8">Conditional statements</h2>
+  <h2 class="en" id="heading_id_8">Conditional statements</h2>
 
-  <p>Continuing with our <code>Person</code> example, supposing we just want to print out the list of emails, without digging into it. We can do that with a template</p>
+  <h2 class="zh" id="heading_id_8">条件语句</h2>
+
+  <p class="en">Continuing with our <code>Person</code> example, supposing we just want to print out the list of emails, without digging into it. We can do that with a template</p>
+
+  <p class="zh"> 继续我们那个<code>Person</code>的例子，假设我们只是想打印出来的邮件列表，而不关心其中的字段。我们可以用模板这么干</p>
+
+
+
   <pre><code>
 Name is {{.Name}}
 Emails are {{.Emails}}
@@ -486,9 +556,14 @@ Emails are [jan@newmarch.name jan.newmarch@gmail.com]
 </code>
 </pre>
 
-  <p>because that is how the <code>fmt</code> package will display a list.</p>
+  <p class="en">because that is how the <code>fmt</code> package will display a list.</p>
 
-  <p>In many circumstances that may be fine, if that is what you want. Let's consider a case where it is <em>almost</em> right but not quite. There is a JSON package to serialise objects, which we looked at in <a href="../serialisation/chapter.html">Chapter 4</a>. This would produce</p>
+  <p class="zh">因为这个<code>fmt</code>包会显示一个列表。</p>
+
+  <p class="en">In many circumstances that may be fine, if that is what you want. Let's consider a case where it is <em>almost</em> right but not quite. There is a JSON package to serialise objects, which we looked at in <a href="../serialisation/chapter.html">Chapter 4</a>. This would produce</p>
+
+  <p class="zh">在许多情况下，这样做也没有问题，如果那是你想要的。让我们考虑下一种情况，它 <em>几乎</em>是对的但不是必须的。有一个JSON序列化对象的包，让我们看看<a href="../serialisation/chapter.html">第4章</a>。它是这样的</p>
+
   <pre>
 <code>
 {"Name": "jan",
@@ -497,7 +572,12 @@ Emails are [jan@newmarch.name jan.newmarch@gmail.com]
 </code>
 </pre>
 
-  <p>The JSON package is the one you would use in practice, but let's see if we can produce JSON output using templates. We can do something similar just by the templates we have. This is <em>almost</em> right as a JSON serialiser:</p>
+  <p  class="en">The JSON package is the one you would use in practice, but let's see if we can produce JSON output using templates. We can do something similar just by the templates we have. This is <em>almost</em> right as a JSON serialiser:</p>
+
+  <p  class="zh">JSON包是一个你会在实践中使用，但是让我们看看我们是否能够使用JSON输出模板。我们可以做一些我们有的类似的模板。这<em>几乎</em>就是一个JSON串行器：
+</p>
+
+
   <pre>
 <code>
 {"Name": "{{.Name}}",
@@ -506,7 +586,9 @@ Emails are [jan@newmarch.name jan.newmarch@gmail.com]
 </code>
 </pre>
 
-  <p>It will produce</p>
+  <p class="en">It will produce</p>
+
+  <p class="zh">像这样组装</p>
   <pre>
 <code>
 {"Name": "jan",
@@ -515,9 +597,14 @@ Emails are [jan@newmarch.name jan.newmarch@gmail.com]
 </code>
 </pre>
 
-  <p>which has two problems: the addresses aren't in quotes, and the list elements should be ',' separated.</p>
+  <p class="en" >which has two problems: the addresses aren't in quotes, and the list elements should be ',' separated.</p>
 
-  <p>How about this: looking at the array elements, putting them in quotes and adding commas?</p>
+  <p class="zh" >其中有两个问题：地址没有在引号中，列表中的元素应该是'，'分隔。</p>
+
+  <p class="en">How about this: looking at the array elements, putting them in quotes and adding commas?</p>
+
+  <p class="zh">  这样如何：在数组中的元素，把它们放在引号中并用逗号分隔？</p>
+
   <pre>
 <code>
 {"Name": {{.Name}},
@@ -530,7 +617,10 @@ Emails are [jan@newmarch.name jan.newmarch@gmail.com]
 </code>
 </pre>
 
-  <p>which will produce</p>
+  <p class="en">It will produce</p>
+
+  <p class="zh">像这样组装</p>
+
   <pre>
 <code>
 {"Name": "jan",
@@ -539,11 +629,17 @@ Emails are [jan@newmarch.name jan.newmarch@gmail.com]
 </code>
 </pre>
 
-  <p>(plus some white space.).</p>
+  <p  class="en">(plus some white space.).</p>
 
-  <p>Again, almost correct, but if you look carefully, you will see a trailing ',' after the last list element. According to the JSON syntax (see <a href="http://www.json.org">http://www.json.org/</a>, this trailing ',' is not allowed. Implementations may vary in how they deal with this.</p>
+  <p  class="zh">(再加上一些空白)。</p>
 
-  <p>What we want is "print every element followed by a ',' except for the last one." This is actually a bit hard to do, so a better way is "print every element <em>preceded</em> by a ',' except for the <em>first</em> one." (I got this tip from "brianb" at <a href="http://stackoverflow.com/questions/201782/can-you-use-a-trailing-comma-in-a-json-object">Stack Overflow</a>.). This is easier, because the first element has index zero and many programming languages, including the Go template language, treat zero as Boolean <code>false</code>.</p>
+  <p class="en">Again, almost correct, but if you look carefully, you will see a trailing ',' after the last list element. According to the JSON syntax (see <a href="http://www.json.org">http://www.json.org/</a>, this trailing ',' is not allowed. Implementations may vary in how they deal with this.</p>
+
+  <p class="zh">同样，这样貌似几乎是正确的，但如果你仔细看，你会看到尾有“，”在最后的列表元素。根据JSON的语法（请参阅<a href="http://www.json.org"> http://www.json.org/</a>，这个结尾的'，'是不允许的。这样实现结果可能会有所不同。</p>
+
+  <p  class="en">What we want is "print every element followed by a ',' except for the last one." This is actually a bit hard to do, so a better way is "print every element <em>preceded</em> by a ',' except for the <em>first</em> one." (I got this tip from "brianb" at <a href="http://stackoverflow.com/questions/201782/can-you-use-a-trailing-comma-in-a-json-object">Stack Overflow</a>.). This is easier, because the first element has index zero and many programming languages, including the Go template language, treat zero as Boolean <code>false</code>.</p>
+
+  <p  class="en">我们想要打印所有在后面带','的元素除了最后一个。"这个确实有点难搞, 一个好方法"在',' <em>之前</em>打印所有元素除了<em>第一个</em>。" (我在 "brianb"的 <a href="http://stackoverflow.com/questions/201782/can-you-use-a-trailing-comma-in-a-json-object">Stack Overflow</a>上提了建议)。这样更易于实现，因为第一个元素索引为0，很多编程语言包括GO模板都将0当做布尔型的<code>false</code>。</p>
 
   <p>One form of the conditional statement is <code>{{if pipeline}} T1 {{else}} T0 {{end}}</code>. We need the <code>pipeline</code> to be the index into the array of emails. Fortunately, a variation on the <code>range</code> statement gives us this. There are two forms which introduce variables</p>
   <pre>
@@ -704,7 +800,10 @@ const templ = `{<span class="sgc-3">"Name"</span>: <span class="sgc-3">"{{.Name}
 }
 </span></code></pre>
 
-  <h2 id="heading_id_9">Conclusion</h2>
+ 
+  <h2 class="en" id="heading_id_9">Conclusion</h2>
+
+  <h2 class="zh" id="heading_id_9">结论</h2>
 
   <p>The Go template package is useful for certain kinds of text transformations involving inserting values of objects. It does not have the power of, say, regular expressions, but is faster and in many cases will be easier to use than regular expressions</p>
   <hr />
