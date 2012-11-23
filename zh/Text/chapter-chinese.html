@@ -49,26 +49,34 @@
 
 <body>
   <div class="chapter">
-    <h1 id="heading_id_2">A Complete Web Server</h1>
+    <h1 id="heading_id_2" class="en">A Complete Web Server</h1>
+    <h1 id="heading_id_2" class="zh">一个完整的Web服务器</h1>
   </div>
 
   <div class="preface">
-    <p>This chapter is principally a lengthy illustration of the HTTP chapter, building a complete Web server in Go. It also shows how to use templates in order to use expressions in text files to insert variable values and to generate repeated sections.</p>
+    <p class="en">This chapter is principally a lengthy illustration of the HTTP chapter, building a complete Web server in Go. It also shows how to use templates in order to use expressions in text files to insert variable values and to generate repeated sections.</p>
+    <p class="zh">这章主要是针对Http的一个例子，用Go建立一个完整的Web服务器。它也演示了如何在模板中使用表达式在文本文件中插入变量和生成重复的部分。</p>
   </div>
 
   <div class="generate_from_h2" id="generated-toc"></div>
 
   <h2 id="heading_id_3">Introduction</h2>
+  <h2 id="heading_id_3">说明</h2>
 
-  <p>I am learning Chinese. Rather, after many years of trying I am still <em>attempting</em> to learn Chinese. Of course, rather than buckling down and getting on with it, I have tried all sorts of technical aids. I tried DVDs, videos, flashcards and so on. Eventually I realised that there <em>wasn't a good computer program for Chinese flashcards</em>, and so in the interests of learning, I needed to build one.</p>
+  <p class="en">I am learning Chinese. Rather, after many years of trying I am still <em>attempting</em> to learn Chinese. Of course, rather than buckling down and getting on with it, I have tried all sorts of technical aids. I tried DVDs, videos, flashcards and so on. Eventually I realised that there <em>wasn't a good computer program for Chinese flashcards</em>, and so in the interests of learning, I needed to build one.</p>
+  <p class="zh">我正在学习中文，恰恰相反，我已经坚持学习了很多年。当然，为了拿下它，我尝试使用很多技术来帮助我学习中文。其中我尝试过DVD教程，视频教程，快速学习记忆卡等等。但是最后我意识到这里没有一个很好的中文学习记忆卡程序，所以出于学习的兴趣，我需要创建了一个。</p>
 
-  <p>I had found a program in Python to do some of the task. But sad to say it wasn't well written and after a few attempts at turning it upside down and inside out I came to the conclusion that it was better to start from scratch. Of course, a Web solution would be far better than a standalone one, because then all the other people in my Chinese class could share it, as well as any other learners out there. And of course, the server would be written in Go.</p>
+  <p class="en">I had found a program in Python to do some of the task. But sad to say it wasn't well written and after a few attempts at turning it upside down and inside out I came to the conclusion that it was better to start from scratch. Of course, a Web solution would be far better than a standalone one, because then all the other people in my Chinese class could share it, as well as any other learners out there. And of course, the server would be written in Go.</p>
+  <p class="zh">我发现了一使用Python写的程序可以完成一些这样的任务。但是遗憾的说，它写的不是很好，而且我经过几次尝试捣鼓它，得出一个结论是最好重头开始写一个。当然这个Web解决方案不是我一个人使用，它还会分享给其他学习中文的同学和更多学习中文的者。当然，这个服务我将使用Go语言来写。</p>
 
-  <p>The flashcards server is running at <a href="cict.bhtafe.edu.au:8000">cict.bhtafe.edu.au:8000</a>. The front page consists of a list of flashcard sets currently available, how you want a set displayed (random card order, Chinese, English or random), whether to display a set, add to it, etc. I've spent too much time building it - somehow my Chinese hasn't progressed much while I was doing it... It probably won't be too exciting as a program if you don't want to learn Chinese, but let's get into the structure.</p>
+  <p class="en">The flashcards server is running at <a href="cict.bhtafe.edu.au:8000">cict.bhtafe.edu.au:8000</a>. The front page consists of a list of flashcard sets currently available, how you want a set displayed (random card order, Chinese, English or random), whether to display a set, add to it, etc. I've spent too much time building it - somehow my Chinese hasn't progressed much while I was doing it... It probably won't be too exciting as a program if you don't want to learn Chinese, but let's get into the structure.</p>
+  <p class="zh">flashcards服务器运行在<a href="cict.bhtafe.edu.au:8000">cict.bhtafe.edu.au：8000</a>。在当前页是目前的flashcard组列表，你想怎么显示（随机card的顺序，中文，英文或随机），是否显示一组，还要加上一套，我花了很多时间来构建它 - 不知何故我的中文还没有进展较快，而我该怎么做...它可能不会是太令人兴奋了一个程序，如果你不想学习中文，就让我们来看看程序的结构吧</p>
 
-  <h2 id="heading_id_4">Static pages</h2>
+  <h2 id="heading_id_4" class="en">Static pages</h2>
+  <h2 id="heading_id_4" class="zh">静态文件</h2>
 
-  <p>Some pages will just have static content. These can be managed by a <code>fileServer</code>. For simplicity I put all of the static HTML pages and CSS files in the <code>html</code> directory and all of the JavaScript files in the <code>jscript</code> directory. These are then delivered by the Go code</p>
+  <p class="en">Some pages will just have static content. These can be managed by a <code class="en">fileServer</code>. For simplicity I put all of the static HTML pages and CSS files in the <code>html</code> directory and all of the JavaScript files in the <code>jscript</code> directory. These are then delivered by the Go code</p>
+  <p class="zh">有些页面只是一些静态内容。这些可以由<code class="zh">FILESERVER</code>管理。为了简单起见，我把所有的静态HTML页面和CSS文件放入<code class="zh">html</code>目录中，所有的JavaScript文件放日<code class="zh">JScript</code>目录。 然后这些交付给Go代码。</p>
   <pre>
   <code>
 fileServer := http.FileServer("jscript", "/jscript/")
@@ -79,11 +87,14 @@ http.Handle("/html/", fileServer)
   </code>
 </pre>
 
-  <h2 id="heading_id_5">Templates</h2>
+  <h2 id="heading_id_5" class="en">Templates</h2>
+  <h2 id="heading_id_5" class="zh">模板</h2>
 
-  <p>The list of flashcard sets is open ended, depending on the number of files in a directory. These should not be hardcoded into an HTML page, but the content should be generated as needed. This is an obvious candidate for templates.</p>
+  <p class="en">The list of flashcard sets is open ended, depending on the number of files in a directory. These should not be hardcoded into an HTML page, but the content should be generated as needed. This is an obvious candidate for templates.</p>
+  <p class="zh">flashcard组列表是开放式的, 根据在一个目录中的文件的数量。这些不应该被硬编码到一个HTML页面，但内容应根据需要生成。这就是一个明显的候选模板。</p>
 
-  <p>The list of files in a directory is generated as a list of strings. These can then be displayed in a table using the template</p>
+  <p class="en">The list of files in a directory is generated as a list of strings. These can then be displayed in a table using the template</p>
+  <p class="zh">目录中的文件列表可以被认为是一个字符串列表。 然后模板可将它们显示在一个表格中。</p>
   <pre>
 <code>
 &lt;table&gt;
@@ -97,11 +108,14 @@ http.Handle("/html/", fileServer)
 </code>
 </pre>
 
-  <h2 id="heading_id_6">The Chinese Dictionary</h2>
+  <h2 id="heading_id_6" class="en">The Chinese Dictionary</h2>
+  <h2 id="heading_id_6" class="zh">中文词典</h2>
 
-  <p>Chinese is a complex language (aren't they all :-( ). The written form is hieroglyphic, that is "pictograms" instead of using an alphabet. But this written form has evolved over time, and even recently split into two forms: "traditional" Chinese as used in Taiwan and Hong Kong, and "simplified" Chinese as used in mainland China. While most of the characters are the same, about 1,000 are different. Thus a Chinese dictionary will often have two written forms of the same character.</p>
+  <p class="en">Chinese is a complex language (aren't they all :-( ). The written form is hieroglyphic, that is "pictograms" instead of using an alphabet. But this written form has evolved over time, and even recently split into two forms: "traditional" Chinese as used in Taiwan and Hong Kong, and "simplified" Chinese as used in mainland China. While most of the characters are the same, about 1,000 are different. Thus a Chinese dictionary will often have two written forms of the same character.</p>
+  <p class="zh">中国是一个复杂的语言（不是所有人:-(）。书面形式的象形文字，那是“象形”，而不是使用一个字母，但这个书面形式随着时间的演变，以及最近甚至分裂成两种形式：“繁体”中文使用在中国的台湾和香港，和“简体”中文使用在中国大陆。虽然大多数的文字是相同的，但还是有大约1000中文字是不同的，因此，中文的字典往往有两种书面形式文字。</p>
 
-  <p>Most Westerners like me can't understand these characters. So there is a "Latinised" form called Pinyin which writes the characters in a phonetic alphabet based on the Latin alphabet. It isn't quite the Latin alphabet, because Chinese is a tonal language, and the Pinyin form has to show the tones (much like acccents in French and other European languages). So a typical dictionary has to show four things: the traditional form, the simplified form, the Pinyin and the English. For example,</p>
+  <p class="en">Most Westerners like me can't understand these characters. So there is a "Latinised" form called Pinyin which writes the characters in a phonetic alphabet based on the Latin alphabet. It isn't quite the Latin alphabet, because Chinese is a tonal language, and the Pinyin form has to show the tones (much like acccents in French and other European languages). So a typical dictionary has to show four things: the traditional form, the simplified form, the Pinyin and the English. For example,</p>
+  <p class="zh">和大多数西方人一样，我无法理解这些字符。所以，有一个“Latinised的形式称为”拼音的字符写入以拉丁字母为基础的拼音第一个字母。这不是拉丁字母，因为这是中文的一种语言音调，和拼音形式显示的音调（很像在法国和其他欧洲语言的acccents）。因此，一个典型的字典有四件事情：繁体形式和简化形式，拼音和英文显示。例如，</p>
 
   <table border="1">
     <tr>
@@ -125,11 +139,14 @@ http.Handle("/html/", fileServer)
     </tr>
   </table>
 
-  <p>But again there is a little complication. There is a free <a href="http://www.mandarintools.com/worddict.html">Chinese/English dictionary</a> and even better, you can download it as a UTF-8 file, which Go is well suited to handle. In this, the Chinese characters are written in Unicode but the Pinyin characters are not: although there are Unicode characters for letters such as 'ǎ', many dictionaries including this one use the Latin 'a' and place the tone at the end of the word. Here it is the third tone, so "hǎo" is written as "hao3". This makes it easier for those who only have US keyboards and no Unicode editor to still communicate in Pinyin.</p>
+  <p class="en">But again there is a little complication. There is a free <a href="http://www.mandarintools.com/worddict.html">Chinese/English dictionary</a> and even better, you can download it as a UTF-8 file, which Go is well suited to handle. In this, the Chinese characters are written in Unicode but the Pinyin characters are not: although there are Unicode characters for letters such as 'ǎ', many dictionaries including this one use the Latin 'a' and place the tone at the end of the word. Here it is the third tone, so "hǎo" is written as "hao3". This makes it easier for those who only have US keyboards and no Unicode editor to still communicate in Pinyin.</p>
+  <p class="zh">但是还是有点复杂。这里有一个更好的并且免费的<a href="http://www.mandarintools.com/worddict.html">中英文词典</a>, 你可以下载它是一个UTF-8的文件，非常适合Go去处理。在这，中文的字符集被写入在Unicode中但是拼音没有：尽管有Unicode字符的字母，如“ǎ”，很多词典包括本使用拉丁字母'a'和将音调放在词的结尾。在这里它是第三个音调，所以“hǎo”被写入“HAO3”。这使得它更容易为那些只有美国键盘和没有Unicode的编辑器的人们来与拼音沟通。</p>
 
-  <p>This data format mismatch is not a big deal: just that somewhere along the line, between the original text dictionary and the display in the browser, a data massage has to be performed. Go templates allow this to be done by defining a custom template, so I chose that route. Alternatives could have been to do this as the dictionary is read in, or in the Javascript to display the final characters.</p>
+  <p class="en">This data format mismatch is not a big deal: just that somewhere along the line, between the original text dictionary and the display in the browser, a data massage has to be performed. Go templates allow this to be done by defining a custom template, so I chose that route. Alternatives could have been to do this as the dictionary is read in, or in the Javascript to display the final characters.</p>
+<p class="zh">这种数据格式不匹配并不是一个大的问题：只是在这行的某处地方，在原来的文本字典和显示在浏览器之间， 用数据来完成。Go模板允许通过自定义一个模板， 所以我选择了这个思路。可以选择从dictionary中读取，或者由JavaScript来显示最终的字符。</p>
 
-  <p>The code for the Pinyin formatter is given below. Please don't bother reading it unless you are <em>really</em> interested in knowing the rules for Pinyin formatting.</p>
+  <p class="en">The code for the Pinyin formatter is given below. Please don't bother reading it unless you are <em>really</em> interested in knowing the rules for Pinyin formatting.</p>
+  <p class="zh">拼音格式化的代码在下面给出。请不要仔细的阅读它，除非你真的有兴趣想知道拼音格式化的规则。</p>
   <pre><code><span class="sgc-7">
 <span class="sgc-1">package</span> pinyin
 
@@ -255,7 +272,8 @@ http.Handle("/html/", fileServer)
 }
 </span></code></pre>
 
-  <p>How this is used is illustrated by the function <code>lookupWord</code>. This is called in response to an HTML Form request to find the English words in a dictionary.</p>
+  <p class="en">How this is used is illustrated by the function <code>lookupWord</code>. This is called in response to an HTML Form request to find the English words in a dictionary.</p>
+  <p class="zh"><code>lookupWord</code>函数说明了怎样去使用它。这就是在字典中查找英文单词的Html表单请求的响应。</p>
   <pre>
   <code>
 func lookupWord(rw http.ResponseWriter, req *http.Request) {
@@ -273,7 +291,8 @@ func lookupWord(rw http.ResponseWriter, req *http.Request) {
   </code>
 </pre>
 
-  <p>The HTML code is</p>
+  <p class="en">The HTML code is</p>
+  <p class="zh">HTML代码</p>
   <pre><code><span class="sgc-7">
 &lt;html&gt;
   &lt;body&gt;
@@ -309,14 +328,20 @@ func lookupWord(rw http.ResponseWriter, req *http.Request) {
 &lt;/html&gt;
 </span></code></pre>
 
-  <h3 id="heading_id_7">The Dictionary type</h3>
+  <h3 id="heading_id_7" class="en">The Dictionary type</h3>
+  <h3 id="heading_id_7" class="zh">字典类型</h3>
 
-  <p>The text file containing the dictionary has lines of the form<br />
+  <p class="en">The text file containing the dictionary has lines of the form<br />
   <em>traditional simplified [pinyin] /translation/translation/.../</em><br />
   For example,<br />
   好 好 [hao3] /good/well/proper/good to/easy to/very/so/(suffix indicating completion or readiness)/</p>
+  <p class="zh">字典中的文本文件中一行的格式<br />
+  <em>繁体 简体 [拼音] /翻译/翻译/.../</em><br />
+  例如，<br />
+  好 好 [hao3] /good/well/proper/good to/easy to/very/so/(suffix indicating completion or readiness)/</p>
 
-  <p>We store each line as an <code>Entry</code> within the <code>Dictionary</code> package:</p>
+  <p class="en">We store each line as an <code>Entry</code> within the <code>Dictionary</code> package:</p>
+  <p class="zh">我们的<code>Dictionary</code>包里存储的一行<code>Entry</code>：</p>
   <pre>
   <code>
 type Entry struct {
@@ -328,7 +353,8 @@ type Entry struct {
   </code>
 </pre>
 
-  <p>The dictionary itself is just an array of these entries:</p>
+  <p class="en">The dictionary itself is just an array of these entries:</p>
+  <p class="zh">字典本身只是一个entry的数组：</p>
   <pre>
   <code>
 type Dictionary struct {
@@ -337,13 +363,17 @@ type Dictionary struct {
   </code>
 </pre>
 
-  <p>Building the dictionary is easy enough. Just read each line and break the line into its various bits using simple string methods. Then add the line to the dictionary slice.</p>
+  <p class="en">Building the dictionary is easy enough. Just read each line and break the line into its various bits using simple string methods. Then add the line to the dictionary slice.</p>
+  <p class="zh">构建字典是很容易的。只要使用简单的字符串方法读取一行然后进行分割。最后添加到dictionary slice中。</p>
 
-  <p>Looking up entries in this dictionary is straightforward: just search through until we find the appropriate key. There are about 100,000 entries in this dictionary: brute force by a linear search is fast enough. If it were necessary, faster storage and search mechanisms could easily be used.</p>
+  <p class="en">Looking up entries in this dictionary is straightforward: just search through until we find the appropriate key. There are about 100,000 entries in this dictionary: brute force by a linear search is fast enough. If it were necessary, faster storage and search mechanisms could easily be used.</p>
+  <p class="zh">在这本词典中查找条目非常简单：只要通过搜索直到我们找到合适的答案。在这本字典有10万左右的条目：暴力的线性搜索速度不够快。如果有必要，可以使用更快的存储和搜索机制。</p>
 
-  <p>The original dictionary grows by people on the Web adding in entries as they see fit. Consequently it isn't that well organised and contains repetitions and multiple entries. So looking up any word - either by Pinyin or by English - may return multiple matches. To cater for this, each lookup returns a "mini dictionary", just those lines in the full dictionary that match.</p>
+  <p class="en">The original dictionary grows by people on the Web adding in entries as they see fit. Consequently it isn't that well organised and contains repetitions and multiple entries. So looking up any word - either by Pinyin or by English - may return multiple matches. To cater for this, each lookup returns a "mini dictionary", just those lines in the full dictionary that match.</p>
+  <p class="zh">原词典发展的人添加条目他们认为网络更适合。所以它不是有条理的和包含了多个重复的条目。因此查找任何单词 - 无论是通过拼音或英语 - 可能返回多个匹配。为了应付这个问题，每个查询返回一个“mini dictionary”，只有那些在字典中匹配的。</p>
 
-  <p>The Dictionary code is</p>
+  <p class="en">The Dictionary code is</p>
+  <p class="zh">Dictionary 代码</p>
   <pre><code><span class="sgc-7">
 <span class="sgc-1">package</span> dictionary
 
@@ -482,9 +512,11 @@ type Dictionary struct {
 }
 </span></code></pre>
 
-  <h2 id="heading_id_8">Flash cards</h2>
+  <h2 id="heading_id_8" class="en">Flash cards</h2>
+  <h2 id="heading_id_8" class="zh">Flash cards</h2>
 
-  <p>Each individual flash card is of the type <code>Flashcard</code></p>
+  <p class="en">Each individual flash card is of the type <code>Flashcard</code></p>
+ <p class="zh">每个flash card的类型<code>Flashcard</code></p>
   <pre>
 <code>
 type FlashCard struct {
@@ -495,9 +527,11 @@ type FlashCard struct {
 </code>
 </pre>
 
-  <p>At present we only store the simplified character and the english translation for that character. We also have a <code>Dictionary</code> which will contain only one entry for the entry we will have chosen somewhere.</p>
+  <p class="en">At present we only store the simplified character and the english translation for that character. We also have a <code>Dictionary</code> which will contain only one entry for the entry we will have chosen somewhere.</p>
+  <p class="zh">目前我们只存储简体字符和该字符的英文翻译。我们将有选择性的加入一个entry到这里的<code>Dictionary</code>中。</p>
 
-  <p>A set of flash cards is defined by the type</p>
+  <p class="en">A set of flash cards is defined by the type</p>
+  <p class="zh">flash cards组的类型</p>
   <pre>
 <code>
 type FlashCards struct {
@@ -509,13 +543,18 @@ type FlashCards struct {
 </code>
 </pre>
 
-  <p>where the <code>CardOrder</code> will be "random" or "sequential" and the <code>ShowHalf</code> will be "RANDOM_HALF" or "ENGLISH_HALF" or "CHINESE_HALF" to determine which half of a new card is shown first.</p>
+  <p class="en">where the <code>CardOrder</code> will be "random" or "sequential" and the <code>ShowHalf</code> will be "RANDOM_HALF" or "ENGLISH_HALF" or "CHINESE_HALF" to determine which half of a new card is shown first.</p>
+  <p class="zh">其中<code>CardOrder</code>将是“random”或者“sequential”和<code>ShowHalf</code>将是“RANDOM_HALF”或“ENGLISH_HALF”或的“CHINESE_HALF”来确定一个新的卡中，意思是中文和英文其中有一个首先被显示。</p>
 
-  <p>The code for flash cards has nothing novel in it. We get data from the client browser and use JSON to create an object from the form data, and store the set of flashcards as a JSON string.</p>
+  <p class="en">The code for flash cards has nothing novel in it. We get data from the client browser and use JSON to create an object from the form data, and store the set of flashcards as a JSON string.</p>
+  <p class="zh">flash cards的代码并没有新意。我们从浏览器客户端获取数据并根据表单的数据使用JSON来创建一个对象，并将其存储于flashcards中作为一个JSON字符串。</p>
 
-  <h2 id="heading_id_9">The Complete Server</h2>
 
-  <p>The complete server is</p>
+  <h2 id="heading_id_9" class="en">The Complete Server</h2>
+  <h2 id="heading_id_9" class="zh">完整的服务器</h2>
+
+  <p class="en">The complete server is</p>
+  <p class="zh">服务器代码如下</p>
   <pre><code><span class="sgc-7">
 <span class="sgc-4">/* Server
  */
@@ -821,9 +860,11 @@ type FlashCards struct {
 }
 </span></code></pre>
 
-  <h2 id="heading_id_10">Other Bits: JavaScript and CSS</h2>
+  <h2 id="heading_id_10" class="en">Other Bits: JavaScript and CSS</h2>
+  <h2 id="heading_id_10" class="zh">其他: JavaScript 和 CSS</h2>
 
-  <p>On request, a set of flashcards will be loaded into the browser. A much abbreviated set is shown below. The display of these cards is controlled by JavaScript and CSS files. These aren't relevant to the Go server so are omitted. Those interested can download the code.</p>
+  <p class="en">On request, a set of flashcards will be loaded into the browser. A much abbreviated set is shown below. The display of these cards is controlled by JavaScript and CSS files. These aren't relevant to the Go server so are omitted. Those interested can download the code.</p>
+  <p class="en">根据需求,flashcards组将会被加载到浏览器中。下面展示了一个简短的HTML页。cards的显示由JavaScript和CSS文件控制。这些都不是和Go服务器相关的技术所以在这省略了。有兴趣的可以下载代码。</p>
   <pre><code><span class="sgc-7">
 &lt;html&gt;
   &lt;head&gt;
@@ -941,11 +982,11 @@ type FlashCards struct {
 
 </span></code></pre>
 
-  <p>Copyright Jan Newmarch, jan@newmarch.name</p>
+  <p class="en">Copyright Jan Newmarch, jan@newmarch.name</p>
+  <p class="zh">版权所有 Jan Newmarch, jan@newmarch.name</p>
 
-  <p>If you like this book, please contribute using Flattr <a class="FlattrButton sgc-8" href="http://jan.newmarch.name/go/index.html"></a><br />
+  <p class="en">If you like this book, please contribute using Flattr <a class="FlattrButton sgc-8" href="http://jan.newmarch.name/go/index.html"></a><br />
   or donate using PayPal</p>
-
   <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
     <input name="cmd" type="hidden" value="_s-xclick" /> <input name="encrypted" type="hidden" value="-----BEGIN PKCS7-----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-----END PKCS7----- " /> <input alt="PayPal - The safer, easier way to pay online." border="0" name="submit" src="https://www.paypalobjects.com/WEBSCR-640-20110401-1/en_AU/i/btn/btn_donateCC_LG.gif" type="image" /> <img alt="" border="0" height="1" src="https://www.paypalobjects.com/WEBSCR-640-20110401-1/en_AU/i/scr/pixel.gif" width="1" />
   </form>
