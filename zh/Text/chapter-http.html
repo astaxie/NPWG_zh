@@ -272,12 +272,12 @@ Content-Type: text/html; charset=ISO-8859-1
   </ul>
   <ul class="zh">
     <li>增加了命令，如 TRACE 和 CONNECT</li>
-    <li>注意在通过代理进行连接时，应当使用绝对路径。如：
+    <li>注意在通过代理服务器进行连接时，应当使用绝对路径。如：
       <pre><code>
       GET http://www.w3.org/index.html HTTP/1.1
       </code></pre>
     </li>
-    <li>增加了更多属性，例如针对代理的 If-Modified-Since。</li>
+    <li>增加了更多属性，例如针对代理服务器的If-Modified-Since。</li>
   </ul>
 
   <p class="en">The changes include</p>
@@ -471,11 +471,11 @@ func Get(url string) (r *Response, finalURL string, err os.Error)
   <h2 id="heading_id_16" class="zh">设置HTTP请求</h2>
 
   <p class="en">Go also supplies a lower-level interface for user agents to communicate with HTTP servers. As you might expect, not only does it give you more control over the client requests, but requires you to spend more effort in building the requests. However, there is only a small increase.</p>
-  <p class="zh">Go还提供一个较低级别的用户代理接口用来与HTTP服务器进行通信。你可能已经想到了，这样可以更灵活地控制客户端请求，当然创建请求也会更费力气。不过这只需要多费一点点力气。</p>
+  <p class="zh">Go还提供一个较低级别的用户代理接口用来与HTTP服务器进行通信。你可能已经想到，这样可以更灵活地控制客户端请求，当然创建请求也会更费力气。不过这只需要多费一点点力气。</p>
 
 
   <p class="en">The data type used to build requests is the type <code>Request</code>. This is a complex type, and is given in the Go documentation as</p>
-  <p class="zh">用来创建请求的数据类型是<code>Request</code>。这是个复杂的类型，Go语言文档中给出的如下：</p>
+  <p class="zh">用来创建请求的数据类型是<code>Request</code>。这是个复杂的类型，Go语言文档中给出的定义如下：</p>
   <pre><code>
 type Request struct {
     Method     string // GET, POST, PUT, etc.
@@ -572,18 +572,19 @@ request.Header.Add("Accept-Charset", "UTF-8;q=1, ISO-8859-1;q=0")
   <p class="zh">(注意，若没有在列表中提及，则默认设置ISO-8859-1总是返回值1).</p>
 
   <p class="en">A client setting a charset request is simple by the above. But there is some confusion about what happens with the server's return value of a charset. The returned resource <em>should</em> have a <code>Content-Type</code> which will specify the media type of the content such as <code>text/html</code>. If appropriate the media type should state the charset, such as <code>text/html; charset=UTF-8</code>. If there is no charset specification, then according to the HTTP specification it should be treated as the default ISO8859-1 charset. But the HTML 4 specification states that since many servers don't conform to this, then you can't make any assumptions.</p>
-  <p class="zh">客户端设置字符集请求就是这么简单。But there is some confusion about what happens with the server's return value of a charset. The returned resource <em>should</em> have a <code>Content-Type</code> which will specify the media type of the content such as <code>text/html</code>. If appropriate the media type should state the charset, such as <code>text/html; charset=UTF-8</code>. If there is no charset specification, then according to the HTTP specification it should be treated as the default ISO8859-1 charset. But the HTML 4 specification states that since many servers don't conform to this, then you can't make any assumptions.</p>
+  <p class="zh">如上所述，客户端设置字符集请求很简单。但对于服务器返回的字符集，发生的事情就比较复杂。返回的资源<em>理应</em>包含<code>Content-Type</code>，用来指明内容的媒介类型，如：<code>text/html</code>。有些媒介类型应当声明字符集，如<code>text/html; charset=UTF-8</code>。如果没有指明字符集，按照HTTP规范就应当作为默认的ISO8859-1字符集处理。但是很多服务器并不符合此约定，因此HTML 4规定此时不能做任何假设。</p>
 
   <p class="en">If there is a charset specified in the server's <code>Content-Type</code>, then assume it is correct. if there is none specified, since 50% of pages are in UTF-8 and 20% are in ASCII then it is safe to assume UTF-8. Only 30% of pages may be wrong :-(.</p>
-  <p class="zh">If there is a charset specified in the server's <code>Content-Type</code>, then assume it is correct. if there is none specified, since 50% of pages are in UTF-8 and 20% are in ASCII then it is safe to assume UTF-8. Only 30% of pages may be wrong :-(.</p>
+  <p class="zh">如果服务器的<code>Content-Type</code>指定了字符集，那么就认为它是正确的。如果未指定字符集，由于50%的页面是UTF-8的，20%的页面是ASCII的，因此假设字符集是UTF-8的会比较安全，但仍然有30%的页面可能会出错:-(。</p>
 
-  <h2 id="heading_id_17">The Client object</h2>
+  <h2 id="heading_id_17" class="en">The Client object</h2>
+  <h2 id="heading_id_17" class="zh">客户端对象</h2>
 
   <p class="en">To send a request to a server and get a reply, the convenience object <code>Client</code> is the easiest way. This object can manage multiple requests and will look after issues such as whether the server keeps the TCP connection alive, and so on.</p>
-  <p class="zh">To send a request to a server and get a reply, the convenience object <code>Client</code> is the easiest way. This object can manage multiple requests and will look after issues such as whether the server keeps the TCP connection alive, and so on.</p>
+  <p class="zh">向服务器发送一个请求并取得回复，最简单的方法是使用方便对象<code>Client</code>。此对象可以管理多个请求，并处理一些问题，如与服务器间的TCP连接是否保持活动状态等。</p>
 
   <p class="en">This is illustrated in the following program</p>
-  <p class="zh">This is illustrated in the following program</p>
+  <p class="zh">下面的程序给出了示例：</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* ClientGet
  */
@@ -663,16 +664,16 @@ request.Header.Add("Accept-Charset", "UTF-8;q=1, ISO-8859-1;q=0")
 </span></code></pre>
 
   <h2 id="heading_id_18" class="en">Proxy handling</h2>
-  <h2 id="heading_id_18" class="zh">Proxy handling</h2>
+  <h2 id="heading_id_18" class="zh">代理处理</h2>
 
   <h3 id="heading_id_19" class="en">Simple proxy</h3>
-  <h3 id="heading_id_19" class="zh">Simple proxy</h3>
+  <h3 id="heading_id_19" class="zh">简单代理</h3>
 
   <p class="en">HTTP 1.1 laid out how HTTP should work through a proxy. A "GET" request should be made to a proxy. However, the URL requested should be the full URL of the destination. In addition the HTTP header should contain a "Host" field, set to the proxy. As long as the proxy is configured to pass such requests through, then that is all that needs to be done.</p>
-  <p class="zh">HTTP 1.1 laid out how HTTP should work through a proxy. A "GET" request should be made to a proxy. However, the URL requested should be the full URL of the destination. In addition the HTTP header should contain a "Host" field, set to the proxy. As long as the proxy is configured to pass such requests through, then that is all that needs to be done.</p>
+  <p class="zh">HTTP 1.1规定了HTTP应当如何通过代理工作。向代理服务器发送一个"GET"请求。但是请求URL必须是完整的目标地址。此外，设置代理的HTTP头应当包括"Host"字段。只要代理服务器设置为允许这样的请求通过，那么做这些就够了。</p>
 
   <p class="en">Go considers this to be part of the HTTP transport layer. To manage this it has a class <code>Transport</code>. This contains a field which can be set to a <em>function</em> that returns a URL for a proxy. If we have a URL as a string for the proxy, the appropriate transport object is created and then given to a client object by</p>
-  <p class="zh">Go considers this to be part of the HTTP transport layer. To manage this it has a class <code>Transport</code>. This contains a field which can be set to a <em>function</em> that returns a URL for a proxy. If we have a URL as a string for the proxy, the appropriate transport object is created and then given to a client object by</p>
+  <p class="zh">Go把这看成HTTP传输层的一部分。可使用<code>Transport</code>类进行管理。可以使用<em>函数</em>将代理服务器的URL返回到它的一个字段。假设有一个代理服务器地址字符串URL，相应的创建Transport对象并交给Client对象的代码就是：</p>
   <pre>
     <code>
 proxyURL, err := url.Parse(proxyString)
@@ -682,10 +683,10 @@ client := &amp;http.Client{Transport: transport}
   </pre>
 
   <p class="en">The client can then continue as before.</p>
-  <p class="zh">The client can then continue as before.</p>
+  <p class="zh">客户端可以像之前一样继续使用</p>
 
   <p class="en">The following program illustrates this:</p>
-  <p class="zh">The following program illustrates this:</p>
+  <p class="zh">下面是程序范例:</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* ProxyGet
  */
@@ -757,7 +758,7 @@ client := &amp;http.Client{Transport: transport}
 </span></code></pre>
 
   <p class="en">If you have a proxy at, say, XYZ.com on port 8080, test this by</p>
-  <p class="zh">If you have a proxy at, say, XYZ.com on port 8080, test this by</p>
+  <p class="zh">假设有一个代理服务器XYZ.com，端口8080，测试命令就是</p>
   <pre>
     <code>
 go run ProxyGet.go http://XYZ.com:8080/ http://www.google.com
@@ -765,10 +766,10 @@ go run ProxyGet.go http://XYZ.com:8080/ http://www.google.com
   </pre>
 
   <p class="en">If you don't have a suitable proxy to test this, then download and install the Squid proxy to your own computer.</p>
-  <p class="zh">If you don't have a suitable proxy to test this, then download and install the Squid proxy to your own computer.</p>
+  <p class="zh">如果没有合适的代理服务器可供测试，也可以在自己的计算机上下载安装Squid proxy。</p>
 
   <p class="en">The above program used a known proxy passed as an argument to the program. There are many ways in which proxies can be made known to applications. Most browsers have a configuration menu in which you can enter proxy information: such information is not available to a Go application. Some applications may get proxy information from an <code>autoproxy.pac</code> file somewhere in your network: Go does not (yet) know how to parse these JavaScript files and so cannot use them. Linux systems using Gnome have a configuration system called <code>gconf</code> in which proxy information can be stored: Go cannot access this. <em>But</em> it can find proxy information if it is set in operating system environment variables such as HTTP_PROXY or http_proxy using the function</p>
-  <p class="zh">The above program used a known proxy passed as an argument to the program. There are many ways in which proxies can be made known to applications. Most browsers have a configuration menu in which you can enter proxy information: such information is not available to a Go application. Some applications may get proxy information from an <code>autoproxy.pac</code> file somewhere in your network: Go does not (yet) know how to parse these JavaScript files and so cannot use them. Linux systems using Gnome have a configuration system called <code>gconf</code> in which proxy information can be stored: Go cannot access this. <em>But</em> it can find proxy information if it is set in operating system environment variables such as HTTP_PROXY or http_proxy using the function</p>
+  <p class="zh">上面的程序是将已知的代理服务器地址作为参数传入的。有很多办法可以将代理服务器的地址通知到应用程序。大多数浏览器可以通过配置菜单输入代理服务器的信息：但这些信息对Go应用没有用。有些应用程序可以从网络中某处找到<code>autoproxy.pac</code>文件取得其中的代理服务器信息，但Go(目前还)不能解析JavaScript文件，因此也不能使用。Gnome Linux系统使用的配置系统<code>gconf</code>里可以存储代理服务器信息，但Go也访问不了。<em>但是</em>，如果在操作系统环境变量中设置代理服务器信息（如HTTP_PROXY或http_proxy），Go可以通过以下函数访问到：</p>
   <pre>
     <code>
 func ProxyFromEnvironment(req *Request) (*url.URL, error)
@@ -776,16 +777,16 @@ func ProxyFromEnvironment(req *Request) (*url.URL, error)
   </pre>
 
   <p class="en">If your programs are running in such an environment you can use this function instead of having to explicitly know the proxy parameters.</p>
-  <p class="zh">If your programs are running in such an environment you can use this function instead of having to explicitly know the proxy parameters.</p>
+  <p class="zh">假如你的程序运行在这样的环境中，就可以使用此功能，而不用明确指定代理服务器参数。</p>
 
   <h3 id="heading_id_20" class="en">Authenticating proxy</h3>
-  <h3 id="heading_id_20" class="zh">Authenticating proxy</h3>
+  <h3 id="heading_id_20" class="zh">身份验证代理</h3>
 
   <p class="en">Some proxies will require authentication, by a user name and password in order to pass requests. A common scheme is "basic authentication" in which the user name and password are concatenated into a string "user:password" and then BASE64 encoded. This is then given to the proxy by the HTTP request header "Proxy-Authorisation" with the flag that it is the basic authentication</p>
-  <p class="zh">Some proxies will require authentication, by a user name and password in order to pass requests. A common scheme is "basic authentication" in which the user name and password are concatenated into a string "user:password" and then BASE64 encoded. This is then given to the proxy by the HTTP request header "Proxy-Authorisation" with the flag that it is the basic authentication</p>
+  <p class="zh">有些代理服务器要求通过用户名和密码进行身份验证才能传递请求。一般的方法是“基本身份验证”：将用户名和密码串联成一个字符串“user:password”，然后进行Base64编码，然后添加到HTTP请求头的“Proxy-Authorization”中，再发送到代理服务器</p>
 
   <p class="en">The following program illlustrates this, adding the Proxy-Authentication header to the previous proxy program:</p>
-  <p class="zh">The following program illlustrates this, adding the Proxy-Authentication header to the previous proxy program:</p>
+  <p class="zh">在前一个程序的基础上增加Proxy-Authorization头，示例如下：</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* ProxyAuthGet
  */
@@ -865,37 +866,37 @@ const auth = <span class="sgc-3">"jannewmarch:mypassword"</span>
 </span></code></pre>
 
   <h2 id="heading_id_21" class="en">HTTPS connections by clients</h2>
-  <h2 id="heading_id_21" class="zh">HTTPS connections by clients</h2>
+  <h2 id="heading_id_21" class="zh">客户端发起HTTPS连接</h2>
 
   <p class="en">For secure, encrypted connections, HTTP uses TLS which is described in the chapter on security. The protocol of HTTP+TLS is called HTTPS and uses https:// urls instead of http:// urls.</p>
-  <p class="zh">For secure, encrypted connections, HTTP uses TLS which is described in the chapter on security. The protocol of HTTP+TLS is called HTTPS and uses https:// urls instead of http:// urls.</p>
+  <p class="zh">为保证连接的安全和加密，HTTP使用其在安全性章节中说明的TLS技术。HTTP+TLS的协议被称为HTTPS，它使用https://地址，而不是http://地址。</p>
 
   <p class="en">Servers are required to return valid X.509 certificates before a client will accept data from them. If the certificate is valid, then Go handles everything under the hood and the clients given previously run okay with https URLs.</p>
-  <p class="zh">Servers are required to return valid X.509 certificates before a client will accept data from them. If the certificate is valid, then Go handles everything under the hood and the clients given previously run okay with https URLs.</p>
+  <p class="zh">服务器必须在客户端接受从其数据前返回有效的X.509证书。如果证书有效，Go会在内部处理好所有的事情，而客户端会在使用HTTPS地址是和以前工作得一样出色。</p>
 
   <p class="en">Many sites have invalid certificates. They may have expired, they may be self-signed instead of by a recognised Certificate Authority or they may just have errors (such as having an incorrect server name). Browsers such as Firefox put a big warning notice with a "Get me out of here!" button, but you can carry on at your risk - which many people do.</p>
-  <p class="zh">Many sites have invalid certificates. They may have expired, they may be self-signed instead of by a recognised Certificate Authority or they may just have errors (such as having an incorrect server name). Browsers such as Firefox put a big warning notice with a "Get me out of here!" button, but you can carry on at your risk - which many people do.</p>
+  <p class="zh">许多网站都使用无效的证书。这些证书可能已经过期，或者是自行签名的，而没有让认可的证书颁发机构签名；又或者他们可能只是用错了（比如服务器名称不对）。浏览器（如Firefox），会显示一个很大的警告通知，通知上放着“立即离开！”按钮，但你也可以仍然继续此风险 - 很多人会这么做。</p>
 
   <p class="en">Go presently bails out when it encounters certificate errors. There is cautious support for carrying on but I haven't got it working yet. So there is no current example for "carrying on in the face of adversity :-)". Maybe later.</p>
-  <p class="zh">Go presently bails out when it encounters certificate errors. There is cautious support for carrying on but I haven't got it working yet. So there is no current example for "carrying on in the face of adversity :-)". Maybe later.</p>
+  <p class="zh">Go目前在遇到证书错误时，会bails out。对继续工作的支持非常谨慎，我还没有找到正确的方法。因此，目前也没有“继续此风险”任何示例 :-)。以后再说吧。</p>
 
   <h2 id="heading_id_22" class="en">Servers</h2>
-  <h2 id="heading_id_22" class="zh">Servers</h2>
+  <h2 id="heading_id_22" class="zh">服务器</h2>
 
   <p class="en">The other side to building a client is a Web server handling HTTP requests. The simplest - and earliest - servers just returned copies of files. However, any URL can now trigger an arbitrary computation in current servers.</p>
-  <p class="zh">The other side to building a client is a Web server handling HTTP requests. The simplest - and earliest - servers just returned copies of files. However, any URL can now trigger an arbitrary computation in current servers.</p>
+  <p class="zh">这边创建客户端，另一边Web服务器则需要处理HTTP请求。最早最简单的服务器只是返回文件的副本。然而，目前的服务器上，随便一个URL都可能触发任何计算。</p>
 
   <h3 id="heading_id_23" class="en">File server</h3>
-  <h3 id="heading_id_23" class="zh">File server</h3>
+  <h3 id="heading_id_23" class="zh">文件服务器</h3>
 
   <p class="en">We start with a basic file server. Go supplies a <code>multi-plexer</code>, that is, an object that will read and interpret requests. It hands out requests to <code>handlers</code> which run in their own thread. Thus much of the work of reading HTTP requests, decoding them and branching to suitable functions in their own thread is done for us.</p>
-  <p class="zh">We start with a basic file server. Go supplies a <code>multi-plexer</code>, that is, an object that will read and interpret requests. It hands out requests to <code>handlers</code> which run in their own thread. Thus much of the work of reading HTTP requests, decoding them and branching to suitable functions in their own thread is done for us.</p>
+  <p class="zh">我们从一个基本的文件服务器开始。Go提供了一个<code>multi-plexer</code>，即一个读取和解释请求的对象。它把请求交给运行在自己线程中的<code>handlers</code>。这样，许多读取HTTP请求，解码并转移到合适功能上的工作都可以在各自的线程中进行。</p>
 
   <p class="en">For a file server, Go also gives a <code>FileServer</code> object which knows how to deliver files from the local file system. It takes a "root" directory which is the top of a file tree in the local system, and a pattern to match URLs against. The simplest pattern is "/" which is the top of any URL. This will match all URLs.</p>
-  <p class="zh">For a file server, Go also gives a <code>FileServer</code> object which knows how to deliver files from the local file system. It takes a "root" directory which is the top of a file tree in the local system, and a pattern to match URLs against. The simplest pattern is "/" which is the top of any URL. This will match all URLs.</p>
+  <p class="zh">对于文件服务器，Go也提供了一个<code>FileServer</code>对象，它知道如何发布本地文件系统中的文件。它需要一个“root”目录，该目录是在本地系统中文件树的顶端；还有一个针对URL的匹配模式。最简单的模式是“/”，这是所有URL的顶部，可以匹配所有的URL。</p>
 
   <p class="en">An HTTP server delivering files from the local file system is almost embarrassingly trivial given these objects. It is</p>
-  <p class="zh">An HTTP server delivering files from the local file system is almost embarrassingly trivial given these objects. It is</p>
+  <p class="zh">HTTP服务器从本地文件系统中发布文件太简单了，让人都有点不好意思举例。如下：</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* File Server
  */
@@ -909,12 +910,12 @@ const auth = <span class="sgc-3">"jannewmarch:mypassword"</span>
 )
 
 <span class="sgc-2">func</span> main() {
-        <span class="sgc-1">// deliver files from the directory /var/www
-</span> <span class="sgc-1">//fileServer := http.FileServer(http.Dir("/var/www"))
-</span> fileServer := http.<span class="sgc-4">FileServer</span>(http.<span class="sgc-4">Dir</span>(<span class="sgc-3">"/home/httpd/html/"</span>))
+        <span class="sgc-1">// deliver files from the directory /var/www</span>
+        <span class="sgc-1">// fileServer := http.FileServer(http.Dir("/var/www"))</span>
+        fileServer := http.<span class="sgc-4">FileServer</span>(http.<span class="sgc-4">Dir</span>(<span class="sgc-3">"/home/httpd/html/"</span>))
 
-        <span class="sgc-1">// register the handler and deliver requests to it
-</span> err := http.<span class="sgc-4">ListenAndServe</span>(<span class="sgc-3">":8000"</span>, fileServer)
+        <span class="sgc-1">// register the handler and deliver requests to it</span>
+        err := http.<span class="sgc-4">ListenAndServe</span>(<span class="sgc-3">":8000"</span>, fileServer)
         checkError(err)
         <span class="sgc-1">// That's it!
 </span>}
@@ -928,23 +929,23 @@ const auth = <span class="sgc-3">"jannewmarch:mypassword"</span>
 </span></code></pre>
 
   <p class="en">This server even delivers "404 not found" messages for requests for file resources that don't exist!</p>
-  <p class="zh">This server even delivers "404 not found" messages for requests for file resources that don't exist!</p>
+  <p class="zh">甚至当请求到一个不存在的文件资源时，这个服务器还提供了“404未找到”的信息！</p>
 
   <h3 id="heading_id_24" class="en">Handler functions</h3>
-  <h3 id="heading_id_24" class="zh">Handler functions</h3>
+  <h3 id="heading_id_24" class="zh">处理函数(Handler function)</h3>
 
   <p class="en">In this last program, the handler was given in the second argument to <code>ListenAndServe</code>. Any number of handlers can be registered first by calls to <code>Handle</code> or <code>handleFunc</code>, with signatures</p>
-  <p class="zh">In this last program, the handler was given in the second argument to <code>ListenAndServe</code>. Any number of handlers can be registered first by calls to <code>Handle</code> or <code>handleFunc</code>, with signatures</p>
+  <p class="zh">上一个程序中，handler被作为第二个参数传给<code>ListenAndServe</code>。可以先注册任意多个handler供<code>Handle</code>或<code>handleFunc</code>使用。调用方式：</p>
   <pre><code>
 func Handle(pattern string, handler Handler)
 func HandleFunc(pattern string, handler func(*Conn, *Request))
     </code></pre>
 
   <p class="en">The second argument to <code>HandleAndServe</code> could be <code>nil</code>, and then calls are dispatched to all registered handlers. Each handler should have a different URL pattern. For example, the file handler might have URL pattern "/" while a function handler might have URL pattern "/cgi-bin". A more specific pattern takes precedence over a more general pattern.</p>
-  <p class="zh">The second argument to <code>HandleAndServe</code> could be <code>nil</code>, and then calls are dispatched to all registered handlers. Each handler should have a different URL pattern. For example, the file handler might have URL pattern "/" while a function handler might have URL pattern "/cgi-bin". A more specific pattern takes precedence over a more general pattern.</p>
+  <p class="zh"><code>HandleAndServe</code>的第二个参数是可以是<code>nil</code>，调用会被分派到所有已注册的handler。每个对立对象都有不同的URL匹配模式。例如，可能文件handler的URL匹配模式是"/"，而一个函数handler的URL匹配模式是"/cgi-bin"。这里具体的模式优先级高于一般的模式。</p>
 
   <p class="en">Common CGI programs are <code>test-cgi</code> (written in the shell) or <code>printenv</code> (written in Perl) which print the values of the environment variables. A handler can be written to work in a similar manner.</p>
-  <p class="zh">Common CGI programs are <code>test-cgi</code> (written in the shell) or <code>printenv</code> (written in Perl) which print the values of the environment variables. A handler can be written to work in a similar manner.</p>
+  <p class="zh">常见的CGI程序有<code>test-cgi</code>(shell程序)或<code>printenv</code>(Perl程序)用来打印环境变量的值。可以让handler用类似的方式工作。</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* Print Env
  */
@@ -958,15 +959,15 @@ func HandleFunc(pattern string, handler func(*Conn, *Request))
 )
 
 <span class="sgc-2">func</span> main() {
-        <span class="sgc-1">// file handler for most files
-</span> fileServer := http.<span class="sgc-4">FileServer</span>(http.<span class="sgc-4">Dir</span>(<span class="sgc-3">"/var/www"</span>))
+        <span class="sgc-1">// file handler for most files</span>
+        fileServer := http.<span class="sgc-4">FileServer</span>(http.<span class="sgc-4">Dir</span>(<span class="sgc-3">"/var/www"</span>))
         http.<span class="sgc-4">Handle</span>(<span class="sgc-3">"/"</span>, fileServer)
 
-        <span class="sgc-1">// function handler for /cgi-bin/printenv
-</span> http.<span class="sgc-4">HandleFunc</span>(<span class="sgc-3">"/cgi-bin/printenv"</span>, printEnv)
+        <span class="sgc-1">// function handler for /cgi-bin/printenv</span>
+        http.<span class="sgc-4">HandleFunc</span>(<span class="sgc-3">"/cgi-bin/printenv"</span>, printEnv)
 
-        <span class="sgc-1">// deliver requests to the handlers
-</span> err := http.<span class="sgc-4">ListenAndServe</span>(<span class="sgc-3">":8000"</span>, nil)
+        <span class="sgc-1">// deliver requests to the handlers</span>
+        err := http.<span class="sgc-4">ListenAndServe</span>(<span class="sgc-3">":8000"</span>, nil)
         checkError(err)
         <span class="sgc-1">// That's it!
 </span>}
@@ -989,22 +990,22 @@ func HandleFunc(pattern string, handler func(*Conn, *Request))
 </span></code></pre>
 
   <p class="en"><em>Note: for simplicity this program does not deliver well-formed HTML. It is missing html, head and body tags</em>.</p>
-  <p class="zh"><em>Note: for simplicity this program does not deliver well-formed HTML. It is missing html, head and body tags</em>.</p>
+  <p class="zh"><em>注：为简单起见，本程序不提供完整的的HTML。这里缺少html、head和body标签。</em></p>
 
   <p class="en">Using the <code>cgi-bin</code> directory in this program is a bit cheeky: it doesn't call an external program like CGI scripts do. It just calls a Go function. Go does have the ability to call external programs using <code>os.ForkExec</code>, but does not yet have support for dynamically linkable modules like Apache's <code>mod_perl</code></p>
-  <p class="zh">Using the <code>cgi-bin</code> directory in this program is a bit cheeky: it doesn't call an external program like CGI scripts do. It just calls a Go function. Go does have the ability to call external programs using <code>os.ForkExec</code>, but does not yet have support for dynamically linkable modules like Apache's <code>mod_perl</code></p>
+  <p class="zh">这个程序在使用<code>cgi-bin</code>目录时有点耍赖。其实它并没有调用外部的CGI脚本程序，而只是使用了一个Go的内部函数。Go确实可以通过<code>os.ForkExec</code>调用外部的程序，但还不能支持像Apache的<code>mod_perl</code>这样的动态连接库</p>
 
   <h3 id="heading_id_25" class="en">Bypassing the default multiplexer</h3>
-  <h3 id="heading_id_25" class="zh">Bypassing the default multiplexer</h3>
+  <h3 id="heading_id_25" class="zh">绕过默认的multiplexer</h3>
 
   <p class="en">HTTP requests received by a Go server are usually handled by a multiplexer the examines the path in the HTTP request and calls the appropriate file handler, etc. You can define your own handlers. These can either be registered with the default multiplexer by calling <code>http.HandleFunc</code> which takes a pattern and a function. The functions such as <code>ListenAndServe</code> then take a <code>nil</code> handler function. This was done in the last example.</p>
-  <p class="zh">HTTP requests received by a Go server are usually handled by a multiplexer the examines the path in the HTTP request and calls the appropriate file handler, etc. You can define your own handlers. These can either be registered with the default multiplexer by calling <code>http.HandleFunc</code> which takes a pattern and a function. The functions such as <code>ListenAndServe</code> then take a <code>nil</code> handler function. This was done in the last example.</p>
+  <p class="zh">Go服务器接收到的HTTP请求通常是由一个multiplexer进行处理，检查HTTP请求的路径，然后调用合适的文件handler等等。你也可以定义自己的handler。将一个匹配模式参数和一个函数作为参数，调用<code>http.HandleFunc</code>，可以将其注册为默认的multiplexer。像<code>ListenAndServe</code>这样的函数就可以使用<code>nil</code>作为handler function。上一个例子就是这样做的。</p>
 
   <p class="en">If you want to take over the multiplexer role then you can give a non-zero function as the handler function. This function will then be totally responsible for managing the requests and responses.</p>
-  <p class="zh">If you want to take over the multiplexer role then you can give a non-zero function as the handler function. This function will then be totally responsible for managing the requests and responses.</p>
+  <p class="zh">如果你想扮演multiplexer的角色，那么你就可以给一个非零函数作为handler function。这个函数将会全权负责管理请求和响应。</p>
 
   <p class="en">The following example is trivial, but illustrates the use of this: the multiplexer function simply returns a "204 No content" for <em>all</em> requests:</p>
-  <p class="zh">The following example is trivial, but illustrates the use of this: the multiplexer function simply returns a "204 No content" for <em>all</em> requests:</p>
+  <p class="zh">下面的例子非常简单，但它说明了如何使multiplexer对<em>所有</em>请求都只返回一个“204 No content”：</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* ServerHandler
  */
@@ -1018,8 +1019,8 @@ func HandleFunc(pattern string, handler func(*Conn, *Request))
 <span class="sgc-2">func</span> main() {
 
         myHandler := http.<span class="sgc-4">HandlerFunc</span>(<span class="sgc-2">func</span>(rw http.<span class="sgc-4">ResponseWriter</span>, request *http.<span class="sgc-4">Request</span>) {
-                <span class="sgc-1">// Just return no content - arbitrary headers can be set, arbitrary body
-</span>         rw.<span class="sgc-4">WriteHeader</span>(http.<span class="sgc-4">StatusNoContent</span>)
+                <span class="sgc-1">// Just return no content - arbitrary headers can be set, arbitrary body</span>
+                rw.<span class="sgc-4">WriteHeader</span>(http.<span class="sgc-4">StatusNoContent</span>)
         })
 
         http.<span class="sgc-4">ListenAndServe</span>(<span class="sgc-3">":8080"</span>, myHandler)
@@ -1027,7 +1028,7 @@ func HandleFunc(pattern string, handler func(*Conn, *Request))
 </span></code></pre>
 
 <p class="en">Arbitrarily complex behaviour can be built, of course.</p>
-<p class="zh">当然，想要多复杂的行为都可以。</p>
+<p class="zh">当然，也可以把它做成无所不能的。</p>
 
 <!--
 <h2> Low-level servers </h2>
