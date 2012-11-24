@@ -82,14 +82,14 @@
 
   <p class='en'>The structure of any XML document can be described in a number of ways:</p>
 <p class='zh'>任何XML文档的结构可以用多种方式描述:</p>
-  <ul>
+  <ul class='en'>
     <li>A document type definition DTD is good for describing structure</li>
 
     <li>XML schema are good for describing the data types used by an XML document</li>
 
     <li>RELAX NG is proposed as an alternative to both</li>
   </ul>
-<ul>
+<ul class='zh'>
     <li>一个文档类型定义DTD有利于表现数据结构</li>
 
     <li>在一个XML文档中，使用XML模式有利于描述数据类型</li>
@@ -101,9 +101,9 @@
   <p class='en'>Four topics are discussed in this chapter: parsing an XML stream, marshalling and unmarshalling Go data into XML, and XHTML.</p>
 <p class='zh'>在本章中讨论四个主题:解析一个XML流,编列和反编列Go数据成为XML和XHTML。</p>
   <h2 id="heading_id_4" class='en'>Parsing XML</h2>
-  <h2 id="heading_id_4">解析XML</h2>
+  <h2 id="heading_id_4" class='zh'>解析XML</h2>
   <p class='en'>Go has an XML parser which is created using <code>NewParser</code>. This takes an <code>io.Reader</code> as parameter and returns a pointer to <code>Parser</code>. The main method of this type is <code>Token</code> which returns the next token in the input stream. The token is one of the types <code>StartElement</code>, <code>EndElement</code>, <code>CharData</code>, <code>Comment</code>, <code>ProcInst</code> or <code>Directive</code>.</p>
-  <p class='en'>Go有一个使用 <code>NewParser</code>.创建的XML解析器。这需要一个<code>io.Reader</code> 作为参数,并返回一个指向<code>Parser</code> 的指针。这个类型的主要方法是 <code>Token</code>  ，这个方法返回输入流中的下一个标记。该标记是 <code>StartElement</code>, <code>EndElement</code>, <code>CharData</code>, <code>Comment</code>, <code>ProcInst</code>  和<code>Directive</code> 其中一种。</p>
+  <p class='zh'>Go有一个使用 <code>NewParser</code>.创建的XML解析器。这需要一个<code>io.Reader</code> 作为参数,并返回一个指向<code>Parser</code> 的指针。这个类型的主要方法是 <code>Token</code>  ，这个方法返回输入流中的下一个标记。该标记是 <code>StartElement</code>, <code>EndElement</code>, <code>CharData</code>, <code>Comment</code>, <code>ProcInst</code>  和<code>Directive</code> 其中一种。</p>
   <p class='en'>The types are</p>
   <p class='zh'>这些类有</p>
 
@@ -385,7 +385,15 @@ type Person struct {
         Email []Email `xml:"email"`
 }
         </code></pre></li>
-  <li> 虽然标记结构字段可以使用XML字符串,但是对于结构名不能这么做 ，这个解决办法是增加一个额外字段,命名“XMLName”。这只会影响上级结构，修改<code>Person</code> 如下</li>
+  <li> 虽然标记结构字段可以使用XML字符串,但是对于结构名不能这么做 ，这个解决办法是增加一个额外字段,命名“XMLName”。这只会影响上级结构，修改<code>Person</code> 如下
+     <pre><code>
+type Person struct {
+        XMLName Name `xml:"person"`
+        Name Name `xml:"name"`
+        Email []Email `xml:"email"`
+}
+        </code></pre>
+  </li>
   <li>重复标记会映射到Go的slice</li>
   <li> 要包含属性的标签准确匹配对应的结构字段，只有在Go字段后标记”,attr”。举个下面例子中 <code>Email</code>类型的<code>Type</code>字段，需要标记<code>`xml:"type,attr"`</code>才能匹配带有“type”属性的“email”</li>
   <li>如果一个XML标签没有属性而且只有文本内容,那么它匹配一个<code>string</code> 字段是通过相同的名称(区分大小写的,不过如此)。所以标签<code>`xml:"family"`</code>将对应着文本”Newmarch”映射到<code>Family</code>的string字段中
@@ -458,8 +466,8 @@ type Person struct {
 
   <p class='en'>(Note the spaces are correct.). The strict rules are given in the package specification.</p>
 <p class='zh'>(注意空间是正确的)。Go在包详解中给出了严格的规则。</p>
-  <h2 id="heading_id_6">Marshalling XML</h2>
-<h2 id="heading_id_6">编列 XML</h2>
+  <h2 id="heading_id_6" class='en'>Marshalling XML</h2>
+<h2 id="heading_id_6" class='zh'>编列 XML</h2>
   <p class='en'>Go 1 also has support for marshalling data structures into an XML document. The function is</p>
   <p class='zh'>Go1也支持将数据结构编列为XML文档的。这个函数是</p>
   <pre>
@@ -695,8 +703,8 @@ func (v *StructValue) Field(i int) Value
         }
 }
 </font></code></pre>-->
-
-  <h2 id="heading_id_7">XHTML</h2>
+  <h2 id="heading_id_7" class='en'>XHTML</h2>
+<h2 id="heading_id_7" class='zh'>XHTML</h2>
 
   <p class='en'>HTML does not conform to XML syntax. It has unterminated tags such as '&lt;br&gt;'. XHTML is a cleanup of HTML to make it compliant to XML. Documents in XHTML can be managed using the techniques above for XML.</p>
   <p class='zh'>HTML并不符合XML语法。 它包含无闭端的标签如“< br >”。XHTML是HTML的一个自身兼容XML的子集。 在XHTML文档中可以使用操作XML的技术。</p>
@@ -714,12 +722,12 @@ func (v *StructValue) Field(i int) Value
   </pre>
 
   <h2 id="heading_id_9" class='en'>Conclusion</h2>
-<h2 class='zh'>结论</h2>
+<h2 id="heading_id_9" class='zh'>结论</h2>
   <p class='en'>Go has basic support for dealing with XML strings. It does not as yet have mechanisms for dealing with XML specification languages such as XML Schema or Relax NG.</p>
 <p class='zh'>Go基本支持对XML字符的处理，而且它不像有着针对XML专用语言如XML Schema或Relax NG的处理机制。</p>
-  <p class='en'>Copyright Jan Newmarch, jan@newmarch.name</p>
+  <p>Copyright Jan Newmarch, jan@newmarch.name</p>
 
-  <p class='en'>If you like this book, please contribute using Flattr <a class="FlattrButton sgc-7" href="http://jan.newmarch.name/go/index.html"></a><br />
+  <p>If you like this book, please contribute using Flattr <a class="FlattrButton sgc-7" href="http://jan.newmarch.name/go/index.html"></a><br />
   or donate using PayPal</p>
 
   <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
