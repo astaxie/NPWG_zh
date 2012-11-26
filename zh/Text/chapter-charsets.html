@@ -270,19 +270,19 @@
 
   <p class="en">A character encoding will suffice for handling characters within a single application. However, once you start sending text <em>between</em> applications, then there is the further issue of how the bytes, shorts or words are put on the wire. An encoding can be based on space-and hence bandwidth-saving techniques such as <code>zip</code>'ping the text. Or it could be reduced to a 7-bit format to allow a parity checking bit, such as <code>base64</code>.</p>
 
-  <p class="zh">某个应用程序的字符编码只要内部能处理字符串就足够了。然而，一旦你需要在不同应用程序<em>之间</em>交互，那怎么编码可就成了需要进一步讨论问题了：字节、字符、字是怎么传输的。字符编码可能有很多空白字符（待商议），从而可以使用如<code>zip算法</code>对文本进行压缩，从而节省带宽。或者，它可以减少到7位字节，奇偶校验位，使用<code> base64编码</ code>来代替。</p>
+  <p class="zh">某个应用程序的字符编码只要内部能处理字符串就足够了。然而，一旦你需要在不同应用程序<em>之间</em>交互，那怎么编码可就成了需要进一步讨论问题了：字节、字符、字是怎么传输的。字符编码可能有很多空白字符（待商议），从而可以使用如<code>zip算法</code>对文本进行压缩，从而节省带宽。或者，它可以减少到7位字节，奇偶校验位，使用<code> base64编码</code>来代替。</p>
 
 
 
   <p class="en">If we do know the character and transport encoding, then it is a matter of programming to manage characters and strings. If we don't know the character or transport encoding then it is a matter of guesswork as to what to do with any particular string. There is no convention for files to signal the character encoding.</p>
 
-  <p class="zh"></p>
+  <p class="zh">如果我们知道的字符编码和传输编码，那么问题就成了如何通过编程处理字符和字符串；如果我们不知道字符编码和传输编码，那么如何猜到某个特定字符串的编码方式就是大问题。因为没有约定发送文件的字符编码</p>
 
 
 
   <p class="en">There <em>is</em> however a convention for signalling encoding in text transmitted across the internet. It is simple: the header of a text message contains information about the encoding. For example, an HTTP header can contain lines such as</p>
 
-  <p class="zh"></p>
+  <p class="zh"><em>不过</em>，在互联网上传输文本的编码是有约定的。很简单：文本消息头包含的编码信息。例如，HTTP报头可以包含这么几行，如</p>
 
   <pre><code>
 
@@ -296,23 +296,23 @@ Content-Encoding: gzip
 
   <p class="en">which says that the character set is ISO 8859-4 (corresponding to certain countries in Europe) with the default encoding, but then <code>gzip</code>ed. The second part - content encoding - is what we are referring to as "transfer encoding" (IETF RFC 2130).</p>
 
-  <p class="zh"></p>
+  <p class="zh">上面是说，将字符集是ISO 8859-4（对应到欧洲的某些国家）作为默认编码，然后用<code> gzip</code>压缩。内容类型的第二部分就是我们指的是“传输编码”（IETF RFC2130）。</p>
 
 
 
   <p class="en">But how do you read this information? Isn't it encoded? Don't we have a chicken and egg situation? Well, no. The convention is that such information is given in ASCII (to be precise, US ASCII) so that a program can read the headers and then adjust its encoding for the rest of the document.</p>
 
-  <p class="zh"></p>
+  <p class="zh">但是，怎么读懂这个信息呢？它没有编码？这不就是先有鸡还是先有蛋的问题么？嗯，不是的。按照惯例，这样的信息使用ASCII编码（准确地说，美国ASCII），所以程序可以读取headers，然后适配其文档的其余部分的编码。</p>
 
 
 
   <h2 id="heading_id_10" class="en">ASCII</h2>
-
+	  <h2 id="heading_id_10" class="zh">ASCII编码</h2>
 
 
   <p class="en">ASCII has the repertoire of the English characters plus digits, punctuation and some control characters. The code points for ASCII are given by the familiar table</p>
 
-  <p class="zh"></p>
+  <p class="zh">ASCII字符集包含的英文字符、数字，标点符号和一些控制字符。 下面这张熟悉的表给出了ASCII字符编码值</p>
 
   <pre>
 
@@ -454,13 +454,13 @@ Content-Encoding: gzip
 
   <p class="en">The most common encoding for ASCII uses the code points as 7-bit bytes, so that the encoding of 'A' for example is 65.</p>
 
-  <p class="zh">最常见的ascii编码使用7位字节，所以A的码是65。</p>
+  <p class="zh">最常见的ASCII编码使用7位字节，所以A的码是65。</p>
 
 
 
   <p class="en">This set is actually <em>US ASCII</em>. Due to European desires for accented characters, some punctuation characters are omitted to form a minimal set, ISO 646, while there are "national variants" with suitable European characters. The page <a href="http://www.cs.tut.fi/~jkorpela/chars.html">http://www.cs.tut.fi/~jkorpela/chars.html</a> by Jukka Korpela has more information for those interested. We shall not need these variants though.</p>
 
-  <p class="zh"></p>
+  <p class="zh">这个字符集是实际的<em>美国ASCII</em>。鉴于欧洲需要处理重音字符，于是省略一些标点字符，形成一个最小的字符集，ISO 646，同时有合适的欧洲本国字符的“国家变种字符集”。有兴趣的可以看看Jukka Korpel的这个网页<a href="http://www.cs.tut.fi/~jkorpela/chars.html"> http://www.cs.tut.fi/〜jkorpela/ chars.html</a>。当然我们并不需要这些变种。</p>
 
 
 
