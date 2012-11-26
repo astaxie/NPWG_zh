@@ -550,30 +550,30 @@ Content-Encoding: gzip
 
 
   <h2 id="heading_id_13" class="en">UTF-8, Go and runes</h2>
-
+  <h2 id="heading_id_13" class="zh">UTF-8, Go语言和runes</h2>
 
 
   <p class="en">UTF-8 is the most commonly used encoding. Google estimates that 50% of the pages that it sees are encoded in UTF-8. The ASCII set has the same encoding values in UTF-8, so a UTF-8 reader can read text consisting of just ASCII characters as well as text from the full Unicode set.</p>
 
-  <p class="zh"></p>
+  <p class="zh">UTF - 8是最常用的编码。谷歌估计它抓取的网页有50%使用UTF-8编码。ASCII字符集具有相同的在UTF-8中编码值相同，所以UTF-8的读取方法可以用Unicode字符集读取一个ASCII字符组成的网页。</p>
 
 
 
   <p class="en">Go uses UTF-8 encoded characters in its strings. Each character is of type <code>rune</code>. This is a alias for <code>int32</code> as a Unicode character can be 1, 2 or 4 bytes in UTF-8 encoding. In terms of characters, a string is an array of runes.</p>
 
-  <p class="zh"></p>
+  <p class="zh">Go语言使用UTF-8编码字符串。每个字符类型都是<code>rune</code>。<code>rune</code>是 <code>int32</code>的一个别名，因为Unicode编码可以是1,2或4个字节。字符和字符串其实都是一个runes的数组</p>
 
 
 
   <p class="en">A string is also an array of bytes, but you have to be careful: only for the ASCII subset is a byte equal to a character. All other characters occupy two, three or four bytes. This means that the length of a string in characters (runes) is generally not the same as the length of its byte array. They are only equal when the string consists of ASCII characters only.</p>
 
-  <p class="zh"></p>
+  <p class="zh">Unicode中一个字符串其实是一个字节数组，但是你要注意：只有ASCII这个字符集是一个字节等于一个字符。所有其他字符占用2个，三个或四个字节。这意味着，一个字符串的长度（runes）通常是不一样的长度的字节数组。他们只有在全是ASCII字符是才相同。</p>
 
 
 
   <p class="en">The following program fragment illustrates this. If we take a UTF-8 string and test its length, you get the length of the underlying byte array. But if you cast the string to an array of runes <code>[]rune</code> then you get an array of the Unicode code points which is generally the number of characters:</p>
 
-  <p class="zh"></p>
+  <p class="zh">下面的程序片段可以说明这些。如果我们使用utf-8来检验它的长度，你只会得到它字符层面的长度。但如果你把字符串转换成rues数组<code>[]rune</code>，你就等到一个Unicode编码的数组：</p>
 
   <pre><code>
 
@@ -591,7 +591,7 @@ println("Byte length", len(str))
 
   <p class="en">prints</p>
 
-  <p class="zh"></p>
+  <p class="zh">输出为</p>
 
   <pre><code>
 
@@ -609,7 +609,7 @@ Byte length 27
 
   <p class="en">Possibly surprisingly, you need do nothing special to handle UTF-8 text in either the client or the server. The underlying data type for a UTF-8 string in Go is a byte array, and as we saw just above, Go looks after encoding the string into 1, 2, 3 or 4 bytes as needed. The length of the string is the length of the byte array, so you write any UTF-8 string by writing the byte array.</p>
 
-  <p class="zh"></p>
+  <p class="zh">可能令人惊讶的是，你需要什么都不做特殊处理UTF - 8文本无论是客户端或服务器。基本数据类型为UTF - 8字符串是一个字节数组，当我们看到上面去看一看，编码后的字符串为1，2，3或4个字节需要。字符串的长度是长度的字节数组，所以你写任何UTF - 8字符串写字节数组。</p>
 
 
 
