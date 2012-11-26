@@ -21,7 +21,7 @@ Network programming with Go 中文翻译版本
 - 吴文磊
 - Border
 - 微尘
-- ◥︼狐◆狐℡
+- chenzhekl
 
 ## 翻译计划
 
@@ -126,7 +126,7 @@ Network programming with Go 中文翻译版本
     </tr>
     <tr>
         <td>第十四章：Network channels</td>
-        <td>◥︼狐◆狐℡</td>
+        <td>chenzhekl</td>
         <td>微尘</td>
         <td>欧林猫</td>
         <td>Asta谢</td>
