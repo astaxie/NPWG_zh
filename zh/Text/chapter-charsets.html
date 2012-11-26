@@ -242,35 +242,35 @@
 
   <p class="en">To communicate or store a character you need to encode it in some way. To transmit a string, you need to encode all characters in the string. There are many possible encodings for any code set.</p>
 
-  <p class="zh"></p>
+  <p class="zh">字符的交互（传输）和存储都要以某种方式编码。要发送一个字符串，你需要将字符串中的所有字符进行编码。每种字符集都有很多的编码方案。</p>
 
 
 
   <p class="en">For example, 7-bit ASCII code points can be encoded as themselves into 8-bit bytes (an octet). So ASCII 'A' (with codepoint 65) is encoded as the 8-bit octet 01000001. However, a different encoding would be to use the top bit for parity checking e.g. with odd parity ASCII 'A" would be the octet 11000001. Some protocols such as Sun's XDR use 32-bit word-length encoding. ASCII 'A' would be encoded as 00000000 00000000 0000000 01000001.</p>
 
-  <p class="zh"></p>
+  <p class="zh">例如，7位字节ASCII编码转换成8位字节（8进制）。所以，ASCII的'A'（编码值65）可以被编码为8进制的01000001。不过，另一种不同的编码方式对最高位别有用途，如奇偶校验，带有奇校验的ASCII编码“A”将是这个8进制数11000001。还有一些协议，如Sun的XDR，使用32位字长编码ASCII编码。所以，'A'将被编码为00000000 00000000000000001000001。</p>
 
 
 
   <p class="en">The character encoding is where we function at the programming level. Our programs deal with encoded characters. It obviously makes a difference whether we are dealing with 8-bit characters with or without parity checking, or with 32-bit characters.</p>
 
-  <p class="zh"></p>
+  <p class="zh">字符编码​​是在程序应用层面使用的。应用程序处理编码的字符时，是否带包含奇偶校验处理8位字符或32位字符，显然有很大的差别。</p>
 
 
 
   <p class="en">The encoding extends to strings of characters. A word-length even parity encoding of "ABC" might be 10000000 (parity bit in high byte) 0100000011 (C) 01000010 (B) 01000001 (A in low byte). The comments about the importance of an encoding apply equally strongly to strings, where the rules may be different.</p>
 
-  <p class="zh"></p>
+  <p class="zh">把字符编码延伸到字符串。一个字节宽、带有奇偶校验的“ABC”编码为10000000（高位奇偶校验）0100000011（C）01000010（B）01000001（A在低位）。对于编码在字符串上的讨论也很重要，虽然编码规则可能不同。</p>
 
 
 
-  <h3 id="heading_id_9">Transport encoding</h3>
+  <h3 id="heading_id_9" class="en">Transport encoding</h3>
+<h3 id="heading_id_9" class="zh">编码传输</h3>
 
 
+  <p class="en">A character encoding will suffice for handling characters within a single application. However, once you start sending text <em>between</em> applications, then there is the further issue of how the bytes, shorts or words are put on the wire. An encoding can be based on space-and hence bandwidth-saving techniques such as <code>zip</code>'ping the text. Or it could be reduced to a 7-bit format to allow a parity checking bit, such as <code>base64</code>.</p>
 
-  <p class="en">A character encoding will suffice for handling characters within a single application. However, once you start sending text <em>between</em> applications, then there is the further issue of how the bytes, shorts or words are put on the wire. An encoding can be based on space- and hence bandwidth-saving techniques such as <code>zip</code>'ping the text. Or it could be reduced to a 7-bit format to allow a parity checking bit, such as <code>base64</code>.</p>
-
-  <p class="zh"></p>
+  <p class="zh">某个应用程序的字符编码只要内部能处理字符串就足够了。然而，一旦你需要在不同应用程序<em>之间</em>交互，那怎么编码可就成了需要进一步讨论问题了：字节、字符、字是怎么传输的。字符编码可能有很多空白字符（待商议），从而可以使用如<code>zip算法</code>对文本进行压缩，从而节省带宽。或者，它可以减少到7位字节，奇偶校验位，使用<code> base64编码</ code>来代替。</p>
 
 
 
