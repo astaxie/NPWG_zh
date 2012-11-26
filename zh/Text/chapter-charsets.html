@@ -492,25 +492,24 @@ Content-Encoding: gzip
 
   <p class="en">Neither ASCII nor ISO 8859 cover the languages based on hieroglyphs. Chinese is estimated to have about 20,000 separate characters, with about 5,000 in common use. These need more than a byte, and typically two bytes has been used. There have been many of these two-byte character sets: Big5, EUC-TW, GB2312 and GBK/GBX for Chinese, JIS X 0208 for Japanese, and so on. These encodings are generally not mutually compatable.</p>
 
-  <p class="zh"></p>
-
+  <p class="zh">ASCII和ISO 8859都不能覆盖象形文字。中文大约有20000个独立的字符，其中5000个常用字符。这些字符需要不知一个字节，基本上双字节都会被用上。也有一些多字节的编码：中文的Big5, EUC-TW, GB2312 和GBK/GBX，日文的 JIS X 0208，等等。这些编码通常是不兼容的</p>
 
 
   <p class="en">Unicode is an embracing standard character set intended to cover all major character sets in use. It includes European, Asian, Indian and many more. It is now up to version 5.2 and has over 107,000 characters. The number of code points now exceeds 65,536, that is. more than 2^16. This has implications for character encodings.</p>
 
-  <p class="zh"></p>
+  <p class="zh">Unincode是一个受到拥护的字符集编码标准，旨在统一主要使用的编码。它包含了欧洲文字、亚洲文字和印度文字等。现在Unicode已经到了5.2的版本，包含107,0000个字符。编码字符超过65536，也就是2^16。这已经覆盖了整个编码。</p>
 
 
 
   <p class="en">The first 256 code points correspond to ISO 8859-1, with US ASCII as the first 128. There is thus a backward compatability with these major character sets, as the code points for ISO 8859-1 and ASCII are exactly the same in Unicode. The same is not true for other character sets: for example, while most of the Big5 characters are also in Unicode, the code points are not the same. The page http://moztw.org/docs/big5/table/unicode1.1-obsolete.txt contains one example of a (large) table mapping from Big5 to Unicode.</p>
 
-  <p class="zh"></p>
+  <p class="zh">(Unicode编码)前256个编码对应 ISO 8859-1，同时前128个也是美式ASCII编码。所以主流的编码都是相互兼容的，ISO 8859-1、ASCII和Unicode是一样的。对其他字符集则不一定正确：例如，虽然Big5编码也在Unicode中，但他们的编码值并不相同。http://moztw.org/docs/big5/table/unicode1.1-obsolete.txt这个页面就是证明：一张Big5到Unicode的大的映射表。</p>
 
 
 
   <p class="en">To represent Unicode characters in a computer system, an encoding must be used. The encoding UCS is a two-byte encoding using the code point values of the Unicode characters. However, since there are now too many characters in Unicode to fit them all into 2 bytes, this encoding is obsolete and no longer used. Instead there are:</p>
 
-  <p class="zh"></p>
+  <p class="zh">为了在计算机系统中表示Unicode字符，必须使用一个编码方案。UCS编码使用两个字节来编码一个字符值。然而，Unicode现在有太多的字符需要对应到双字节的编码。以下方案是替代原来陈旧的编码方案的：</p>
 
 
 
@@ -531,7 +530,23 @@ Content-Encoding: gzip
     <li>UTF-7 is used sometimes, but is not common</li>
 
   </ul>
+   <ul class="zh">
 
+    <li>UTF-32使用4个字节编码，但是已经不在推荐，HTML5甚至严重警告反对使用</li>
+
+
+
+    <li>UTF-16是最常见的，它通过溢出两个字节来处理ASCII和ISO 8859-1外的字符</li>
+
+
+
+    <li>UTF-8每个字符使用1到4个字节，所以ASCII值不变，但ISO 8859-1的值会变化</li>
+
+
+
+    <li>UTF-7有时会用到，但不常见</li>
+
+  </ul>
 
 
   <h2 id="heading_id_13" class="en">UTF-8, Go and runes</h2>
