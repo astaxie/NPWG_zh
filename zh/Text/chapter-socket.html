@@ -150,30 +150,39 @@
   <p class="zh">如果你需要400台计算机在同一个网络，该方案是不可行的。254太小，而65,536又太大。根据二进制计算，你大约需要512(2^9)。这样就可以通过使用一个23位的网络地址和9位的设备地址实现。同样，如果您需要高达1024台设备，使用一个22位网络地址和一个10位的设备地址。</p>
   
   <p class="en">Given an IP address of a device, and knowing how many bits N are used for the network address gives a relatively straightforward process for extracting the network address and the device address within that network. Form a "network mask" which is a 32-bit binary number with all ones in the first N places and all zeroes in the remaining ones. For example, if 16 bits are used for the network address, the mask is 11111111111111110000000000000000. It's a little inconvenient using binary, so decimal bytes are usually used. The netmask for 16 bit network addresses is 255.255.0.0, for 24 bit network addresses it is 255.255.255.0, while for 23 bit addresses it would be 255.255.254.0 and for 22 bit addresses it would be 255.255.252.0.</p>
-  <p class="zh">根据设备的IP地址，知道多少字节用于网络地址，通过网络提取网络地址和设备地址给出了一个相对简单的处理。例如：“网络掩码”是一个前面N位为1，其他所有位为0的32位二进制数。</p>
+  <p class="zh">根据设备的IP地址，知道多少字节用于网络地址，通过网络提取网络地址和设备地址给出了一个相对简单的处理。例如：“网络掩码”是一个前面N位为1，其他所有位为0的32位二进制数。例如，如果使用16位的网络地址，掩码为11111111111111110000000000000000。使用二进制有一点不方便，所以通常使用十进制字节。16位网络地址的子网掩码是255.255.0.0，而对于23位地址，这将是255.255.254.0，和22位地址，这将是255.255.252.0。</p>
   
-  <p>Then to find the network of a device, bit-wise AND it's IP address with the network mask, while the device address within the subnet is found with bit-wise AND of the 1's complement of the mask with the IP address.</p>
+  <p class="en">Then to find the network of a device, bit-wise AND it's IP address with the network mask, while the device address within the subnet is found with bit-wise AND of the 1's complement of the mask with the IP address.</p>
+  <p class="zh">接着查找设备的网络，并将其IP地址与网络掩码进行按位与操作，而该设备在子网中的地址，可通过其IP地址同掩码与1的补码的按位与操作发现。</p>
 
-  <h3 id="heading_id_10">IPv6 addresses</h3>
+  <h3 id="heading_id_10" class="en">IPv6 addresses</h3>
+  <h3 id="heading_id_10" class="zh">IPv6地址</h3>
 
-  <p>The internet has grown vastly beyond original expectations. The initially generous 32-bit addressing scheme is on the verge of running out. There are unpleasant workarounds such as NAT addressing, but eventually we will have to switch to a wider address space. IPv6 uses 128-bit addresses. Even bytes becomes cumbersome to express such addresses, so hexadecimal digits are used, grouped into 4 digits and separated by a colon ':'. A typical address might be 2002:c0e8:82e7:0:0:0:c0e8:82e7.</p>
+  <p class="en">The internet has grown vastly beyond original expectations. The initially generous 32-bit addressing scheme is on the verge of running out. There are unpleasant workarounds such as NAT addressing, but eventually we will have to switch to a wider address space. IPv6 uses 128-bit addresses. Even bytes becomes cumbersome to express such addresses, so hexadecimal digits are used, grouped into 4 digits and separated by a colon ':'. A typical address might be 2002:c0e8:82e7:0:0:0:c0e8:82e7.</p>
+  <p class="zh">因特网的迅速发展大大超出了原来的预期。最初富余的32位地址解决方案已经接近用完。虽然有一些例如NAT地址输入这样不是很完美的解决方法，但最终我们将不得不切换到更广阔的地址空间。IPv6使用128位地址，即使表达同样的地址，字节数变得很麻烦，由':'分隔的4位16进制组成。一个典型的例子如：2002:c0e8:82e7:0:0:0:c0e8:82e7。</p>
 
-  <p>These addresses are not easy to remember! DNS will become even more important. There are tricks to reducing some addresses, such as eliding zeroes and repeated digits. For example, "localhost" is 0:0:0:0:0:0:0:1, which can be shortened to ::1</p>
+  <p class="en">These addresses are not easy to remember! DNS will become even more important. There are tricks to reducing some addresses, such as eliding zeroes and repeated digits. For example, "localhost" is 0:0:0:0:0:0:0:1, which can be shortened to ::1</p>
+  <p class="zh">要记住这些地址并不容易！DNS将变得更加重要。有一些技巧用来介绍一些地址，如省略一些零和重复的数字。例如："localhost"地址是：0:0:0:0:0:0:0:1，可以缩短到::1。</p>
 
-  <h2 id="heading_id_11">IP address type</h2>
+  <h2 id="heading_id_11" class="en">IP address type</h2>
+  <h2 id="heading_id_11" class="zh">IP地址类型</h2>
 
-  <h3 id="heading_id_12">The type IP</h3>
+  <h3 id="heading_id_12" class="en">The type IP</h3>
+  <h2 id="heading_id_12" class="zh">IP类型</h2>
 
-  <p>The package "net" defines many types, functions and methods of use in Go network programming. The type <code>IP</code> is defined as an array of bytes</p>
+  <p class="en">The package "net" defines many types, functions and methods of use in Go network programming. The type <code>IP</code> is defined as an array of bytes</p>
+  <p class="zh">"net"包定义了许多类型, 函数，方法用于Go网络编程。<code>IP</code>类型被定义为一个字节数组。</p>
   <pre>
     <code>
       type IP []byte
     </code>
   </pre>
 
-  <p>There are several functions to manipulate a variable of type <code>IP</code>, but you are likely to use only some of them in practice. For example, the function <code>ParseIP(String)</code> will take a dotted IPv4 address or a colon IPv6 address, while the <code>IP</code> method <code>String</code> will return a string. Note that you may not get back what you started with: the string form of 0:0:0:0:0:0:0:1 is ::1.</p>
+  <p class="en">There are several functions to manipulate a variable of type <code>IP</code>, but you are likely to use only some of them in practice. For example, the function <code>ParseIP(String)</code> will take a dotted IPv4 address or a colon IPv6 address, while the <code>IP</code> method <code>String</code> will return a string. Note that you may not get back what you started with: the string form of 0:0:0:0:0:0:0:1 is ::1.</p>
+  <p class="zh">有几个函数来处理一个<code>IP</code>类型的变量, 但是在实践中你很可能只用到其中的一些。例如, <code>ParseIP(String)</code>函数将获取逗号分隔的IPv4或者冒号分隔的IPv6地址, 而<code>IP</code>方法的字符串将返回一个<code>字符串</code>。请注意，您可能无法取回你期望的: 字符串 0:0:0:0:0:0:0:1是::1。</p>
 
-  <p>A program to illustrate this is</p>
+  <p class="en">A program to illustrate this is</p>
+  <p class="zh">下面用一个程序来说明</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* IP
  */
@@ -203,59 +212,69 @@
 }
 </span></code></pre>
 
-  <p>If this is compiled to the executable <code>IP</code> then it can run for example as</p>
+  <p class="en">If this is compiled to the executable <code>IP</code> then it can run for example as</p>
+  <p class="zh">如果编译它为可执行文件<code>IP</code>，那么它可以运行如</p>
   <pre><code>
 IP 127.0.0.1
     </code></pre>
 
-  <p>with response</p>
+  <p class="en">with response</p>
+  <p class="zh">得到结果</p>
   <pre><code>
 The address is 127.0.0.1
     </code></pre>
 
-  <p>or as</p>
+  <p class="en">or as</p>
+  <p class="zh">或</p>
   <pre><code>
 IP 0:0:0:0:0:0:0:1
     </code></pre>
 
-  <p>with response</p>
+  <p>得到结果</p>
   <pre><code>
 The address is ::1
     </code></pre>
 
-  <h3 id="heading_id_13">The type IPmask</h3>
+  <h3 id="heading_id_13" class="en">The type IPmask</h3>
+  <h3 id="heading_id_13" class="zh">IP掩码</h3>
 
-  <p>In order to handle masking operations, there is the type</p>
+  <p class="en">In order to handle masking operations, there is the type</p>
+  <p class="zh">为了处理掩码操作，有下面类型：</p>
   <pre>
     <code>
 type IPMask []byte
     </code>
   </pre>
 
-  <p>There is a function to create a mask from a 4-byte IPv4 address</p>
+  <p class="en">There is a function to create a mask from a 4-byte IPv4 address</p>
+  <p class="zh">下面这个函数用一个4字节的IPv4地址来创建一个掩码</p>
   <pre>
     <code>
 func IPv4Mask(a, b, c, d byte) IPMask
     </code>
   </pre>
 
-  <p>Alternatively, there is a method of <code>IP</code> which returns the default mask</p>
+  <p class="en">Alternatively, there is a method of <code>IP</code> which returns the default mask</p>
+  <p class="zh">另外, 这是一个<code>IP</code>的方法返回默认的掩码</p>
   <pre>
     <code>
 func (ip IP) DefaultMask() IPMask
     </code>
   </pre>
 
-  <p>Note that the string form of a mask is a hex number such as ffff0000 for a mask of 255.255.0.0.</p>
+  <p class="en">Note that the string form of a mask is a hex number such as ffff0000 for a mask of 255.255.0.0.</p>
+  <p class="zh">需要注意的是一个掩码的字符串形式是一个十六进制数，如掩码255.255.0.0为ffff0000。</p>
 
-  <p>A mask can then be used by a method of an IP address to find the network for that IP address</p>
+  <p class="en">A mask can then be used by a method of an IP address to find the network for that IP address</p>
+  <p class="zh">一个掩码可以使用一个IP地址的方法，找到该IP地址的网络</p>
   <pre>
     <code>
 func (ip IP) Mask(mask IPMask) IP
     </code>
   </pre>
 
-  <p>An example of the use of this is the following program:</p>
+  <p class="en">An example of the use of this is the following program:</p>
+  <p class="zh">下面的程序是一个使用了这个的例子：</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* Mask
  */
@@ -292,19 +311,23 @@ func (ip IP) Mask(mask IPMask) IP
 }
 </span></code></pre>
 
-  <p>If this is compiled to <code>Mask</code> and run by</p>
+  <p class="en">If this is compiled to <code>Mask</code> and run by</p>
+  <p class="zh">编译并运行<code>Mask</code></p>
   <pre><code>
 Mask 127.0.0.1
     </code></pre>
 
-  <p>it will return</p>
+  <p class="en">it will return</p>
+  <p class="zh">将返回</p>
   <pre><code>
 Address is  127.0.0.1  Default mask length is  8  Network is  127.0.0.0
     </code></pre>
 
-  <h3 id="heading_id_14">The type IPAddr</h3>
+  <h3 id="heading_id_14" class="en">The type IPAddr</h3>
+  <h3 id="heading_id_14" class="zh">IPAddr类型</h3>
 
-  <p>Many of the other functions and methods in the net package return a pointer to an <code>IPAddr</code>. This is simply a structure containing an <code>IP</code>.</p>
+  <p class="en">Many of the other functions and methods in the net package return a pointer to an <code>IPAddr</code>. This is simply a structure containing an <code>IP</code>.</p>
+  <p class="zh">在net包的许多函数和方法会返回一个指向<code>IPAddr</code>的指针。这是一个简单的结构，它包含一个<code>IP</code>。</p>
   <pre>
     <code>
 type IPAddr {
@@ -313,14 +336,16 @@ type IPAddr {
     </code>
   </pre>
 
-  <p>A primary use of this type is to perform DNS lookups on IP host names.</p>
+  <p class="en">A primary use of this type is to perform DNS lookups on IP host names.</p>
+  <p class="zh">这种类型的主要用途是执行DNS查找IP主机名。</p>
   <pre>
     <code>
 func ResolveIPAddr(net, addr string) (*IPAddr, os.Error)
     </code>
   </pre>
 
-  <p>where <code>net</code> is one of "ip", "ip4" or "ip6". This is shown in the program</p>
+  <p class="en">where <code>net</code> is one of "ip", "ip4" or "ip6". This is shown in the program</p>
+  <p class="zh">其中<code>net</code>是"ip","ip4"或者"ip6"的其中一个. 下面的程序中将会展示。</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* ResolveIP
  */
@@ -351,23 +376,28 @@ func ResolveIPAddr(net, addr string) (*IPAddr, os.Error)
 }
 </span></code></pre>
 
-  <p>Running <code>ResolveIP www.google.com</code> returns</p>
+  <p class="en">Running <code>ResolveIP www.google.com</code> returns</p>
+  <p class="zh">运行<code>ResolveIP www.google.com</code>返回</p>
   <pre><code>
 Resolved address is  66.102.11.104
     </code></pre>
 
-  <h3 id="heading_id_15">Host lookup</h3>
+  <h3 id="heading_id_15" class="en">Host lookup</h3>
+  <h3 id="heading_id_15" class="zh">主机查询</h3>
 
-  <p>The function <code>ResolveIPAddr</code> will perform a DNS lookup on a hostname, and return a single IP address. However, hosts may have multiple IP addresses, usually from multiple network interface cards. They may also have multiple host names, acting as aliases.</p>
+  <p class="en">The function <code>ResolveIPAddr</code> will perform a DNS lookup on a hostname, and return a single IP address. However, hosts may have multiple IP addresses, usually from multiple network interface cards. They may also have multiple host names, acting as aliases.</p>
+  <p class="zh"><code>ResolveIPAddr</code>函数将执行DNS查询的主机名，并返回一个简单的IP地址。然而，通常主机如果有多个网卡，则可以有多个IP地址。它们也可能有多个主机名，作为别名。</p>
   <pre>
     <code>
 func LookupHost(name string) (cname string, addrs []string, err os.Error)
     </code>
   </pre>
 
-  <p>One of these addresses will be labelled as the "canonical" host name. If you wish to find the canonical name, use <code>func LookupCNAME(name string) (cname string, err os.Error)</code></p>
+  <p class="en">One of these addresses will be labelled as the "canonical" host name. If you wish to find the canonical name, use <code>func LookupCNAME(name string) (cname string, err os.Error)</code></p>
+  <p class="zh">这些地址将会被归类为“canonical”主机名。如果你想找到的规范名称，使用<code>func LookupCNAME(name string) (cname string, err os.Error)</code></p>
 
-  <p>This is shown in the following program</p>
+  <p class="en">This is shown in the following program</p>
+  <p class="zh">下面是一个演示程序</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* LookupHost
  */
@@ -400,7 +430,8 @@ func LookupHost(name string) (cname string, addrs []string, err os.Error)
 }
 </span></code></pre>
 
-  <p>Note that this function returns strings, not <code>IPAddress</code> values.</p>
+  <p class="en">Note that this function returns strings, not <code>IPAddress</code> values.</p>
+  <p class="zh">注意，这个函数返回字符串，而不是<code>IPAddress</code>。</p>
 
   <h2 id="heading_id_16">Services</h2>
 
