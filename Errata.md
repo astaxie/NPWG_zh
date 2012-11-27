@@ -15,6 +15,7 @@ Errata
 例如：
 
 	## Chapter 1 Architecture
+
 	   L51, C76: sytems -> systems
 	   L58, C30: highl evel -> high level
 	 ? L84, C37: independance -> independence
@@ -34,6 +35,7 @@ Errata
 ========
 
 ## Chapter 1 Architecture
+
    L51, C76: sytems -> systems
    L58, C30: highl evel -> high level
  ? L84, C37: independance -> independence
@@ -61,6 +63,7 @@ Errata
  ? L448, C204: recognise -> recognize
 
 ## Chapter 2 Overview of the Go language
+
    None
 
 ## Chapter 3 Socket-level Programming
