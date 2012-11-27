@@ -48,7 +48,8 @@
 
 <body>
   <div class="chapter">
-    <h1 id="heading_id_2">Network channels</h1>
+    <h1 id="heading_id_2" class="en">Network channels</h1>
+    <h1 id="heading_id_2" class="zh">网络 channels</h1>
   </div>
 
   <div class="preface"></div>
@@ -56,32 +57,45 @@
   <div class="generate_from_h2" id="generated-toc"></div>
 
   <div class="warning">
-    <h2 id="heading_id_3">Warning</h2>
+    <h2 id="heading_id_3" class="en">Warning</h2>
+    <h2 id="heading_id_3" class="zh">警告</h2>
 
-    <p>The netchan package is being reworked. While it was in earlier versions of Go, it is not in Go 1. It is available in the <code>old/netchan</code> package if you still need it. This chapter describes this old version. Do not use it for new code.</p>
+    <p class="en">The netchan package is being reworked. While it was in earlier versions of Go, it is not in Go 1. It is available in the <code>old/netchan</code> package if you still need it. This chapter describes this old version. Do not use it for new code.</p>
+    <p class="zh">现在netchan包正在重新设计。但在因为它在早期的Go版本（早于Go 1）中有被使用，如果你确实需要它，可以在<code>old/netchan</code>下找到。这一章描述的是旧版本的使用。请不要在新代码中使用它.</p>
   </div>
 
-  <h2 id="heading_id_4">Introduction</h2>
+  <h2 id="heading_id_4" class="en">Introduction</h2>
+  <h2 id="heading_id_4" class="zh">简介</h2>
 
-  <p>There are many models for sharing information between communicating processes. One of the more elegant is Hoare's concept of <em>channels</em>. In this, there is no shared memory, so that none of the issues of accessing common memory arise. Instead, one process will send a message along a channel to another process. Channels may be synchronous, or asynchronous, buffered or unbuffered.</p>
+  <p class="en">There are many models for sharing information between communicating processes. One of the more elegant is Hoare's concept of <em>channels</em>. In this, there is no shared memory, so that none of the issues of accessing common memory arise. Instead, one process will send a message along a channel to another process. Channels may be synchronous, or asynchronous, buffered or unbuffered.</p>
+  <p class="zh">关于进程间共享信息有过许多模型。其中较为优美的是Hoare提出的<em>channels</em>模型。在这一模型中，不需要共享内存，因此读取共享内存引起的问题都可以避免。取而代之的是使用channel传递消息：一个进程通过一个channel向另一个进程发送消息，channels可以是同步的，也可以是异步的，可以是带缓冲的，也可以是不带缓冲的。</p>
 
-  <p>Go has channels as first order data types in the language. The canonical example of using channels is Erastophene's prime sieve: one goroutine generates integers from 2 upwards. These are pumped into a series of channels that act as sieves. Each filter is distinguished by a different prime, and it removes from its stream each number that is divisible by its prime. So the '2' goroutine filters out even numbers, while the '3' goroutine filters out multiples of 3. The first number that comes out of the current set of filters must be a new prime, and this is used to start a new filter with a new channel.</p>
+  <p class="en">Go has channels as first order data types in the language. The canonical example of using channels is Erastophene's prime sieve: one goroutine generates integers from 2 upwards. These are pumped into a series of channels that act as sieves. Each filter is distinguished by a different prime, and it removes from its stream each number that is divisible by its prime. So the '2' goroutine filters out even numbers, while the '3' goroutine filters out multiples of 3. The first number that comes out of the current set of filters must be a new prime, and this is used to start a new filter with a new channel.</p>
+  <p class="zh">Go内建channel作为第一等数据类型。一个使用channel的经典例子是Erastophene的素数筛选器：使用一个goroutine从2开始生成整数，将这些数字送入一系列作为过滤器的channel，每一个过滤器由一个不同的素数标识，它们把能被自身代表素数整除的数从流中删除，所以“2”goroutine过滤掉所有偶数，“3”goroutine过滤掉所有3的倍数。第一个从这一系列过滤器中走出来的必然是一个新的素数，然后再开启新的channel，用新素数生成一个新的过滤器，循环往复。</p>
 
-  <p>The efficacy of many thousands of goroutines communicating by many thousands of channels depends on how well the implementation of these primitives is done. Go is designed to optimise these, so this type of program is feasible.</p>
+  <p class="en">The efficacy of many thousands of goroutines communicating by many thousands of channels depends on how well the implementation of these primitives is done. Go is designed to optimise these, so this type of program is feasible.</p>
+  <p class="zh">无数goroutine之间通过大量channel通信的效率取决于原语设计的好坏。Go天生为此优化，所以这种程序是可行的</p>
 
-  <p>Go also supports distributed channels using the <code>netchan</code> package. But network communications are thousands of times slower than channel communications on a single computer. Running a sieve on a network over TCP would be ludicrously slow. Nevertheless, it gives a programming option that may be useful in many situations.</p>
+  <p class="en">Go also supports distributed channels using the <code>netchan</code> package. But network communications are thousands of times slower than channel communications on a single computer. Running a sieve on a network over TCP would be ludicrously slow. Nevertheless, it gives a programming option that may be useful in many situations.</p>
+  <p class="zh">Go也通过<code>netchan</code>包支持分布式channel。但是网络间channel通信的效率远比单一电脑上channel间通信的效率低。在网络上通过TCP协议运行一个筛选器更是慢的可怕。然而，这还是给程序员多了一个选择，而且这在某些情况下十分有用。</p>
 
-  <p>Go's network channel model is somewhat similar in concept to the RPC model: a server creates channels and registers them with the network channel API. A client does a lookup for channels on a server. At this point both sides have a shared channel over which they can communicate. Note that communication is one-way: if you want to send information both ways, open two channels one for each direction.</p>
+  <p class="en">Go's network channel model is somewhat similar in concept to the RPC model: a server creates channels and registers them with the network channel API. A client does a lookup for channels on a server. At this point both sides have a shared channel over which they can communicate. Note that communication is one-way: if you want to send information both ways, open two channels one for each direction.</p>
+  <p class="zh">Go的网络channel模型某种意义上和RPC模型类似：服务器创建channel然后用网络channel API注册它们，客户端在服务器上查询channel。这样服务器和客户端就有了一个可以相互通信的共享channel。注意这种通信是单向的，如果你想要双向发送信息，为每个方向单独创建一个channel。</p>
 
-  <h2 id="heading_id_5">Channel server</h2>
+  <h2 id="heading_id_5" class="en">Channel server</h2>
+  <h2 id="heading_id_5" class="zh">服务器端Channel</h2>
 
-  <p>In order to make a channel visible to clients, you need to <em>export</em> it. This is done by creating an exporter using <code>NewExporter</code> with no parameters. The server then calls <code>ListenAndServe</code> to lsiten and handle responses. This takes two parameters, the first being the underlying transport mechanism such as "tcp" and the second being the network listening address (usually just a port number.</p>
+  <p class="en">In order to make a channel visible to clients, you need to <em>export</em> it. This is done by creating an exporter using <code>NewExporter</code> with no parameters. The server then calls <code>ListenAndServe</code> to lsiten and handle responses. This takes two parameters, the first being the underlying transport mechanism such as "tcp" and the second being the network listening address (usually just a port number.</p>
+  <p class="zh">要让一个channel对客户端可见，你需要<em>导出</em>它。这可以通过不带参数<code>NewExporter</code>创建一个新的导出，之后服务器调用<code>ListenAndServe</code>监听、处理请求。<code>ListenAndServe</code>带有两个参数，第一个是底层的传输机制，比如“tcp”；第二个是监听地址（通常只是一个端口号）。</p>
 
-  <p>For each channel, the server creates a normal local channel and then calls <code>Export</code> to bind this to the network channel. At the time of export, the direction of communication must be specified. Clients search for channels by name, which is a string. This is specified to the exporter.</p>
+  <p class="en">For each channel, the server creates a normal local channel and then calls <code>Export</code> to bind this to the network channel. At the time of export, the direction of communication must be specified. Clients search for channels by name, which is a string. This is specified to the exporter.</p>
+  <p class="zh">对每个channel，服务器创建一个普通的本地channel，然后调用<code>Export</code>将它绑定到网络channel上。在导出的同时，必须指定通信的方向。客户端可以通过名字（一个字符串）搜寻channel。8888888888888888888888</p>
 
-  <p>The server then uses the local channels in the normal way, reading or writing on them. We illustrate with an "echo" server which reads lines and sends them back. It needs two channels for this. The channel that the client writes to we name "echo-out". On the server side this is a read channel. Similarly, the channel that the client reads from we call "echo-in", which is a write channel to the server.</p>
+  <p class="en">The server then uses the local channels in the normal way, reading or writing on them. We illustrate with an "echo" server which reads lines and sends them back. It needs two channels for this. The channel that the client writes to we name "echo-out". On the server side this is a read channel. Similarly, the channel that the client reads from we call "echo-in", which is a write channel to the server.</p>
+  <p class="zh">服务器之后可以像使用本地channel一样，读取或是写入数据。我们以一个“echo”服务器为例，它读入文本，再原样发送回去。它需要两个channel，我们把客户端用来写入数据的channel叫做“echo-out”，在服务器端，用它来读取数据。相似的，客户端用来读取数据的channel叫做“echo-in”，服务器往里写入数据。</p>
 
-  <p>The server program is</p>
+  <p class="en">The server program is</p>
+  <p class="zh">服务器程序如下</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* EchoServer
  */
@@ -129,12 +143,16 @@
 </span></code></pre>
 
   <p><em>Note: at the time of writing, the server will sometimes fail with an error message "netchan export: error encoding client response". This is logged as <a href="http://code.google.com/p/go/issues/detail?id=1805">Issue 1805</a></em></p>
+  <p><em>注意：在这篇教程写下的时候，服务器可能会收到“netchan export: error encoding client response”的错误消息，这个问题被登记为<a href="http://code.google.com/p/go/issues/detail?id=1805">Issue 1805。</a></em></p>
 
-  <h2 id="heading_id_6">Channel client</h2>
+  <h2 id="heading_id_6" class="en">Channel client</h2>
+  <h2 id="heading_id_6" class="zh">客户端Channel</h2>
 
-  <p>In order to find an exported channel, the client must <em>import</em> it. This is created using <code>Import</code> which takes a protocol and a network service address of "host:port". This is then used to import a network channel by name and bind it to a local channel. Note that channel variables are <em>references</em>, so you do not need to pass their addresses to functions that change them.</p>
+  <p class="en">In order to find an exported channel, the client must <em>import</em> it. This is created using <code>Import</code> which takes a protocol and a network service address of "host:port". This is then used to import a network channel by name and bind it to a local channel. Note that channel variables are <em>references</em>, so you do not need to pass their addresses to functions that change them.</p>
+  <p class="zh">为了找到导出的channel，客户端必须<em>导入</em>它。使用<code>Import</code>方法可以完成，它接受两个参数：协议名和形如“host:port”网络服务地址。之后就能通过名字导入，并绑定到本地channel上。注意，channel变量是<em>引用变量</em>，不用向改变他们的函数传递channel的地址。</p>
 
-  <p>The following client gets two channels to and from the echo server, and then writes and reads ten messages:</p>
+  <p class="en">The following client gets two channels to and from the echo server, and then writes and reads ten messages:</p>
+  <p class="zh">以下客户端使用两个channel向/从服务器发送、接受消息，然后写入并读取收到的十条信息。</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* EchoClient
  */
@@ -186,9 +204,11 @@
 }
 </span></code></pre>
 
-  <h2 id="heading_id_7">Handling Timeouts</h2>
+  <h2 id="heading_id_7" class="en">Handling Timeouts</h2>
+  <h2 id="heading_id_7" class="zh">处理超时</h2>
 
-  <p>Because these channels use the network, there is alwasy the possibility of network errors leading to timeouts. Andrew Gerrand points out a solution using <a href="http://blog.golang.org/2010/09/go-concurrency-patterns-timing-out-and.html">timeouts</a>: "[Set up a timeout channel.] We can then use a select statement to receive from either ch or timeout. If nothing arrives on ch after one second, the timeout case is selected and the attempt to read from ch is abandoned."</p>
+  <p class="en">Because these channels use the network, there is alwasy the possibility of network errors leading to timeouts. Andrew Gerrand points out a solution using <a href="http://blog.golang.org/2010/09/go-concurrency-patterns-timing-out-and.html">timeouts</a>: "[Set up a timeout channel.] We can then use a select statement to receive from either ch or timeout. If nothing arrives on ch after one second, the timeout case is selected and the attempt to read from ch is abandoned."</p>
+  <p class="zh">因为channel使用网络通信，存在因为网络错误导致超时的可能性。Andrew Gerrand提出了一个办法<a href="http://blog.golang.org/2010/09/go-concurrency-patterns-timing-out-and.html">timeouts</a>: "[Set up a timeout channel.]</p>我们可以使用select语句从ch或是timeout接受信息。如果超过1秒钟ch没有收到信息，timeout通道被选择，放弃从ch获取信息。
   <pre>
 <code>
 timeout := make(chan bool, 1)
@@ -198,7 +218,7 @@ go func() {
 }()
 
 select {
-case &amp;lt- ch:
+case &lt;- ch:
     // a read from ch has occurred
 case &lt;- timeout:
     // the read from ch has timed out
@@ -206,13 +226,16 @@ case &lt;- timeout:
 </code>
 </pre>
 
-  <h2 id="heading_id_8">Channels of channels</h2>
+  <h2 id="heading_id_8" class="en">Channels of channels</h2>
+  <h2 id="heading_id_8" class="zh">传递channel的channel</h2>
 
-  <p>The online Go tutorial at http://golang.org/doc/go_tutorial.html has an example of multiplexing, where channels of channels are used. The idea is that instread of sharing one channel, a new communicator is given their own channel to have a privagye conversation. That is, a client is sent a channel from a server through a shared channel, and uses that private channel.</p>
+  <p class="en">The online Go tutorial at http://golang.org/doc/go_tutorial.html has an example of multiplexing, where channels of channels are used. The idea is that instread of sharing one channel, a new communicator is given their own channel to have a privagye conversation. That is, a client is sent a channel from a server through a shared channel, and uses that private channel.</p>
+  <p class="zh">在线Go指导（http://golang.org/doc/go_tutorial.html）中展示了一个有点复杂的例子，其中使用了传递channel的channel。</p>
 
-  <p>This doesn't work directly with network channels: a channel cannot be sent over a network channel. So we have to be a little more indirect. Each time a client connects to a server, the server builds new network channels and exports them with new names. Then it sends the <em>names</em> of these new channels to the client which imports them. It uses these new channels for communicaiton.</p>
+  <p class="en">This doesn't work directly with network channels: a channel cannot be sent over a network channel. So we have to be a little more indirect. Each time a client connects to a server, the server builds new network channels and exports them with new names. Then it sends the <em>names</em> of these new channels to the client which imports them. It uses these new channels for communicaiton.</p>
 
-  <p>A server is</p>
+  <p class="en">A server is</p>
+  <p class="zh">服务器代码如下</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* EchoChanServer
  */
@@ -272,7 +295,8 @@ case &lt;- timeout:
 }
 </span></code></pre>
 
-  <p>and a client is</p>
+  <p class="en">and a client is</p>
+  <p class="zh">客户端代码如下</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* EchoChanClient
  */
@@ -325,14 +349,19 @@ case &lt;- timeout:
 }
 </span></code></pre>
 
-  <h2 id="heading_id_9">Conclusion</h2>
+  <h2 id="heading_id_9" class="en">Conclusion</h2>
+  <h2 id="heading_id_9" class="zh">总结</h2>
 
-  <p>Network channels are a distributed analogue of local channels. They behave approximately the same, but due to limitations of the model some things have to be done a little differently.</p>
+  <p class="en">Network channels are a distributed analogue of local channels. They behave approximately the same, but due to limitations of the model some things have to be done a little differently.</p>
+  <p class="zh">网络channel是本地channel的分布式模拟。它们表现的近乎相同，但是由于模型的限制，存在一些不同。</p>
 
-  <p>Copyright Jan Newmarch, jan@newmarch.name</p>
+  <p class="en">Copyright Jan Newmarch, jan@newmarch.name</p>
+  <p class="zh">版权所有 Jan Newmarch, jan@newmarch.name</p>
 
-  <p>If you like this book, please contribute using Flattr <a class="FlattrButton sgc-7" href="http://jan.newmarch.name/go/index.html"></a><br />
+  <p class="en">If you like this book, please contribute using Flattr <a class="FlattrButton sgc-7" href="http://jan.newmarch.name/go/index.html"></a><br />
   or donate using PayPal</p>
+  <p class="en">如果你喜欢这本书，请通过Flattr支持 <a class="FlattrButton sgc-7" href="http://jan.newmarch.name/go/index.html"></a><br />
+  或是使用Paypal捐助，</p>
 
   <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
     <input name="cmd" type="hidden" value="_s-xclick" /> <input name="encrypted" type="hidden" value="-----BEGIN PKCS7-----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-----END PKCS7----- " /> <input alt="PayPal - The safer, easier way to pay online." border="0" name="submit" src="https://www.paypalobjects.com/WEBSCR-640-20110401-1/en_AU/i/btn/btn_donateCC_LG.gif" type="image" /> <img alt="" border="0" height="1" src="https://www.paypalobjects.com/WEBSCR-640-20110401-1/en_AU/i/scr/pixel.gif" width="1" />
