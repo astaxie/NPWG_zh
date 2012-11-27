@@ -36,35 +36,35 @@ Errata
 
 ## Chapter 1 Architecture
 
-   L51, C76: sytems -> systems
-   L58, C30: highl evel -> high level
- ? L84, C37: independance -> independence
-   L91, C191: succesful -> successful
-   L108, C6: Thre -> There
- ? L114, C310: organisation -> organization
- ? L114, C343: organisation -> organization
- ? L118, C159: organisation -> organization
-   L116, C194: Are -> Area
-   L116, C228: Are -> Area
- ? L120, C341: compatable -> compatible
-   L122, C245: smorgasborg -> smorgasbord
- ? L156, C52: independant -> independent
-   L188, C276: similarlym -> similarly
-   L230, C174: thir -> their
-   L232, C60: stroing -> storing
-   L236, C47: applicaitons -> applications
-   L236, C139: sysem -> system
-   L246, C141: usuall -> usually
-   L252, C53: acess -> access
-   L254, C30: scuh -> such
-   L288, C68: laelled -> labelled
-   L288, C108: diplay -> display
- ? L373, C47: incompatable -> incompatible
- ? L448, C204: recognise -> recognize
+	   L51, C76: sytems -> systems
+	   L58, C30: highl evel -> high level
+	 ? L84, C37: independance -> independence
+	   L91, C191: succesful -> successful
+	   L108, C6: Thre -> There
+	 ? L114, C310: organisation -> organization
+	 ? L114, C343: organisation -> organization
+	 ? L118, C159: organisation -> organization
+	   L116, C194: Are -> Area
+	   L116, C228: Are -> Area
+	 ? L120, C341: compatable -> compatible
+	   L122, C245: smorgasborg -> smorgasbord
+	 ? L156, C52: independant -> independent
+	   L188, C276: similarlym -> similarly
+	   L230, C174: thir -> their
+	   L232, C60: stroing -> storing
+	   L236, C47: applicaitons -> applications
+	   L236, C139: sysem -> system
+	   L246, C141: usuall -> usually
+	   L252, C53: acess -> access
+	   L254, C30: scuh -> such
+	   L288, C68: laelled -> labelled
+	   L288, C108: diplay -> display
+	 ? L373, C47: incompatable -> incompatible
+	 ? L448, C204: recognise -> recognize
 
 ## Chapter 2 Overview of the Go language
 
-   None
+	   None
 
 ## Chapter 3 Socket-level Programming
 
