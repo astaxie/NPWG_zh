@@ -545,7 +545,7 @@ func (c *TCPConn) Read(b []byte) (n int, err os.Error)
   <h3 id="heading_id_20" class="zh">TCP客户端</h3>
 
   <p class="en">Once a client has established a TCP address for a service, it "dials" the service. If succesful, the dial returns a <code>TCPConn</code> for communication. The client and the server exchange messages on this. Typically a client writes a request to the server using the <code>TCPConn</code>, and reads a response from the <code>TCPConn</code>. This continues until either (or both) sides close the connection. A TCP connection is established by the client using the function</p>
-  <p class="zh">一旦客户端已经建立TCP服务, 就会尝试请求此服务. 如果成功，该调用返回一个用于通信的<code>TCPConn</code>。客户端和服务器通过它交换消息。通常情况下，客户端使用<code>TCPConn</code>写入请求到服务器, 并从<code>TCPConn</code>的读取响应。持续这样，直到任一（或两者）的两侧关闭连接。客户端使用该函数建立一个TCP连接。</p>
+  <p class="zh">一旦客户端已经建立TCP服务, 就可以和对方设备"通话"了. 如果成功，该调用返回一个用于通信的<code>TCPConn</code>。客户端和服务器通过它交换消息。通常情况下，客户端使用<code>TCPConn</code>写入请求到服务器, 并从<code>TCPConn</code>的读取响应。持续这样，直到任一（或两者）的两侧关闭连接。客户端使用该函数建立一个TCP连接。</p>
   <pre><code>
 func DialTCP(net string, laddr, raddr *TCPAddr) (c *TCPConn, err os.Error)
     </code></pre>
