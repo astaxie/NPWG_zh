@@ -433,26 +433,34 @@ func LookupHost(name string) (cname string, addrs []string, err os.Error)
   <p class="en">Note that this function returns strings, not <code>IPAddress</code> values.</p>
   <p class="zh">注意，这个函数返回字符串，而不是<code>IPAddress</code>。</p>
 
-  <h2 id="heading_id_16">Services</h2>
+  <h2 id="heading_id_16" class="en">Services</h2>
+  <h2 id="heading_id_16" class="zh">服务</h2>
 
-  <p>Services run on host machines. They are typically long lived and are designed to wait for requests and respond to them. There are many types of services, and there are many ways in which they can offer their services to clients. The internet world bases many of these services on two methods of communication, TCP and UDP, although there are other communication protocols such as SCTP waiting in the wings to take over. Many other types of service, such as peer-to-peer, remote procedure calls, communicating agents, and many others are built on top of TCP and UDP.</p>
+  <p class="en">Services run on host machines. They are typically long lived and are designed to wait for requests and respond to them. There are many types of services, and there are many ways in which they can offer their services to clients. The internet world bases many of these services on two methods of communication, TCP and UDP, although there are other communication protocols such as SCTP waiting in the wings to take over. Many other types of service, such as peer-to-peer, remote procedure calls, communicating agents, and many others are built on top of TCP and UDP.</p>
+  <p class="zh">服务运行在主机。它们通常长期存活目的是等待的请求和响应。有许多类型的服务，有很多途径使他们能够向客户提供服务。互联网的世界基于TCP和UDP这两种通信方法提供许多这些服务，虽然也有其他通信协议如SCTP​​伺机取代。许多其他类型的服务，例如点对点, 远过程调用, 通信代理, 和许多其他建立在TCP和UDP之上的服务。</p>
 
-  <h3 id="heading_id_17">Ports</h3>
+  <h3 id="heading_id_17" class="en">Ports</h3>
+  <h3 id="heading_id_17" class="zh">端口</h3>
 
-  <p>Services live on host machines. The IP address will locate the host. But on each computer may be many services, and a simple way is needed to distinguish between them. The method used by TCP, UDP, SCTP and others is to use a <em>port number</em>. This is an unsigned integer beween 1 and 65,535 and each service will associate itself with one or more of these port numbers.</p>
+  <p class="en">Services live on host machines. The IP address will locate the host. But on each computer may be many services, and a simple way is needed to distinguish between them. The method used by TCP, UDP, SCTP and others is to use a <em>port number</em>. This is an unsigned integer beween 1 and 65,535 and each service will associate itself with one or more of these port numbers.</p>
+  <p class="zh">服务存活于主机内。IP地址可以定位主机。但在每台计算机上可能会提供多种服务，需要一个简单的方法对它们加以区分。TCP，UDP，SCTP或者其他协议使用<em>端口号</em>来加以区分。这里使用一个1到65,535的无符号整数，每个服务将这些端口号中的一个或多个相关联。</p>
 
-  <p>There are many "standard" ports. Telnet usually uses port 23 with the TCP protocol. DNS uses port 53, either with TCP or with UDP. FTP uses ports 21 and 20, one for commands, the other for data transfer. HTTP usually uses port 80, but it often uses ports 8000, 8080 and 8088, all with TCP. The X Window System often takes ports 6000-6007, both on TCP and UDP.</p>
+  <p class="en">There are many "standard" ports. Telnet usually uses port 23 with the TCP protocol. DNS uses port 53, either with TCP or with UDP. FTP uses ports 21 and 20, one for commands, the other for data transfer. HTTP usually uses port 80, but it often uses ports 8000, 8080 and 8088, all with TCP. The X Window System often takes ports 6000-6007, both on TCP and UDP.</p>
+  <p class="zh">有很多“标准”的端口。Telnet服务通常使用端口号23的TCP协议。DNS使用端口号53的TCP或UDP协议。FTP使用端口21和20的命令，进行数据传输。HTTP通常使用端口80，但经常使用，端口8000，8080和8088，协议为TCP。X Window系统往往需要端口6000-6007，TCP和UDP协议。</p>
 
-  <p>On a Unix system, the commonly used ports are listed in the file <code>/etc/services</code>. Go has a function to interrogate this file</p>
+  <p class="en">On a Unix system, the commonly used ports are listed in the file <code>/etc/services</code>. Go has a function to interrogate this file</p>
+  <p class="zh">在Unix系统中, <code>/etc/services</code>文件列出了常用的端口。Go语言有一个函数可以获取该文件。</p>
   <pre>
     <code>
 func LookupPort(network, service string) (port int, err os.Error)
     </code>
   </pre>
 
-  <p>The network argument is a string such as "tcp" or "udp", while the service is a string such as "telnet" or "domain" (for DNS).</p>
+  <p class="en">The network argument is a string such as "tcp" or "udp", while the service is a string such as "telnet" or "domain" (for DNS).</p>
+  <p class="zh">network是一个字符串例如"tcp"或"udp", service也是一个字符串，如"telnet"或"domain"(DNS)。</p>
 
-  <p>A program using this is</p>
+  <p class="en">A program using this is</p>
+  <p class="zh">示例程序如下</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* LookupPort
  */
@@ -486,11 +494,14 @@ func LookupPort(network, service string) (port int, err os.Error)
 }
 </span></code></pre>
 
-  <p>For example, running <code>LookupPort tcp telnet</code> prints <code>Service port: 23</code></p>
+  <p class="en">For example, running <code>LookupPort tcp telnet</code> prints <code>Service port: 23</code></p>
+  <p class="zh">如例子所示, 运行<code>LookupPort tcp telnet</code> 打印 <code>Service port: 23</code></p>
 
-  <h3 id="heading_id_18">The type TCPAddr</h3>
+  <h3 id="heading_id_18" class="en">The type TCPAddr</h3>
+  <h3 id="heading_id_18" class="zh">TCPAddr类型</h3>
 
-  <p>The type <code>TCPAddr</code> is a structure containing an <code>IP</code> and a <code>port</code>:</p>
+  <p class="en">The type <code>TCPAddr</code> is a structure containing an <code>IP</code> and a <code>port</code>:</p>
+  <p class="zh"><code>TCPAddr</code>类型包含一个<code>IP</code>和一个<code>port</code>的结构:</p>
   <pre>
     <code>
 type TCPAddr struct {
@@ -500,16 +511,19 @@ type TCPAddr struct {
     </code>
   </pre>
 
-  <p>The function to create a <code>TCPAddr</code> is <code>ResolveTCPAddr</code></p>
+  <p class="en">The function to create a <code>TCPAddr</code> is <code>ResolveTCPAddr</code></p>
+  <p class="zh">函数<code>ResolveTCPAddr</code>用来创建一个<code>TCPAddr</code></p>
   <pre>
     <code>
 func ResolveTCPAddr(net, addr string) (*TCPAddr, os.Error)
     </code>
   </pre>
 
-  <p>where <code>net</code> is one of "tcp", "tcp4" or "tcp6" and the <code>addr</code> is a string composed of a host name or IP address, followed by the port number after a ":", such as "www.google.com:80" or '127.0.0.1:22". if the address is an IPv6 address, which already has colons in it, then the host part must be enclosed in square brackets, such as "[::1]:23". Another special case is often used for servers, where the host address is zero, so that the TCP address is really just the port name, as in ":80" for an HTTP server.</p>
+  <p class="en">where <code>net</code> is one of "tcp", "tcp4" or "tcp6" and the <code>addr</code> is a string composed of a host name or IP address, followed by the port number after a ":", such as "www.google.com:80" or '127.0.0.1:22". if the address is an IPv6 address, which already has colons in it, then the host part must be enclosed in square brackets, such as "[::1]:23". Another special case is often used for servers, where the host address is zero, so that the TCP address is really just the port name, as in ":80" for an HTTP server.</p>
+  <p class="zh"><code>net</code>是"tcp", "tcp4"或"tcp6"其中之一，<code>addr</code>是一个字符串，由主机名或IP地址，以及":"后跟随着端口号组成，例如： "www.google.com:80" 或 '127.0.0.1:22"。如果地址是一个IPv6地址，由于已经有冒号，主机部分，必须放在方括号内, 例如："[::1]:23". 另一种特殊情况是经常用于服务器, 主机地址为0, 因此，TCP地址实际上就是端口名称, 例如：":80" 用来表示HTTP服务器。</p>
 
-  <h2 id="heading_id_19">TCP Sockets</h2>
+  <h2 id="heading_id_19" class="en">TCP Sockets</h2>
+  <h2 id="heading_id_19" class="zh">TCP套接字</h2>
 
   <p>When you know how to reach a service via its network and port IDs, what then? If you are a client you need an API that will allow you to connect to a service and then to send messages to that service and read replies back from the service.</p>
 
