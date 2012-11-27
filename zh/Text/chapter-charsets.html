@@ -609,45 +609,46 @@ Byte length 27
 
   <p class="en">Possibly surprisingly, you need do nothing special to handle UTF-8 text in either the client or the server. The underlying data type for a UTF-8 string in Go is a byte array, and as we saw just above, Go looks after encoding the string into 1, 2, 3 or 4 bytes as needed. The length of the string is the length of the byte array, so you write any UTF-8 string by writing the byte array.</p>
 
-  <p class="zh">可能令人惊讶的是，你需要什么都不做特殊处理UTF - 8文本无论是客户端或服务器。基本数据类型为UTF - 8字符串是一个字节数组，当我们看到上面去看一看，编码后的字符串为1，2，3或4个字节需要。字符串的长度是长度的字节数组，所以你写任何UTF - 8字符串写字节数组。</p>
+  <p class="zh">可能令人惊讶的是，无论是客户端或服务器你不需要对utf-8的文本做任何特殊的处理。UTF-8字符串的长度就是一个字节数组，如上所示。Go语言自动处理编码后的字符串是1，2，3或4个字节。所以utf-8的字符串你可以随便写。</p>
 
 
 
   <p class="en">Similarly to read a string, you just read into a byte array and then cast the array to a string using <code>string([]byte)</code>. If Go cannot properly decode bytes into Unicode characters, then it gives the Unicode Replacement Character \uFFFD. The length of the resulting byte array is the length of the legal portion of the string.</p>
 
-  <p class="zh"></p>
+  <p class="zh">类似于读取字符串，只要读入一个字节数组，然后使用<code>string([]byte)</code>将数组转换成一个字符串。如果Go语言不能正确解码，将字节转换为Unicode字符，那么它给使用Unicode替换字符\uFFFD。生成的字节数组的长度是有效字符串的长度。</p>
 
 
 
   <p class="en">So the clients and servers given in earlier chapters work perfectly well with UTF-8 encoded text.</p>
 
-  <p class="zh"></p>
+  <p class="zh">所以前面章节中提到的客户端和服务端使用uft-8编码会表现的比较好</p>
 
 
 
-  <h3 id="heading_id_15">ASCII client and server</h3>
-
+  <h3 id="heading_id_15" class="en">ASCII client and server</h3>
+  <h3 id="heading_id_15" class="zh">ASCII 编码的客户端和服务器</h3>
 
 
   <p class="en">The ASCII characters have the same encoding in ASCII and in UTF-8. So ordinary UTF-8 character handling works fine for ASCII characters. No special handling need to be done.</p>
 
-  <p class="zh"></p>
+  <p class="zh">ASCII字符的ASCII编码和UTF-8编码的值相同，所以普通的UTF-8字符能正常处理ASCII字符，不需要做任何特殊的处理。</p>
 
 
 
   <h2 id="heading_id_16" class="en">UTF-16 and Go</h2>
 
+  <h2 id="heading_id_16" class="zh">Go语言和utf-16</h2>
 
 
   <p class="en">UTF-16 deals with arrays of short 16-bit unsigned integers. The package <code>utf16</code> is designed to manage such arrays. To convert a normal Go string, that is a UTF-8 string, into UTF-16, you first extract the code points by coercing it into a <code>[]rune</code> and then use <code>utf16.Encode</code> to produce an array of type <code>uint16</code>.</p>
 
-  <p class="zh"></p>
+  <p class="zh">utf-16可以用16位字节无符号整形数处理。 <code>utf16</code> 包就是用来处理这样的字串的。将一个Go语言的utf-8正常编码的字串转换utf-16的编码，你应先将字串转换成<code>[]rune</code>rune数组，然后使用 <code>utf16.Encode</code> 生成一个 <code>uint16</code>类型的数组。</p>
 
 
 
   <p class="en">Similarly, to decode an array of unsigned short UTF-16 values into a Go string, you use <code>utf16.Decode</code> to convert it into code points as type <code>[]rune</code> and then to a string. The following code fragment illustrates this</p>
 
-  <p class="zh"></p>
+  <p class="zh">同样，解码utf-16字串成一个Go字符串，你需要<code>utf16.Decode</code>将编码转换成<code>[]rune</code> ，然后才能改成一个字符串。如下面的代码所示：</p>
 
   <pre><code>
 
@@ -669,11 +670,12 @@ str = string(ints)
 
   <p class="en">These type conversions need to be applied by clients or servers as appropriate, to read and write 16-bit short integers, as shown below.</p>
 
-  <p class="zh"></p>
+  <p class="zh">类型的转换需要客户端和服务器在合适的时机读取和写入16位的整数，如下图所示。（……图呢？）</p>
 
 
 
-  <h3 id="heading_id_17">Little-endian and big-endian</h3>
+  <h3 id="heading_id_17" class="en">Little-endian and big-endian</h3>
+   <h3 id="heading_id_17" class="zh">Little-endian and big-endian</h3>
 
 
 
