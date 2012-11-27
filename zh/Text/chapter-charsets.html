@@ -681,13 +681,13 @@ str = string(ints)
 
   <p class="en">Unfortunately, there is a little devil lurking behind UTF-16. It is basically an encoding of characters into 16-bit short integers. The big question is: for each short, how is it written as two bytes? The top one first, or the top one second? Either way is fine, as long as the receiver uses the same convention as the sender.</p>
 
-  <p class="zh"></p>
+  <p class="zh">然而，UTF-16编码潜藏着一个小的恶魔。它基本上是一个16字节字符编码。最大的问题是：每一个短字，是如何拼写的？高位在前还是高位在后？无论哪种方式，只要是发生器和接收器约定好就可以。</p>
 
 
 
   <p class="en">Unicode has addressed this with a special character known as the BOM (byte order marker). This is a zero-width non-printing character, so you never see it in text. But its value 0xfffe is chosen so that you can tell the byte-order:</p>
 
-  <p class="zh"></p>
+  <p class="zh">Unicode通过一个特殊字节标记了寻址方式，这个字节就被称为BOM（字节顺序标记）。这是一个零宽度非打印字符，所以你永远不会在文本中看到它。但是它通过0xFFFE的值，可以告诉你编码的顺序</p>
 
 
 
@@ -700,22 +700,30 @@ str = string(ints)
     <li>In a little-endian system it is FE FF</li>
 
   </ul>
+<ul class="zh">
 
+    <li>在big-endian 系统中，它是FF FE</li>
+
+
+
+    <li>在little-endian 系统中，它是FE FF</li>
+
+  </ul>
 
 
   <p class="en">Text will sometimes place the BOM as the first character in the text. The reader can then examine these two bytes to determine what endian-ness has been used.</p>
 
-  <p class="zh"></p>
+  <p class="zh">有时BOM会位于文本的第一个字符。文本被读入是可以检查，以确定使用的是那种系统。</p>
 
 
 
-  <h3 id="heading_id_18">UTF-16 client and server</h3>
-
+  <h3 id="heading_id_18" class="en">UTF-16 client and server</h3>
+  <h3 id="heading_id_18" class="zh">UTF-16 编码的客户端和服务器</h3>
 
 
   <p class="en">Using the BOM convention, we can write a server that prepends a BOM and writes a string in UTF-16 as</p>
 
-  <p class="zh"></p>
+  <p class="zh">根据BOM的约定，服务器可以预先设置BOM来表示utf-16,如下</p>
 
   <pre><code><span class="sgc-7">
 
@@ -853,7 +861,7 @@ const <span class="sgc-4">BOM</span> = '\ufffe'
 
   <p class="en">while a client that reads a byte stream, extracts and examines the BOM and then decodes the rest of the stream is</p>
 
-  <p class="zh"></p>
+  <p class="zh">同时客户端读取一个字节流，提取并检查BOM，然后解码该流的其余部分的。</p>
 
   <pre><code><span class="sgc-7">
 
@@ -1013,41 +1021,42 @@ const <span class="sgc-4">BOM</span> = '\ufffe'
 
   <p class="en">This book is not about i18n issues. In particular we don't want to delve into the arcane areas of Unicode. But you should know that Unicode is not a simple encoding and there are many complexities. For example, some earlier character sets used <em>non-spacing</em> characters, particularly for accents. This was brought into Unicode, so you can produce accented characters in two ways: as a single Unicode character, or as a pair of non-spacing accent plus non-accented character. For example, U+04D6 CYRILLIC CAPITAL LETTER IE WITH BREVE is a single character. It is equivalent to U+0415 CYRILLIC CAPITAL LETTER IE combined with the breve accent U+0306 COMBINING BREVE. This makes string comparison difficult on occassions. The Go specification does not at present address such issues.</p>
 
-  <p class="zh"></p>
+  <p class="zh">这本书不是有关国际化问题。特别是，我们不想钻研的神秘的Unicode。但是你应该知道，Unicode不是一个简单的编码，也有很多的复杂的地方。例如，一些早期的字符集用<em>非空格字符</em>，尤其是重音字符。这些重音字符要转换成Unicode可以用两种办法：作为一个Unicode字符，或作为一个非空格字符和非重音字符的组合。例如， U+04D6 CYRILLIC CAPITAL LETTER IE WITH BREVE 是一个字符。这是相当于 U+0415 CYRILLIC CAPITAL LETTER IE和U+0306加上BREVE.。这使得字符串比较有时变得困难了。 GO规范确目前没有对这个问题过深研究。</p>
 
 
 
   <h2 id="heading_id_20" class="en">ISO 8859 and Go</h2>
-
+  <h2 id="heading_id_20" class="zh">ISO 8859 编码和Go语言</h2>
 
 
   <p class="en">The ISO 8859 series are 8-bit character sets for different parts of Europe and some other areas. They all have the ASCII set common in the low part, but differ in the top part. According to Google, ISO 8859 codes account for about 20% of the web pages it sees.</p>
 
-  <p class="zh"></p>
+  <p class="zh">ISO 8859系列字符集都是8位字符集，他们为欧洲不同地区和其他一些地方设计。他们有相同的ASCII并且都在地位，但高位不同。据谷歌估计，ISO 8859编码了尽20%的网页。</p>
 
 
 
   <p class="en">The first code, ISO 8859-1 or Latin-1, has the first 256 characters in common with Unicode. The encoded value of the Latin-1 characters is the same in UTF-16 and in the default ISO 8859-1 encoding. But this doesn't really help much, as UTF-16 is a 16-bit encoding and ISO 8859-1 is an 8-bit encoding. UTF-8 is a 8-bit encoding, but it uses the top bit to signal extra bytes, so only the ASCII subset overlaps for UTF-8 and ISO 8859-1. So UTF-8 doesn't help much either.</p>
 
-  <p class="zh"></p>
+  <p class="zh">第一个编码字符集，ISO 8859-1或叫做Latin-1，前256个字符和Unicode相同。 Latin-1字符的utf-16和ISO 8859-1有相同的编码。但是，这并不真的有用，因为UTF-16是一个16位的编码字符集而ISO 8859-1是8位编码。 UTF-8是一种8位编码，但是高位用来表示更多的字符，所以只有ASCII的一部分是utf-8和ISO 8859-1相同，所以UTF-8并没有多大实际用途（都是8位的）。
+</p>
 
 
 
   <p class="en">But the ISO 8859 series don't have any complex issues. To each character in each set corresponds a unique Unicode character. For example, in ISO 8859-2, the character "latin capital letter I with ogonek" has ISO 8859-2 code point 0xc7 (in hexadecimal) and corresponding Unicode code point of U+012E. Transforming either way between an ISO 8859 set and the corresponding Unicode characters is essentially just a table lookup.</p>
 
-  <p class="zh"></p>
+  <p class="zh">但ISO8859系列没有任何复杂的问题。每一组中的每个字符对应一个唯一的Unicode字符。例如，在ISO 8859-2中的字符“latin capital letter I with ogonek”在ISO 8859-2是0xc7（十六进制），对应的Unicode的U+012E。 ISO 8859字符集和Unicode字符集之间转换其实只是一个表查找。</p>
 
 
 
   <p class="en">The table from ISO 8859 code points to Unicode code points could be done as an array of 256 integers. But many of these will have the same value as the index. So we just use a map of the different ones, and those not in the map take the index value.</p>
 
-  <p class="zh"></p>
+  <p class="zh">这个从 ISO 8859到Unicode的查找表，可以用一个256的数组完成。因为，许多字符索引相同。因此，我们只需要一个标注不同索引的映射就可以。</p>
 
 
 
   <p class="en">For ISO 8859-2 a portion of the map is</p>
 
-  <p class="zh"></p>
+  <p class="zh"> ISO 8859-2的映射为</p>
 
   <pre><code>
 
@@ -1069,7 +1078,7 @@ var unicodeToISOMap = map[int] uint8 {
 
   <p class="en">and a function to convert UTF-8 strings to an array of ISO 8859-2 bytes is</p>
 
-  <p class="zh"></p>
+  <p class="zh">从utf-8转换成 ISO 8859-2的函数</p>
 
   <pre><code>
 
@@ -1119,7 +1128,7 @@ func unicodeStrToISO(str string) []byte {
 
   <p class="en">In a similar way you cacn change an array of ISO 8859-2 bytes into a UTF-8 string:</p>
 
-  <p class="zh"></p>
+  <p class="zh">同样你可以将ISO 8859-2转换为utf-8</p>
 
   <pre><code>
 
@@ -1165,23 +1174,23 @@ func isoBytesToUnicode(bytes []byte) string {
 
   <p class="en">These functions can be used to read and write UTF-8 strings as ISO 8859-2 bytes. By changing the mapping table, you can cover the other ISO 8859 codes. Latin-1, or ISO 8859-1, is a special case - the exception map is empty as the code points for Latin-1 are the same in Unicode. You could also use the same technique for other character sets based on a table mapping, such as Windows 1252.</p>
 
-  <p class="zh"></p>
+  <p class="zh">这些函数可以用来将ISO 8859-2当作UTF-8来读写。通过改变映射表，可以覆盖其他的ISO 8859字符集合。Latin-1字符集（ISO 8859-1）是一个特殊的情况：地图映射为空，因为字符在Latin-1和Unicode中编码相同。同样的方法，你也可以使用其他字符集构建映射表，如Windows1252。</p>
 
 
 
   <h2 id="heading_id_21" class="en">Other character sets and Go</h2>
-
+  <h2 id="heading_id_21" class="zh">其他字符集和Go语言</h2>
 
 
   <p class="en">There are very, very many character set encodings. According to Google, these generally only have a small use, which will hopefully decrease even further in time. But if your software wants to capture all markets, then you may need to handle them.</p>
 
-  <p class="zh"></p>
+  <p class="zh">还有非常非常多的字符集编码。据谷歌称，这些字符集通常只有很少地方使用，所以可能用的会更少。但是，如果你的软件要占据所有市场，那么你可能需要对这些字符集进行处理。</p>
 
 
 
   <p class="en">In the simplest cases, a lookup table will suffice. But that doesn't always work. The character coding ISO 2022 minimised character set sizes by using a finite state machine to swap code pages in and out. This was borrowed by some of the Japanese encodings, and makes things very complex.</p>
 
-  <p class="zh"></p>
+  <p class="zh">在最简单的情况下，查找表就够了。但是，这样也不是总是奏效。ISO 2022字符编码方案通过……。这是从日本某写编码中借用来个，相当复杂。</p>
 
 
 
