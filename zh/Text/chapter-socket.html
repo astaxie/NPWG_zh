@@ -627,9 +627,9 @@ GetHeadInfo www.google.com:80
 }
 </span></code></pre>
 
-  <p>The first point to note is the almost excessive amount of error checking that is going on. This is normal for networking programs: the opportunities for failure are substantially greater than for standalone programs. Hardware may fail on the client, the server, or on any of the routers and switches in the middle; communication may be blocked by a firewall; timeouts may occur due to network load; the server may crash while the client is talking to it. The following checks are performed:</p>
-
-  <ol>
+  <p class="en">The first point to note is the almost excessive amount of error checking that is going on. This is normal for networking programs: the opportunities for failure are substantially greater than for standalone programs. Hardware may fail on the client, the server, or on any of the routers and switches in the middle; communication may be blocked by a firewall; timeouts may occur due to network load; the server may crash while the client is talking to it. The following checks are performed:</p>
+  <p class="zh">第一个要注意的点是几乎过量的错误检查是怎么回事。这是正常的网络程序：失败的机会大大超过单独的程序。在客户端，服务器端或任何路由和中间交换上，硬件可能失败；通信可能会被防火墙阻塞;因网络负载可能会出现超时;当客户端联系服务器，服务器可能会崩溃。进行下列检查：</p>
+  <ol class="en">
     <li>There may be syntax errors in the address specified</li>
 
     <li>The attempt to connect to the remote service may fail. For example, the service requested might not be running, or there may be no such host connected to the network</li>
@@ -638,28 +638,46 @@ GetHeadInfo www.google.com:80
 
     <li>Similarly, the reads might fail</li>
   </ol>
+  <ol class="zh">
+    <li>指定的地址中可能存在语法错误</li>
 
-  <p>Reading from the server requires a comment. In this case, we read essentially a single response from the server. This will be terminated by end-of-file on the connection. However, it may consist of several TCP packets, so we need to keep reading till the end of file. The <code>io/ioutil</code> function <code>ReadAll</code> will look after these issues and return the complete response. (Thanks to Roger Peppe on the golang-nuts mailing list.).</p>
+    <li>尝试连接到远程服务可能会失败。例如, 所请求的服务可能没有运行, 或者有可能是主机没有连接到网络</li>
 
-  <p>There are some language issues involved. First, most of the functions return a dual value, with possible error as second value. If no error occurs, then this will be <code>nil</code>. In C, the same behaviour is gained by special values such as <code>NULL</code>, or -1, or zero being returned - if that is possible. In Java, the same error checking is managed by throwing and catching exceptions, which can make the code look very messy.</p>
+    <li>虽然连接已经建立，如果连接突然丢失也可能导致写失败，或网络超时</li>
 
-  <p>In earlier versions of this program, I returned the result in the array <code>buf</code>, which is of type <code>[512]byte</code>. Attempts to coerce this to a string failed - only byte arrays of type <code>[]byte</code> can be coerced. This is a bit of a nuisance.</p>
+    <li>同样，读操作也可能会失败</li>
+  </ol>
 
-  <h3 id="heading_id_21">A Daytime server</h3>
+  <p class="en">Reading from the server requires a comment. In this case, we read essentially a single response from the server. This will be terminated by end-of-file on the connection. However, it may consist of several TCP packets, so we need to keep reading till the end of file. The <code>io/ioutil</code> function <code>ReadAll</code> will look after these issues and return the complete response. (Thanks to Roger Peppe on the golang-nuts mailing list.).</p>
+  <p class="zh">值得一提的是,如何从服务端读取数据，在这种情况下，读本质上是一个单一的来自服务器的响应，这将终止文件结束的连接。但是，它可能包括多个TCP数据包，所以我们需要不断地读，直到文件的末尾。在<code>io/ioutil</code>下的<code>ReadAll</code>函数考虑这些问题，并返回完整响应。(感谢Roger Peppe在golang-nuts上的邮件列表。)。</p>
 
-  <p>About the simplest service that we can build is the daytime service. This is a standard Internet service, defined by RFC 867, with a default port of 13, on both TCP and UDP. Unfortunately, with the (justified) increase in paranoia over security, hardly any sites run a daytime server any more. Never mind, we can build our own. (For those interested, if you install <code>inetd</code> on your system, you usually get a daytime server thrown in.)</p>
+  <p class="en">There are some language issues involved. First, most of the functions return a dual value, with possible error as second value. If no error occurs, then this will be <code>nil</code>. In C, the same behaviour is gained by special values such as <code>NULL</code>, or -1, or zero being returned - if that is possible. In Java, the same error checking is managed by throwing and catching exceptions, which can make the code look very messy.</p>
+  <p class="zh">有一些涉及语言的问题，首先, 大多数函数返回两个值, 第二个值是可能出现的错误。如果没有错误发生, 那么它的值为<code>nil</code>。在C中, 如果需要的话，同样的行为通过定义特殊值例如<code>NULL</code>, 或 -1, 或0来返回。在Java中, 同样的错误检查通过抛出和捕获异常来管理，它会使代码看起来很凌乱。</p>
 
-  <p>A server registers itself on a port, and listens on that port. Then it blocks on an "accept" operation, waiting for clients to connect. When a client connects, the accept call returns, with a connection object. The daytime service is very simple and just writes the current time to the client, closes the connection, and resumes waiting for the next client.</p>
+  <p class="en">In earlier versions of this program, I returned the result in the array <code>buf</code>, which is of type <code>[512]byte</code>. Attempts to coerce this to a string failed - only byte arrays of type <code>[]byte</code> can be coerced. This is a bit of a nuisance.</p>
+  <p class="zh">在这个程序的早期版本, 我在返回结果中返回<code>buf</code>数组, 它的类型是<code>[512]byte</code>。我试图强迫类型为一个字符串但失败 - 只有字节数组类型<code>[]byte</code>可以强制转换。这确实有点困扰。</p>
 
-  <p>The relevant calls are</p>
+  <h3 id="heading_id_21" class="en">A Daytime server</h3>
+  <h3 id="heading_id_21" class="zh">一个时间(Daytime)服务器</h3>
+
+  <p class="en">About the simplest service that we can build is the daytime service. This is a standard Internet service, defined by RFC 867, with a default port of 13, on both TCP and UDP. Unfortunately, with the (justified) increase in paranoia over security, hardly any sites run a daytime server any more. Never mind, we can build our own. (For those interested, if you install <code>inetd</code> on your system, you usually get a daytime server thrown in.)</p>
+  <p class="zh">关于最简单的服务，我们可以建立是时间(Daytime)服务。这是一个标准的互联网服务, 由RFC 867定义, 默认的端口13, 协议是TCP和UDP。很遗憾, 对安全的偏执，几乎没有任何站点运行着时间(Daytime)服务器。不过没关系，我们可以建立我们自己的。 (对于那些有兴趣, 你可以在你的系统安装<code>inetd</code>, 你通常可以得到一个时间(Daytime)服务器。)</p>
+
+  <p class="en">A server registers itself on a port, and listens on that port. Then it blocks on an "accept" operation, waiting for clients to connect. When a client connects, the accept call returns, with a connection object. The daytime service is very simple and just writes the current time to the client, closes the connection, and resumes waiting for the next client.</p>
+  <p class="zh">在一个服务器上注册并监听一个端口。然后它阻塞在一个"accept"操作，并等待客户端连接。当一个客户端连接, accept调用返回一个连接(connection)对象。时间(Daytime)服务非常简单，只是将当前时间写入到客户端, 关闭该连接，并继续等待下一个客户端。</p>
+
+  <p class="en">The relevant calls are</p>
+  <p class="zh">有关调用</p>
   <pre><code>
 func ListenTCP(net string, laddr *TCPAddr) (l *TCPListener, err os.Error)
 func (l *TCPListener) Accept() (c Conn, err os.Error)
     </code></pre>
 
-  <p>The argument <code>net</code> can be set to one of the strings "tcp", "tcp4" or "tcp6". The IP address should be set to zero if you want to listen on all network interfaces, or to the IP address of a single network interface if you only want to listen on that interface. If the port is set to zero, then the O/S will choose a port for you. Otherwise you can choose your own. Note that on a Unix system, you cannot listen on a port below 1024 unless you are the system supervisor, root, and ports below 128 are standardised by the IETF. The example program chooses port 1200 for no particular reason. The TCP address is given as ":1200" - all interfaces, port 1200.</p>
+  <p class="en">The argument <code>net</code> can be set to one of the strings "tcp", "tcp4" or "tcp6". The IP address should be set to zero if you want to listen on all network interfaces, or to the IP address of a single network interface if you only want to listen on that interface. If the port is set to zero, then the O/S will choose a port for you. Otherwise you can choose your own. Note that on a Unix system, you cannot listen on a port below 1024 unless you are the system supervisor, root, and ports below 128 are standardised by the IETF. The example program chooses port 1200 for no particular reason. The TCP address is given as ":1200" - all interfaces, port 1200.</p>
+  <p class="zh"><code>net</code>参数可以设置为字符串"tcp", "tcp4"或者"tcp6"中的一个。如果你想监听所有网络接口，IP地址应设置为0，或如果你只是想监听一个简单网络接口，IP地址可以设置为该网络的地址。如果端口设置为0，O/S会为你选择一个端口。否则，你可以选择你自己的。需要注意的是，在Unix系统上，除非你是监控系统，否则不能监听低于1024的端口，小于128的端口是由IETF标准化。该示例程序选择端口1200没有特别的原因。TCP地址如下":1200" - 所有网络接口, 端口1200。</p>
 
-  <p>The program is</p>
+  <p class="en">The program is</p>
+  <p class="zh">程序</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* DaytimeServer
  */
@@ -701,16 +719,20 @@ func (l *TCPListener) Accept() (c Conn, err os.Error)
 }
 </span></code></pre>
 
-  <p>If you run this server, it will just wait there, not doing much. When a client connects to it, it will respond by sending the daytime string to it and then return to waiting for the next client.</p>
+  <p class="en">If you run this server, it will just wait there, not doing much. When a client connects to it, it will respond by sending the daytime string to it and then return to waiting for the next client.</p>
+  <p class="zh">如果你运行该服务器, 它会在那里等候, 没有做任何事。当一个客户端连接到该服务器, 它会响应发送时间(Daytime)字符串，然后继续等待下一个客户端。</p>
 
-  <p>Note the changed error handling in the server as compared to a client. The server should run forever, so that if any error occurs with a client, the server just ignores that client and carries on. A client could otherwise try to mess up the connection with the server, and bring it down!</p>
+  <p class="en">Note the changed error handling in the server as compared to a client. The server should run forever, so that if any error occurs with a client, the server just ignores that client and carries on. A client could otherwise try to mess up the connection with the server, and bring it down!</p>
+  <p class="zh">注意，相比客户端服务器改变了的错误处理。服务器应该永远运行，所以，如果出现任何错误与客户端，服务器只是忽略客户端继续运行。否则，客户端可以尝试搞砸了与服务器的连接，并导致服务器宕机。</p>
 
-  <p>We haven't built a client. That is easy, just changing the previous client to omit the initial write. Alternatively, just open up a <code>telnet</code> connection to that host:</p>
+  <p class="en">We haven't built a client. That is easy, just changing the previous client to omit the initial write. Alternatively, just open up a <code>telnet</code> connection to that host:</p>
+  <p class="zh">我们还没有建立一个客户端。这很简单，只是改变以前的客户端省略的初始写入。另外, 只需打开一个<code>telnet</code>连接到该主机：</p>
   <pre><code>
 telnet localhost 1200
     </code></pre>
 
-  <p>This will produce output such as</p>
+  <p class="en">This will produce output such as</p>
+  <p class="zh">输出如下：</p>
   <pre><code>
 $telnet localhost 1200
 Trying ::1...
@@ -719,9 +741,11 @@ Escape character is '^]'.
 Sun Aug 29 17:25:19 EST 2010Connection closed by foreign host.
     </code></pre>
 
-  <p>where "Sun Aug 29 17:25:19 EST 2010" is the output from the server.</p>
+  <p class="en">where "Sun Aug 29 17:25:19 EST 2010" is the output from the server.</p>
+  <p class="zh">服务器输出："Sun Aug 29 17:25:19 EST 2010"。</p>
 
-  <h3 id="heading_id_22">Multi-threaded server</h3>
+  <h3 id="heading_id_22" class="en">Multi-threaded server</h3>
+  <h3 id="heading_id_22" class="zh">多线程服务器</h3>
 
   <p>"echo" is another simple IETF service. This just reads what the client types, and sends it back:</p>
   <pre><code><span class="sgc-5">
