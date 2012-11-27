@@ -3,13 +3,17 @@ Errata
 原文勘误表
 
 格式如下：
+
 	Chapter <n> <chaptername>
 	L<n>, C<n>: <typo> -> <fixed>
+
 其中：
+
 	Ln = typo行号
 	Cn = typo列号
 
 例如：
+
 	## Chapter 1 Architecture
 	   L51, C76: sytems -> systems
 	   L58, C30: highl evel -> high level
