@@ -893,11 +893,13 @@ func (c *TCPConn) SetKeepAlive(keepalive bool) os.Error
   <h2 id="heading_id_26" class="zh">UDP数据报</h2>
 
   <p class="en">In a connectionless protocol each message contains information about its origin and destination. There is no "session" established using a long-lived socket. UDP clients and servers make use of datagrams, which are individual messages containing source and destination information. There is no state maintained by these messages, unless the client or server does so. The messages are not guaranteed to arrive, or may arrive out of order.</p>
-  <p class="zh">在一个无连接的协议中，每个消息都包含了关于它的起源和目的地的信息。</p>
+  <p class="zh">在一个无连接的协议中，每个消息都包含了关于它的来源和目的地的信息。没有"session"建立在使用长寿命的套接字。UDP客户端和服务器使用的数据包，单独包含来源和目的地的信息。除非客户端或服务器这样做，否则消息的状态不会保持。这些消息不能保证一定到达，也可能保证按顺序到达。</p>
 
-  <p>The most common situation for a client is to send a message and hope that a reply arrives. The most common situation for a server would be to receive a message and then send one or more replies back to that client. In a peer-to-peer situation, though, the server may just forward messages to other peers.</p>
+  <p class="en">The most common situation for a client is to send a message and hope that a reply arrives. The most common situation for a server would be to receive a message and then send one or more replies back to that client. In a peer-to-peer situation, though, the server may just forward messages to other peers.</p>
+  <p class="zh">客户端最常见的情况发送消息，并希望响应正常到达。服务器最常见的情况为将收到一条消息，然后发送一个或多个回复给客户端。而在点对点的情况下， 服务器可能仅仅是把消息转发到其他点。</p>
 
-  <p>The major difference between TCP and UDP handling for Go is how to deal with packets arriving from possibly multiple clients, without the cushion of a TCP session to manage things. The major calls needed are</p>
+  <p class="en">The major difference between TCP and UDP handling for Go is how to deal with packets arriving from possibly multiple clients, without the cushion of a TCP session to manage things. The major calls needed are</p>
+  <p class="zh">Go下处理TCP和UDP之间的主要区别是如何处理多个客户端可能同时有数据包到达，没有一个管理TCP会话的缓冲。主要需要调用的是</p>
   <pre><code>
 func ResolveUDPAddr(net, addr string) (*UDPAddr, os.Error)
 func DialUDP(net string, laddr, raddr *UDPAddr) (c *UDPConn, err os.Error)
@@ -906,7 +908,8 @@ func (c *UDPConn) ReadFromUDP(b []byte) (n int, addr *UDPAddr, err os.Error
 func (c *UDPConn) WriteToUDP(b []byte, addr *UDPAddr) (n int, err os.Error)
     </code></pre>
 
-  <p>The client for a UDP time service doesn't need to make many changes, just changing <code>...TCP...</code> calls to <code>...UDP...</code> calls:</p>
+  <p class="en">The client for a UDP time service doesn't need to make many changes, just changing <code>...TCP...</code> calls to <code>...UDP...</code> calls:</p>
+  <p class="zh">UDP时间服务的客户端并不需要做很多的变化，仅仅改变<code>...TCP...</code>调用为<code>...UDP...</code>调用:</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* UDPDaytimeClient
  */
@@ -951,7 +954,8 @@ func (c *UDPConn) WriteToUDP(b []byte, addr *UDPAddr) (n int, err os.Error)
 }
 </span></code></pre>
 
-  <p>while the server has to make a few more:</p>
+  <p class="en">while the server has to make a few more:</p>
+  <p class="zh">服务器也有很少的改动:</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* UDPDaytimeServer
  */
@@ -1000,26 +1004,34 @@ func (c *UDPConn) WriteToUDP(b []byte, addr *UDPAddr) (n int, err os.Error)
 }
 </span></code></pre>
 
-  <h2 id="heading_id_27">Server listening on multiple sockets</h2>
+  <h2 id="heading_id_27" class="en">Server listening on multiple sockets</h2>
+  <h2 id="heading_id_27" class="zh">服务器侦听多个套接字</h2>
 
-  <p>A server may be attempting to listen to multiple clients not just on one port, but on many. In this case it has to use some sort of polling mechanism between the ports.</p>
+  <p class="en">A server may be attempting to listen to multiple clients not just on one port, but on many. In this case it has to use some sort of polling mechanism between the ports.</p>
+  <p class="zh">一个服务器可能试图不止在一个端口监听多个客户端，或是更多，在这种情况下，它在端口之间使用某种轮询机制。</p>
 
-  <p>In C, the select() call lets the kernel do this work. The call takes a number of file descriptors. The process is suspended. When I/O is ready on one of these, a wakeup is done, and the process can continue. This is cheaper than busy polling. In Go, accomplish the same by using a different goroutine for each port. A thread will become runnable when the lower-level select() discovers that I/O is ready for this thread.</p>
+  <p class="en">In C, the select() call lets the kernel do this work. The call takes a number of file descriptors. The process is suspended. When I/O is ready on one of these, a wakeup is done, and the process can continue. This is cheaper than busy polling. In Go, accomplish the same by using a different goroutine for each port. A thread will become runnable when the lower-level select() discovers that I/O is ready for this thread.</p>
+  <p class="zh">在C中, 调用的内核select()可以完成这项工作。 调用需要一个文件描述符的数字。该进程被暂停。当I/O准备好其中一个，一个唤醒被完成，并且该过程可以继续。This is cheaper than busy polling. 在G中, 完成相同的功能，通过为每个端口使用一个不同的goroutine。低级别的select()时发现，I/O已经准备好该线程，一个线程将运行。</p>
 
-  <h2 id="heading_id_28">The types Conn, PacketConn and Listener</h2>
+  <h2 id="heading_id_28" class="en">The types Conn, PacketConn and Listener</h2>
+  <h2 id="heading_id_28" class="zh">Conn，PacketConn和Listener类型</h2>
 
-  <p>So far we have differentiated between the API for TCP and the API for UDP, using for example <code>DialTCP</code> and <code>DialUDP</code> returning a <code>TCPConn</code> and <code>UDPConn</code> respectively. The type <code>Conn</code> is an interface and both <code>TCPConn</code> and <code>UDPConn</code> implement this interface. To a large extent you can deal with this interface rather than the two types.</p>
+  <p class="en">So far we have differentiated between the API for TCP and the API for UDP, using for example <code>DialTCP</code> and <code>DialUDP</code> returning a <code>TCPConn</code> and <code>UDPConn</code> respectively. The type <code>Conn</code> is an interface and both <code>TCPConn</code> and <code>UDPConn</code> implement this interface. To a large extent you can deal with this interface rather than the two types.</p>
+  <p class="zh">迄今为止我们已经区分TCP和UDP API的不同，使用例子<code>DialTCP</code>和<code>DialUDP</code>分别返回一个<code>TCPConn</code>和 <code>UDPConn</code>。<code>Conn</code>类型是一个接口，<code>TCPConn</code>和<code>UDPConn</code>实现了该接口。在很大程度上，你可以通过该接口处理而不是用这两种类型。</p>
 
-  <p>Instead of separate dial functions for TCP and UDP, you can use a single function</p>
+  <p class="en">Instead of separate dial functions for TCP and UDP, you can use a single function</p>
+  <p class="zh">你可以使用一个简单的函数，而不是单独使用TCP和UDP的dial函数。</p>
   <pre>
     <code>
 func Dial(net, laddr, raddr string) (c Conn, err os.Error)
     </code>
   </pre>
 
-  <p>The <code>net</code> can be any of "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only), "udp", "udp4" (IPv4-only), "udp6" (IPv6-only), "ip", "ip4" (IPv4-only) and "ip6" IPv6-only). It will return an appropriate implementation of the <code>Conn</code> interface. Note that this function takes a string rather than address as <code>raddr</code> argument, so that programs using this can avoid working out the address type first.</p>
+  <p class="en">The <code>net</code> can be any of "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only), "udp", "udp4" (IPv4-only), "udp6" (IPv6-only), "ip", "ip4" (IPv4-only) and "ip6" (IPv6-only). It will return an appropriate implementation of the <code>Conn</code> interface. Note that this function takes a string rather than address as <code>raddr</code> argument, so that programs using this can avoid working out the address type first.</p>
+  <p class="zh"><code>net</code>可以是"tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only), "udp", "udp4" (IPv4-only), "udp6" (IPv6-only), "ip", "ip4" (IPv4-only)和"ip6" (IPv6-only)任何一种。它将返回一个实现了<code>Conn</code>接口的类型。注意此函数接受一个字符串而不是<code>raddr</code>地址参数，因此，使用此程序可避免的地址类型。</p>
 
-  <p>Using this function makes minor changes to programs. For example, the earlier program to get HEAD information from a Web page can be re-written as</p>
+  <p class="en">Using this function makes minor changes to programs. For example, the earlier program to get HEAD information from a Web page can be re-written as</p>
+  <p class="zh">使用该函数需要对程序轻微的调整。例如, 前面的程序从一个Web页面获取HEAD信息可以被重新写为</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* IPGetHeadInfo
  */
@@ -1080,19 +1092,22 @@ func Dial(net, laddr, raddr string) (c Conn, err os.Error)
 }
 </span></code></pre>
 
-  <p>Writing a server can be similarly simplified using the function</p>
+  <p class="en">Writing a server can be similarly simplified using the function</p>
+  <p class="zh">使用该函数同样可以简化一个服务器的编写</p>
   <pre>
     <code>
 func Listen(net, laddr string) (l Listener, err os.Error)
     </code>
   </pre>
 
-  <p>which returns an object implementing the <code>Listener</code> interface. This interface has a method</p>
+  <p class="en">which returns an object implementing the <code>Listener</code> interface. This interface has a method</p>
+  <p class="zh">返回一个实现<code>Listener</code>接口的对象. 该接口有一个方法</p>
   <pre><code>
 func (l Listener) Accept() (c Conn, err os.Error)
     </code></pre>
 
-  <p>which will allow a server to be built. Using this, the multi-threaded Echo server given earlier becomes</p>
+  <p class="en">which will allow a server to be built. Using this, the multi-threaded Echo server given earlier becomes</p>
+  <p class="zh">这将允许构建一个服务器。使用它, 将使前面给出的多线程Echo服务器改变</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* ThreadedIPEchoServer
  */
@@ -1143,26 +1158,34 @@ func (l Listener) Accept() (c Conn, err os.Error)
 }
 </span></code></pre>
 
-  <p>If you want to write a UDP server, then there is an interface <code>PacketConn</code> and a method to return an implementation of this:</p>
+  <p class="en">If you want to write a UDP server, then there is an interface <code>PacketConn</code> and a method to return an implementation of this:</p>
+  <p class="zh">如果你想写一个UDP服务器, 这里有一个<code>PacketConn</code>的接口，和一个实现了该接口的方法:</p>
   <pre><code>
 func ListenPacket(net, laddr string) (c PacketConn, err os.Error)
     </code></pre>
 
-  <p>This interface has primary methods <code>ReadFrom</code> and <code>WriteTo</code> to handle packet reads and writes.</p>
+  <p class="en">This interface has primary methods <code>ReadFrom</code> and <code>WriteTo</code> to handle packet reads and writes.</p>
+  <p class="zh">这个接口的主要方法<code>ReadFrom</code>和<code>WriteTo</code>用来处理数据包的读取和写入。</p>
 
-  <p>The Go <code>net</code> package recommends using these interface types rather than the concrete ones. But by using them, you lose specific methods such as <code>SetKeepAlive</code> or <code>TCPConn</code> and <code>SetReadBuffer</code> of <code>UDPConn</code>, unless you do a type cast. It is your choice.</p>
+  <p class="en">The Go <code>net</code> package recommends using these interface types rather than the concrete ones. But by using them, you lose specific methods such as <code>SetKeepAlive</code> or <code>TCPConn</code> and <code>SetReadBuffer</code> of <code>UDPConn</code>, unless you do a type cast. It is your choice.</p>
+  <p class="zh">Go的<code>net</code>包建议使用接口类型而不是具体的实现类型。但是，通过使用它们，你失去了具体的方法，比如<code>SetKeepAlive</code>或<code>TCPConn</code>和<code>UDPConn</code>的<code>SetReadBuffer</code>，除非你做一个类型转换。如何选择在于你。</p>
 
-  <h2 id="heading_id_29">Raw sockets and the type IPConn</h2>
+  <h2 id="heading_id_29" class="en">Raw sockets and the type IPConn</h2>
+  <h2 id="heading_id_29" class="zh">原始套接字和IPConn类型</h2>
 
-  <p>This section covers advanced material which most programmers are unlikely to need. it deals with <em>raw sockets</em>, which allow the programmer to build their own IP protocols, or use protocols other than TCP or UDP</p>
+  <p class="en">This section covers advanced material which most programmers are unlikely to need. it deals with <em>raw sockets</em>, which allow the programmer to build their own IP protocols, or use protocols other than TCP or UDP</p>
+  <p class="zh">本节涵盖了大多数程序员可能需要的高级资料。它涉及<em>raw sockets</em>, ，允许程序员建立自己的IP协议，或使用TCP或UDP协议。</p>
 
-  <p>TCP and UDP are not the only protocols built above the IP layer. The site http://www.iana.org/assignments/protocol-numbers lists about 140 of them (this list is often available on Unix systems in the file <code>/etc/protocols</code>). TCP and UDP are only numbers 6 and 17 respectively on this list.</p>
+  <p class="en">TCP and UDP are not the only protocols built above the IP layer. The site http://www.iana.org/assignments/protocol-numbers lists about 140 of them (this list is often available on Unix systems in the file <code>/etc/protocols</code>). TCP and UDP are only numbers 6 and 17 respectively on this list.</p>
+  <p class="zh">TCP和UDP并不是建立在IP层之上唯一的协议。该网站：http://www.iana.org/assignments/protocol-numbers 列表上大约有140关于它们(该列表往往在Unix系统的<code>/etc/protocols</code>文件上。)。TCP和UDP在这个名单上分别为6和17。</p>
 
-  <p>Go allows you to build so-called raw sockets, to enable you to communicate using one of these other protocols, or even to build your own. But it gives minimal support: it will connect hosts, and write and read packets between the hosts. In the next chapter we will look at designing and implementing your own protocols above TCP; this section considers the same type of problem, but at the IP layer.</p>
+  <p class="en">Go allows you to build so-called raw sockets, to enable you to communicate using one of these other protocols, or even to build your own. But it gives minimal support: it will connect hosts, and write and read packets between the hosts. In the next chapter we will look at designing and implementing your own protocols above TCP; this section considers the same type of problem, but at the IP layer.</p>
+  <p class="zh">Go允许你建立所谓的原始套接字，使您可以使用这些其它协议通信，或甚至建立你自己的。但它提供了最低限度的支持: 它会连接主机, 写入和读取和主机之间的数据包。在接下来的章节中，我们将着眼于设计和实现自己的基于TCP之上的协议; 这部分认为同样的问题存在于IP层。</p>
 
-  <p>To keep things simple, we shall use almost the simplest possible example: how to send a ping message to a host. Ping uses the "echo" command from the ICMP protocol. This is a byte-oriented protocol, in which the client sends a stream of bytes to another host, and the host replies. the format is:</p>
+  <p class="en">To keep things simple, we shall use almost the simplest possible example: how to send a ping message to a host. Ping uses the "echo" command from the ICMP protocol. This is a byte-oriented protocol, in which the client sends a stream of bytes to another host, and the host replies. the format is:</p>
+  <p class="zh">为了简单起见，我们将使用几乎最简单的例子: 如何发送一个ping消息给主机。Ping使用"echo"命令的ICMP协议。这是一个面向字节协议, 客户端发送一个字节流到另一个主机, 并等待主机的答复。格式如下:</p>
 
-  <ul>
+  <ul class="en">
     <li>The first byte is 8, standing for the echo message</li>
 
     <li>The second byte is zero</li>
@@ -1175,8 +1198,22 @@ func ListenPacket(net, laddr string) (c PacketConn, err os.Error)
 
     <li>The rest of the packet is user data</li>
   </ul>
+  <ul class="zh">
+    <li>首字节是8, 表示echo消息</li>
 
-  <p>The following program will prepare an IP connection, send a ping request to a host and get a reply. You may need to have root access in order to run it successfully.</p>
+    <li>第二个字节是0</li>
+
+    <li>第三和第四字节是整个消息的校验和</li>
+
+    <li>第五和第六字节是一个任意标识</li>
+
+    <li>第七和第八字节是一个任意的序列号</li>
+
+    <li>该数据包的其余部分是用户数据</li>
+  </ul>
+
+  <p class="en">The following program will prepare an IP connection, send a ping request to a host and get a reply. You may need to have root access in order to run it successfully.</p>
+  <p class="zh">下面的程序将准备一个IP连接，发送一个ping请求到主机，并得到答复。您可能需要root权限才能运行成功。</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* Ping
  */
@@ -1311,13 +1348,16 @@ usually set at 15.
 </p>
 -->
 
-  <h2 id="heading_id_30">Conclusion</h2>
+  <h2 id="heading_id_30" class="en">Conclusion</h2>
+  <h2 id="heading_id_30" class="zh">结论</h2>
 
-  <p>This chapter has considered programming at the IP, TCP and UDP levels. This is often necessary if you wish to implement your own protocol, or build a client or server for an existing protocol.</p>
+  <p class="en">This chapter has considered programming at the IP, TCP and UDP levels. This is often necessary if you wish to implement your own protocol, or build a client or server for an existing protocol.</p>
+  <p class="zh">本章注重IP, TCP和UDP级别的编程。如果你想实现自己的协议，或用现有的协议建立一个客户端或服务器，这往往很重要。</p>
 
-  <p>Copyright Jan Newmarch, jan@newmarch.name</p>
+  <p class="en">Copyright Jan Newmarch, jan@newmarch.name</p>
+  <p class="zh">版权所有 Jan Newmarch, jan@newmarch.name</p>
 
-  <p>If you like this book, please contribute using Flattr <a class="FlattrButton sgc-8" href="http://jan.newmarch.name/go/index.html"></a><br />
+  <p class="en">If you like this book, please contribute using Flattr <a class="FlattrButton sgc-8" href="http://jan.newmarch.name/go/index.html"></a><br />
   or donate using PayPal</p>
 
   <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
