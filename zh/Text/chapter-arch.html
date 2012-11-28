@@ -4,7 +4,9 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Distributed Systems Architecture</title>
+  <title class="en">Distributed Systems Architecture</title>
+
+  <title class="cn">分布式系统架构</title>
   <link href="../Styles/stylesheet.css" rel="stylesheet" type="text/css" />
   <script type="text/javascript">
 
@@ -42,39 +44,66 @@
 
 <body>
   <div class="sgc-1">
-    <h1 id="heading_id_2">Architecture</h1>
+    <h1 id="heading_id_2" class="en">Architecture</h1>
+
+    <h1 id="heading_id_2" class="cn">架构</h1>
   </div>
 
   <div class="generate_from_h2" id="generated-toc"></div>
 
   <div class="preface">
-    <p>This chapter covers the major architectural features of distributed sytems.</p>
+    <p class="en">This chapter covers the major architectural features of distributed sytems.</p>
+
+    <p class="zh">本章涵盖了分布式系统架构的主要特性。</p>
   </div>
 
-  <h2 id="heading_id_3">Introduction</h2>
+  <h2 id="heading_id_3" class="en">Introduction</h2>
 
-  <p>You can't build a system without some idea of what you want to build. And you can't build it if you don't know the environment in which it will work. GUI programs are different to batch processing programs; games programs are different to business programs; and distributed programs are different to standalone programs. They each have their approaches, their common patterns, the problems that typically arise and the solutions that are often used.</p>
+  <h2 id="heading_id_3" class="zh">前言</h2>
 
-  <p>This chapter covers the highl evel architectural aspects of distributed systems. There are many ways of looking at such systems, and many of these are dealt with.</p>
+  <p class="en">You can't build a system without some idea of what you want to build. And you can't build it if you don't know the environment in which it will work. GUI programs are different to batch processing programs; games programs are different to business programs; and distributed programs are different to standalone programs. They each have their approaches, their common patterns, the problems that typically arise and the solutions that are often used.</p>
 
-  <h2 id="heading_id_4">Protocol Layers</h2>
+  <p class="zh">你若不知道你想构建什么，就无法构建一个系统。而如果你不知道它会在何种环境下工作，也同样不行。就像GUI程序不同于批处理程序，游戏程序不同于商业程序一样，分布式程序也不同于独立的程序。它们都有各自的方法，常见的模式，经常出现的问题以及常用的解决方案。</p>
 
-  <p>Distributed systems are <em>hard</em>. There are multiple computers involved, which have to be connected in some way. Programs have to be written to run on each computer in the system and they all have to co-operate to get a distributed task done.</p>
+  <p class="en">This chapter covers the highl evel architectural aspects of distributed systems. There are many ways of looking at such systems, and many of these are dealt with.</p>
 
-  <p>The common way to deal with complexity is to break it down into smaller and simpler parts. These parts have their own structure, but they also have defined means of communicating with other related parts. In distributed systems, the parts are called <em>protocol layers</em> and they have clearly defined functions. They form a stack, with each layer communicating with the layer above and the layer below. The communication between layers is defined by protocols.</p>
+  <p class="zh">本章涵盖了分布式系统的上层架构，从多种角度考虑了这样的系统及其依赖。</p>
 
-  <p>Network communications requires protocols to cover high-level application communication all the way down to wire communication and the complexity handled by encapsulation in protocol layers.</p>
+  <h2 id="heading_id_4" class="en">Protocol Layers</h2>
 
-  <h3 id="heading_id_5">ISO OSI Protocol</h3>
+  <h2 id="heading_id_4" class="zh">协议层</h2>
 
-  <p>Although it was never properly implemented, the OSI (Open Systems Interconnect) protocol has been a major influence in ways of talking about and influencing distributed systems design. It is commonly given in the following figure:<br />
+  <p class="en">Distributed systems are <em>hard</em>. There are multiple computers involved, which have to be connected in some way. Programs have to be written to run on each computer in the system and they all have to co-operate to get a distributed task done.</p>
+
+  <p class="zh">分布式系统很<em>复杂</em>，它涉及到多台计算机的连接方式。我们编写的程序必须能在该系统中的每一台计算机上运行，它们必须都能协同操作来完成一项分布式任务。</p>
+
+  <p class="en">The common way to deal with complexity is to break it down into smaller and simpler parts. These parts have their own structure, but they also have defined means of communicating with other related parts. In distributed systems, the parts are called <em>protocol layers</em> and they have clearly defined functions. They form a stack, with each layer communicating with the layer above and the layer below. The communication between layers is defined by protocols.</p>
+
+  <p class="zh">解决这种复杂性的一般方法，就是将它分解为更小更简单的部分。这些部分都有它们自己的结构，但也定义了与其它相关部分进行通信的方式。在分布式系统中，这种部分称为<em>协议层</em>，它们的功能都有明确的定义。它们在一起形成层次结构，并与其各自的上下层进行通行。层次之间的通信则由协议来定义。</p>
+
+  <p class="en">Network communications requires protocols to cover high-level application communication all the way down to wire communication and the complexity handled by encapsulation in protocol layers.</p>
+
+  <p class="zh">网络通信所需的协议覆盖了从上层应用通信一直到底层有线通信的所有方式，它们的复杂性通过在协议层中进行封装来处理。</p>
+
+  <h3 id="heading_id_5" class="en">ISO OSI Protocol</h3>
+
+  <h3 id="heading_id_5" class="zh">ISO OSI协议</h3>
+
+  <p class="en">Although it was never properly implemented, the OSI (Open Systems Interconnect) protocol has been a major influence in ways of talking about and influencing distributed systems design. It is commonly given in the following figure:<br />
   <img alt="" src="../Images/iso.gif" /></p>
 
-  <h3 id="heading_id_6">OSI layers</h3>
+  <p class="zh">尽管OSI（开放系统互联）协议从未被完整地实现过，但它仍对分布式系统的讨论和设计产生了十分重要的影响。它的结构大致为下图所示：<br />
+  <img alt="" src="../Images/iso-zh.gif" /></p>
 
-  <p>The function of each layer is:</p>
+  <h3 id="heading_id_6" class="en">OSI layers</h3>
 
-  <ul>
+  <h3 id="heading_id_6" class="cn">OSI层</h3>
+
+  <p class="en">The function of each layer is:</p>
+
+  <p class="cn">每一层的功能为：</p>
+
+  <ul class="en">
     <li>Network layer provides switching and routing technologies</li>
 
     <li>Transport layer provides transparent transfer of data between end systems and is responsible for end-to-end error recovery and flow control</li>
@@ -86,16 +115,37 @@
     <li>Application layer supports application and end-user processes</li>
   </ul>
 
-  <h3 id="heading_id_7">TCP/IP Protocol</h3>
+  <ul class="zh">
+    <li>网络层提供交换和路由技术</li>
 
-  <p>While the OSI model was being argued, debated, partly implemented and fought over, the DARPA internet research project was busy building the TCP/IP protocols. These have been immensely succesful and have led to The Internet (with capitals). This is a much simpler stack:<br />
+    <li>传输层在终端系统间提供透明的数据传输，并负责端对端的错误恢复及流程控制</li>
+
+    <li>会话层在应用间建立、管理并结束连接</li>
+
+    <li>表现层提供数据表现差异的独立性（例如加密）</li>
+
+    <li>应用层支持应用与最终用户的处理</li>
+  </ul>
+
+  <h3 id="heading_id_7" class="en">TCP/IP Protocol</h3>
+
+  <h3 id="heading_id_7" class="zh">TCP/IP协议</h3>
+
+  <p class="en">While the OSI model was being argued, debated, partly implemented and fought over, the DARPA internet research project was busy building the TCP/IP protocols. These have been immensely succesful and have led to The Internet (with capitals). This is a much simpler stack:<br />
   <img alt="" src="../Images/tcp_stack.gif" /></p>
 
-  <h3 id="heading_id_8">Some Alternative Protocols</h3>
+  <p class="zh">当OSI标准模型正在为实现细节闹得不可开交时，DARPA互联网技术项目却在忙着构建TCP/IP协议。它们取得了极大的成功，并引领了Internet（首字母大写），因为这是个更简单的层次结构：<br />
+  <img alt="" src="../Images/tcp_stack.gif" /></p>
 
-  <p>Although it almost seems like it, the TCP/IP protocols are not the only ones in existence and in the long run may not even be the most successful. There are many protocols occupying significant niches, such as</p>
+  <h3 id="heading_id_8" class="en">Some Alternative Protocols</h3>
 
-  <ul>
+  <h3 id="heading_id_8" class="zh">一些可选的协议</h3>
+
+  <p class="en">Although it almost seems like it, the TCP/IP protocols are not the only ones in existence and in the long run may not even be the most successful. There are many protocols occupying significant niches, such as</p>
+
+  <p class="zh">尽管现在到处都是TCP/IP协议，但它并不是唯一存在的。从长远来看，它甚至不会是最成功的。还有些协议占有重要的地位，比如：</p>
+
+  <ul class="en">
     <li>Firewire</li>
 
     <li>USB</li>
@@ -105,17 +155,39 @@
     <li>WiFi</li>
   </ul>
 
-  <p>Thre is active work continuing on many other protocols, even quite bizarre ones such as those for the "internet in space."</p>
+  <ul class="zh">
+    <li>火线</li>
 
-  <p>The focus in this book will be on the TCP/IP, but you should be aware of these other ones.</p>
+    <li>USB</li>
 
-  <h2 id="heading_id_9">Networking</h2>
+    <li>蓝牙</li>
 
-  <p>A network is a communications system for connecting end systems called hosts. The mechanisms of connection might be copper wire, ethernet, fibre optic or wireless, but that won't concern us here. A local area network (LAN) connects computers that are close together, typically belonging to a home, small organisation or part of a larger organisation.</p>
+    <li>WiFi</li>
+  </ul>
 
-  <p>A Wide Area Network (WAN) connects computers across a larger physical area, such as between cities. There are other types as well, such as MANs (Metropolitan Area Network), PANs (Personal Are Networks) and even BANs (Body Are Network).</p>
+  <p class="en">Thre is active work continuing on many other protocols, even quite bizarre ones such as those for the "internet in space."</p>
 
-  <p>An internet is a connection of two or more distinct networks, typically LANs or WANs. An intranet is an internet with all networks belonging to a single organisation.</p>
+  <p class="zh">还有些其它的协议在继续活跃地工作，甚至还有些像“太空互联网”这样奇怪的协议。</p>
+
+  <p class="en">The focus in this book will be on the TCP/IP, but you should be aware of these other ones.</p>
+
+  <p class="zh">本书将重点介绍TCP/IP，但你也应当了解一些其它的协议。</p>
+
+  <h2 id="heading_id_9" class="en">Networking</h2>
+
+  <h2 id="heading_id_9" class="zh">网络</h2>
+
+  <p class="en">A network is a communications system for connecting end systems called hosts. The mechanisms of connection might be copper wire, ethernet, fibre optic or wireless, but that won't concern us here. A local area network (LAN) connects computers that are close together, typically belonging to a home, small organisation or part of a larger organisation.</p>
+
+  <p class="zh">网络是一个通信系统，它连接了称为主机的最终系统。这种连接机制可以是铜线、以太网、光纤或无线，但这些与我们无关。局域网（LAN）将计算机紧密地连接在一起，一般为家庭、小型组织或大型组织的一部分。</p>
+
+  <p class="en">A Wide Area Network (WAN) connects computers across a larger physical area, such as between cities. There are other types as well, such as MANs (Metropolitan Area Network), PANs (Personal Are Networks) and even BANs (Body Are Network).</p>
+
+  <p class="zh">广域网（WAN）连接起一个更大物理区域的计算机，例如城市之间。还有些其它的类型，如城域网（MAN）、个人域网（PAN）甚至体域网（BAN）。</p>
+
+  <p class="en">An internet is a connection of two or more distinct networks, typically LANs or WANs. An intranet is an internet with all networks belonging to a single organisation.</p>
+
+  <p class="zh">An internet is a connection of two or more distinct networks, typically LANs or WANs. An intranet is an internet with all networks belonging to a single organisation.</p>
 
   <p>There are significant differences between an internet and an intranet. Typically an intranet will be under a single administrative control, which will impose a single set of coherent policies. An internet on the other hand will not be under the control of a single body, and the controls exercised over different parts may not even be compatable.</p>
 

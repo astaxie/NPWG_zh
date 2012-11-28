@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="no"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
   "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 
@@ -51,26 +51,30 @@
 
 <body>
   <div class="chapter">
-    <h1 id="heading_id_2">Data serialisation</h1>
+    <h1 id="heading_id_2" class="en">Data serialisation</h1>
+    <h1 id="heading_id_2" class="zh">数据序列化</h1>
   </div>
 
+
+
   <div class="preface">
-    <p>Communication between a client and a service requires the exchange of data. This data may be highly structured, but has to be serialised for transport. This chapter looks at the basics of serialisation and then considers several techniques supported by Go APIs.</p>
+    <p class="en">Communication between a client and a service requires the exchange of data. This data may be highly structured, but has to be serialised for transport. This chapter looks at the basics of serialisation and then considers several techniques supported by Go APIs.</p>
+    <p class="zh">客户端与服务之间通过数据交换来通信,数据可能是高度结构化的,但是为了传输它们必须被序列化,这一章将研究序列化基础并介绍一些Go API支持的序列化技术</p>
   </div>
 
   <div class="generate_from_h2" id="generated-toc"></div>
 
   <h2 id="heading_id_3">Introduction</h2>
 
-  <p>A client and server need to exchange information via messages. TCP and UDP provide the transport mechanisms to do this. The two processes also have to have a protocol in place so that message exchange can take place meaningfully.</p>
-
-  <p>Messages are sent across the network as a sequence of bytes, which has no structure except for a linear stream of bytes. We shall address the various possibilities for messages and the protocols that define them in the next chapter. In this chapter we concentrate on a component of messages - the data that is transferred.</p>
-
-  <p>A program will typically build complex data structures to hold the current program state. In conversing with a remote client or service, the program will be attempting to transfer such data structures across the network - that is, outside of the application's own address space.</p>
-
-  <p>Programming languages use structured data such as</p>
-
-  <ul>
+  <p class="en">A client and server need to exchange information via messages. TCP and UDP provide the transport mechanisms to do this. The two processes also have to have a protocol in place so that message exchange can take place meaningfully.</p>
+  <p class="zh">客户端与服务器需要通过消息来交换信息,TCP与UDP是消息传递的两种机制，在这两种机制之上就需要有适当的协议来约定传输的内容的含义了</p>
+  <p class="en">Messages are sent across the network as a sequence of bytes, which has no structure except for a linear stream of bytes. We shall address the various possibilities for messages and the protocols that define them in the next chapter. In this chapter we concentrate on a component of messages - the data that is transferred.</p>
+  <p class="zh">在网络上消息被当作字节序列来传输,除开是线性的字节流之外,它们是没有结构的,我们将在下一章解决定义消息与协议涉及到的的各种问题,这一章,我们将重点关注消息的一个方面-被传输的数据</p>
+  <p class="en">A program will typically build complex data structures to hold the current program state. In conversing with a remote client or service, the program will be attempting to transfer such data structures across the network - that is, outside of the application's own address space.</p>
+  <p class="zh">典型地,程序将构造一个复杂的数据结构用来保持其自身当前的状态,在与远程的客户端或服务的交谈中,它可能会尝试通过网络将类似的结构传输过去-即:此数据结构出现在应用自身地址空间之外</p>
+  <p class="en">Programming languages use structured data such as</p>
+  <p class="zh">编程语言使用的结构化的数据类型有</p>
+  <ul class="en">
     <li>records/structures</li>
 
     <li>variant records</li>
@@ -83,7 +87,7 @@
 
     <li>non-linear structures such as
 
-      <ul>
+      <ul class="en">
         <li>circular linked list</li>
 
         <li>binary tree</li>
@@ -93,10 +97,33 @@
     </li>
   </ul>
 
-  <p>None of IP, TCP or UDP packets know the meaning of any of these data types. All that they can contain is a sequence of bytes. Thus an application has to <em>serialise</em> any data into a stream of bytes in order to write it, and deserialise the stream of bytes back into suitable data structures on reading it. These two operations are known as <em>marshalling</em> and <em>unmarshalling</em> respectively.</p>
+<ul class="zh">
+    <li>记录/结构</li>
 
-  <p>For example, consider sending the following variable length table of two columns of variable length strings:</p>
+    <li>可变记录</li>
 
+    <li>数组 - 固定大小或可变的</li>
+
+    <li>字符串 - 固定大小或可变的</li>
+
+    <li>表 - 例如:记录构成的数组</li>
+
+    <li>非线程结构，比如
+
+      <ul class="en">
+        <li>循环链表</li>
+
+        <li>二叉树</li>
+
+        <li>含有其他对象引用的对象</li>
+      </ul>
+    </li>
+  </ul>
+
+  <p class="en">None of IP, TCP or UDP packets know the meaning of any of these data types. All that they can contain is a sequence of bytes. Thus an application has to <em>serialise</em> any data into a stream of bytes in order to write it, and deserialise the stream of bytes back into suitable data structures on reading it. These two operations are known as <em>marshalling</em> and <em>unmarshalling</em> respectively.</p>
+  <p class="zh">没有一个IP,TCP或者UDP包知道这些数据类型的含义,他们能包含的只是字节序列，因此为了写入数据,应用需要将其<em>序列化</em>,反之为了读取数据，应用需要将字节流<em>反序列化</em>到合适的数据结构，这两个操作被分别称为<em>编组</em>与<em>解组</em>。</p>
+  <p class="en">For example, consider sending the following variable length table of two columns of variable length strings:</p>
+  <p class="zh">例如:考虑发送如下这样一个由两列可变长度字符串构成的可变长度的表格</p>
   <div class="sgc-1">
     <table border="1">
       <tr>
@@ -119,7 +146,8 @@
     </table>
   </div>
 
-  <p>This could be done by in various ways. For example, suppose that it is known that the data will be an unknown number of rows in a two-column table. Then a marshalled form could be</p>
+  <p class="en">This could be done by in various ways. For example, suppose that it is known that the data will be an unknown number of rows in a two-column table. Then a marshalled form could be</p>
+  <p class="zh">这可以通过多种方式来完成.比如:假设知道数据将是一个未知行数的两列表格,那么编组形式可能是:</p>
   <pre><code>
     3                // 3 rows, 2 columns assumed
     4 fred           // 4 char string,col 1
@@ -130,7 +158,8 @@
     7 manager        // 7 char string, col 2
 </code></pre>
 
-  <p>Variable length things can alternatively have their length indicated by terminating them with an "illegal" value, such as '\0' for strings:</p>
+  <p class="en">Variable length things can alternatively have their length indicated by terminating them with an "illegal" value, such as '\0' for strings:</p>
+  <p class="zh">可变长度的事物都可以通过用一个“非法”的终结值,比如对于字符串来说的'\0',来间接获得它们的长度</p>
   <pre><code>
     3
     fred\0        
@@ -141,8 +170,9 @@
     manager\0
 </code></pre>
 
-  <p>Alternatively, it may be known that the data is a 3-row fixed table of two columns of strings of length 8 and 10 respectively. Then a serialisation could be</p>
-  <pre><code>
+  <p class="en"> Alternatively, it may be known that the data is a 3-row fixed table of two columns of strings of length 8 and 10 respectively. Then a serialisation could be</p>
+  <p class="zh">假设数据是一个三行两列且每列长度分别是8或10的表格，那么序列化的结果可能是:<p> 
+ <pre><code>
     fred\0\0\0\0
     programmer
     liping\0\0
@@ -151,12 +181,13 @@
     manager\0\0\0
 </code></pre>
 
-  <p><em>Any of these formats is okay - but the message exchange protocol must specify which one is used, or allow it to be determined at runtime.</em></p>
-
-  <h2 id="heading_id_4">Mutual agreement</h2>
-
-  <p>The previous section gave an overview of the issue of data serialisation. In practise, the details can be considerably more complex. For example, consider the first possibility, marshalling a table into the stream</p>
-  <pre><code>
+  <p class="en"><em>Any of these formats is okay - but the message exchange protocol must specify which one is used, or allow it to be determined at runtime.</em></p>
+  <p class="zh"><em>这些格式中的任意一种都是可行的-但是消息交换协议必须指定使用了哪一种或者允许在运行期决定</em></p>
+  <h2 id="heading_id_4" class="en">Mutual agreement</h2>
+  <h2 id="heading_id_4" class="zh">双方协议</h2>
+  <p class="en">The previous section gave an overview of the issue of data serialisation. In practise, the details can be considerably more complex. For example, consider the first possibility, marshalling a table into the stream</p>
+  <p class="zh">前一小节总结了在数据序列化过程中可能遇到的各种问题。而在实际操作中，需要考虑的细节还更多一些，例如:首先考虑将如下这个表编组成流.</p>
+ <pre><code>
     3
     4 fred
     10 programmer
@@ -166,17 +197,19 @@
     7 manager
     </code></pre>
 
-  <p>Many questions arise. For example, how many rows are possible for the table - that is, how big an integer do we need to describe the row size? If it is 255 or less, then a single byte will do, but if it is more, then a short, integer or long may be needed. A similar problem occurs for the length of each string. With the characters themselves, to which character set do they belong? 7 bit ASCII? 16 bit Unicode? The question of character sets is discussed at length in a later chapter.</p>
+  <p class="en">Many questions arise. For example, how many rows are possible for the table - that is, how big an integer do we need to describe the row size? If it is 255 or less, then a single byte will do, but if it is more, then a short, integer or long may be needed. A similar problem occurs for the length of each string. With the characters themselves, to which character set do they belong? 7 bit ASCII? 16 bit Unicode? The question of character sets is discussed at length in a later chapter.</p>
+  <p class="zh">许多问题冒出来了.例如：这个表格可能 有多少行？-即我们需要多大的整数来表示表格的大小,如果它只有255行或者更少,那么一个字节就够了,如果更大一些,就可能需要short, integer或者long 来表示了。对于字符串的长度也存在同样的问题，对字符本身来说,它们属于哪种字符集? 7位的 ASCII? 16位的Unicode? 字符集的问题将会在后面的章节里详细讨论。</p>
+  <p class="en">The above serialisation is <em>opaque</em> or <em>implicit</em>. If data is marshalled using the above format, then there is nothing in the serialised data to say how it should be unmarshalled. The unmarshalling side has to know exactly how the data is serialised in order to unmarshal it correctly. For example, if the number of rows is marshalled as an eight-bit integer, but unmarshalled as a sixteen-bit integer, then an incorrect result will occur as the receiver tries to unmarshall 3 and 4 as a sixteen-bit integer, and the receiving program will almost certainly fail later.</p>
+  <p class="zh">上面的序列化是<em>不透明的</em>或者被称为<em>隐式的</em>，如果采用这种格式来编组数据，那么在被序列化后的数据中没有任何信息用来指示它应该被如何解组。为了正确的解组，解组的一端需要精确的知晓编组的方式。如果表格的行数被以8位整型数的方式编组,但却被当作16位整型来解组，那么接收者在尝试将3与4当作16位整型解组的时候将会得到不正确的结果，几乎可以肯定的是:接收数据的程序将会在后来的某个时候失败。</p>
+  <p class="en">An early well-known serialisation method is XDR (external data representation) used by Sun's RPC, later known as ONC (Open Network Computing). XDR is defined by RFC 1832 and it is instructive to see how precise this specification is. Even so, XDR is inherently type-unsafe as serialised data contains no type information. The correctness of its use in ONC is ensured primarily by compilers generating code for both marshalling and unmarshalling.</p>
+  <p class="zh">早期比较出名的序列化方法是Java使用的XDR(外部资料表示法)。后来就是ONC(开放式网络运算)。XDR由 RFC 1832定义,阅读一下这个规范的详细定义是有意义的，即便如此，当被序列化的数据中不包含类型信息的时候,XDR是天生不安全的。在ONC中主要通过由编译器为编、解组生成额外的代码来确保数据的正确性。</p>
+  <p class="en">Go contains no explicit support for marshalling or unmarshalling opaque serialised data. The RPC package in Go does not use XDR, but instead uses "gob" serialisation, described later in this chapter.</p>
+  <p class="zh">Go没有为编、解组不透明的序列化数据提供显式的支持,标准包中的RPC包也没有使用XDR，而是使用了这一章后面的小节中将要介绍的gob来作为替代方案.</p>
 
-  <p>The above serialisation is <em>opaque</em> or <em>implicit</em>. If data is marshalled using the above format, then there is nothing in the serialised data to say how it should be unmarshalled. The unmarshalling side has to know exactly how the data is serialised in order to unmarshal it correctly. For example, if the number of rows is marshalled as an eight-bit integer, but unmarshalled as a sixteen-bit integer, then an incorrect result will occur as the receiver tries to unmarshall 3 and 4 as a sixteen-bit integer, and the receiving program will almost certainly fail later.</p>
-
-  <p>An early well-known serialisation method is XDR (external data representation) used by Sun's RPC, later known as ONC (Open Network Computing). XDR is defined by RFC 1832 and it is instructive to see how precise this specification is. Even so, XDR is inherently type-unsafe as serialised data contains no type information. The correctness of its use in ONC is ensured primarily by compilers generating code for both marshalling and unmarshalling.</p>
-
-  <p>Go contains no explicit support for marshalling or unmarshalling opaque serialised data. The RPC package in Go does not use XDR, but instead uses "gob" serialisation, described later in this chapter.</p>
-
-  <h2 id="heading_id_5">Self-describing data</h2>
-
-  <p>Self-describing data carries type information along with the data. For example, the previous data might get encoded as</p>
+  <h2 id="heading_id_5" class="en">Self-describing data</h2>
+  <h2 id="heading_id_5" class="zh">自描述数据</h2>
+  <p class="en"> Self-describing data carries type information along with the data. For example, the previous data might get encoded as</p>
+  <p class="zh">自描述数据在最终的结果数据中附带了类型信息,例如，前面提到的数据可能被编码为:</p>
   <pre><code>
 table
    uint8 3
@@ -201,21 +234,23 @@ string
    []byte manager
     </code></pre>
 
-  <p>Of course, a real encoding would not normally be as cumbersome and verbose as in the example: small integers would be used as type markers and the whole data would be packed in as small a byte array as possible. (XML provides a counter-example, though.). However, the principle is that the marshaller will generate such type information in the serialised data. The unmarshaller will know the type-generation rules and will be able to use this to reconstruct the correct data structure.</p>
-
-  <h2 id="heading_id_6">ASN.1</h2>
-
-  <p>Abstract Syntax Notation One (ASN.1) was originally designed in 1984 for the telecommunications industry. ASN.1 is a complex standard, and a subset of it is supported by Go in the package "asn1". It builds self-describing serialised data from complex data structures. Its primary use in current networking systems is as the encoding for X.509 certificates which are heavily used in authentication systems. The support in Go is based on what is needed to read and write X.509 certificates.</p>
-
-  <p>Two functions allow us to marshal and unmarshal data</p>
+  <p class="en">Of course, a real encoding would not normally be as cumbersome and verbose as in the example: small integers would be used as type markers and the whole data would be packed in as small a byte array as possible. (XML provides a counter-example, though.). However, the principle is that the marshaller will generate such type information in the serialised data. The unmarshaller will know the type-generation rules and will be able to use this to reconstruct the correct data structure.</p>
+  <p class="zh">当然，实际使用的编码不会如这个例子般啰嗦与累赘.小整数可能被用作类型标记，整个数据被尽可能的当作一个小的字节数组(XML是一个反例)，然而主要原则就是marshaller会在被编码后的数据中生成类型信息,unmarshaller知晓类型生成的规则，并使用此规则重构出正确的数据结构</p>
+  <h2 id="heading_id_6" class="en">ASN.1</h2>
+  <h2 id="heading_id_6" class="zh"> 抽象语法表示法</h2>
+  <p class="en">Abstract Syntax Notation One (ASN.1) was originally designed in 1984 for the telecommunications industry. ASN.1 is a complex standard, and a subset of it is supported by Go in the package "asn1". It builds self-describing serialised data from complex data structures. Its primary use in current networking systems is as the encoding for X.509 certificates which are heavily used in authentication systems. The support in Go is based on what is needed to read and write X.509 certificates.</p>
+  <p class="zh"> 抽象语法表示法/1(ASN.1)最初出现在1984年，它是一个为电信行业设计的复杂标准，Go的标准包asn1实现了它的一个子集，它可以将复杂的数据结构序列化成 自描述的数据。在当前的网络系统中，它主要用于对认证系统中重度使用的X.509证书的编码。Go对ASN.1的支持主要是X.509证书的读写上。</p>
+  <p class="en">Two functions allow us to marshal and unmarshal data</p>
+ <p class="zh">以下两个函数用以对数据的编、解组</p>
   <pre><code>
 func Marshal(val interface{}) ([]byte, os.Error)
 func Unmarshal(val interface{}, b []byte) (rest []byte, err os.Error)
     </code></pre>
 
-  <p>The first marshals a data value into a serialised byte array, and the second unmarshals it. However, the first argument of type <code>interface</code> deserves further examination. Given a variable of a type, we can marshal it by just passing its value. To unmarshal it, we need a variable of a named type that will match the serialised data. The precise details of this are discussed later. But we also need to make sure that the variable is allocated to memory for that type, so that there is actually existing memory for the unmarshalling to write values into.</p>
-
-  <p>We illustrate with an almost trivial example, of marshalling and unmarshalling an integer. We can pass an integer value to <code>Marshal</code> to return a byte array, and unmarshal the array into an integer variable as in this program: <!--
+  <p class="en">The first marshals a data value into a serialised byte array, and the second unmarshals it. However, the first argument of type <code>interface</code> deserves further examination. Given a variable of a type, we can marshal it by just passing its value. To unmarshal it, we need a variable of a named type that will match the serialised data. The precise details of this are discussed later. But we also need to make sure that the variable is allocated to memory for that type, so that there is actually existing memory for the unmarshalling to write values into.</p>
+  <p class="zh">前一个将数据值编组成序列化的字节数组，后一个将其解组出来，需要对<code>interface</code>类型的实参进行更多的检视。我们仅传递某个类型的变量的值即可将之编组，为了解组它，我们需要一个与被序列化过的数据匹配的确定类型的变量，详细的细节将在后面讨论
+，我们需要保证的是那个变量的内存已经被分配，以使被解组后的数据能有实际被写入的地址。</p>
+  <p class="en">We illustrate with an almost trivial example, of marshalling and unmarshalling an integer. We can pass an integer value to <code>Marshal</code> to return a byte array, and unmarshal the array into an integer variable as in this program: <!--
 . We can find the time from the function
   <code>LocalTime</code> in package "time". We can marshal this
   value directly as type <code>net.Time</code>. To unmarshal,
@@ -223,6 +258,7 @@ func Unmarshal(val interface{}, b []byte) (rest []byte, err os.Error)
   variable must have allocated space, which we can ensure
   by using the operator <code>new</code>. 
 --></p>
+ <p class="zh">我们将举一个小例子，对一个整数进行编、解组。在这个例子中。我们将一个整数传递给<em>Marshal</em>得到一个字节数组，然后将此数组又解组成一个整数。</p>
   <pre><code><span class="sgc-8">
 <span class="sgc-2">/* ASN.1
  */
@@ -254,15 +290,18 @@ func Unmarshal(val interface{}, b []byte) (rest []byte, err os.Error)
 }
 </span></code></pre>
 
-  <p>The unmarshalled value, is of course, 13.</p>
+  <p class="en">The unmarshalled value, is of course, 13.</p>
+  <p class="zh">当然，被解组后的值，是13</p>
 
-  <p>Once we move beyond this, things get harder. In order to manage more complex data types, we have to look more closely at the data structures supported by ASN.1, and how ASN.1 support is done in Go.</p>
+  <p class= "en">Once we move beyond this, things get harder. In order to manage more complex data types, we have to look more closely at the data structures supported by ASN.1, and how ASN.1 support is done in Go.</p>
+  <p class="zh">一旦我们越过了这个小关卡，事情开始变得复杂，为了管理更复杂的数据类型，我们需要更深入的了解ASN.1支持的数据类型，以及Go是如何支持ASN.1的。</p>
+  <p class="en">Any serialisation method will be able to handle certain data types and not handle some others. So in order to determine the suitability of any serialisation such as ASN.1, you have to look at the possible data types supported versus those you wish to use in your application. The following ASN.1 types are taken from http://www.obj-sys.com/asn1tutorial/node4.html</p>
+   <p class="zh">
 
-  <p>Any serialisation method will be able to handle certain data types and not handle some others. So in order to determine the suitability of any serialisation such as ASN.1, you have to look at the possible data types supported versus those you wish to use in your application. The following ASN.1 types are taken from http://www.obj-sys.com/asn1tutorial/node4.html</p>
-
-  <p>The simple types are</p>
-
-  <ul>
+任何序列化方法都只能处理一些确定的数据类型而对另一些无能为力。因此为了评估类似ASN.1等序列化方案的可行性。你必须先将你在程序中要使用的数据类型与它们支持的数据类型做个比较，下面的ASN.1支持的数据类型来自于http://www.obj-sys.com/asn1tutorial/node4.html</p>
+  <p class="en"> The simple types are</p>
+  <p class="zh"> 简单数据类型有:</p>
+  <ul class="en">
     <li>BOOLEAN: two-state variable values</li>
 
     <li>INTEGER: Model integer variable values</li>
@@ -281,10 +320,30 @@ func Unmarshal(val interface{}, b []byte) (rest []byte, err os.Error)
 
     <li>CHARACTER STRING: Models values that are strings of characters fro</li>
   </ul>
+  <ul class="zh">
+    <li>BOOLEAN: 两态变量值</li>
 
-  <p>Character strings can be from certain character sets</p>
+    <li>INTEGER: 表征整型变量值</li>
 
-  <ul>
+    <li>BIT STRING: 表征任意长度的二进制数据</li>
+
+    <li>OCT STRING:表征长度是8的倍数的二进制数据</li>
+
+    <li>NULL: 指示一个没有有效数据的序列</li>
+
+    <li>OBJECT IDENTIFIER: 命名信息对象</li>
+
+    <li>REAL:表征一个real变量值</li>
+
+    <li>ENUMERATED: 表征 一个至少有三个状态的变量值</li>
+
+    <li>CHARACTER STRING: 表征一个字符串值</li>
+  </ul>
+
+
+  <p class="en">Character strings can be from certain character sets</p>
+  <p class="zh">字符串可以来自于确定的字符集</p>
+  <ul class="en">
     <li>NumericString: 0,1,2,3,4,5,6,7,8,9, and space</li>
 
     <li>PrintableString: Upper and lower case letters, digits, space, apostrophe, left/right parenthesis, plus sign, comma, hyphen, full stop, solidus, colon, equal sign, question mark</li>
@@ -300,9 +359,25 @@ func Unmarshal(val interface{}, b []byte) (rest []byte, err os.Error)
     <li>GraphicString 25 All registered G sets, and space GraphicString</li>
   </ul>
 
-  <p>And finally, there are the structured types:</p>
+<ul class="zh">
+    <li>NumericString: 0,1,2,3,4,5,6,7,8,9, 与空格(space)</li>
 
-  <ul>
+    <li>PrintableString: 大、小写字母，数字，空格，省略号，左、右小括号，加号，逗号，连字符，句号，斜线，冒号，等号，问号</li>
+
+    <li>TeletexString(T61String): CCITT的Teletex字符集中的T61，空格和删除(delete)</li>
+
+    <li>VideotexString:CCITT的Videotex字符集中的T.100与T.101, 空格和删除(delete)</li>
+
+    <li>VisibleString (ISO646String):国际ASCII中的打印字符集和空格</li>
+
+    <li>IA5String:国际字母表5(国际ASCII)</li>
+
+    <li>GraphicString:所有被注册的G集和空格</li>
+  </ul>
+
+  <p class="en">And finally, there are the structured types:</p>
+  <p class="zh">最后,以下是结构化的类型:</p>
+  <ul class="en">
     <li>SEQUENCE: Models an ordered collection of variables of different type</li>
 
     <li>SEQUENCE OF: Models an ordered collection of variables of the same type</li>
@@ -318,9 +393,26 @@ func Unmarshal(val interface{}, b []byte) (rest []byte, err os.Error)
     <li>ANY: Enable an application to specify the type Note: ANY is a deprecated ASN.1 Structured Type. It has been replaced with X.680 Open Type.</li>
   </ul>
 
-  <p>Not all of these are supported by Go. Not all possible values are supported by Go. The rules as given in the Go "asn1" package documentation are</p>
+  <ul class="zh">
+    <li>SEQUENCE:表征不同类型变量构成的有序集合</li>
 
-  <ul>
+    <li>SEQUENCE OF: 表征相同类型的变量构成的有序集合</li>
+
+    <li>SET: 表征不同类型的变量构成的无序集</li>
+
+    <li>SET OF:表征相同类型的变量构成的有序集合</li>
+
+    <li>CHOICE:从一个不同类型构成的特定集合中选出一个类型</li>
+
+    <li>SELECTION: 从一个特定的CHOICE类型中选取一个组件类型</li>
+
+    <li>ANY:启用一个用以指定类型的应用. 注意:ANY是一个弃用的ASN.1结构类型,它被x.680的 Open Type所替代</li>
+  </ul>
+
+
+  <p class="en">Not all of these are supported by Go. Not all possible values are supported by Go. The rules as given in the Go "asn1" package documentation are</p>
+  <p class="zh">不是以上所有的类型，可能的值都被Go支持，在Go 'asn1'包文档中定义的规则如下:</p>
+  <ul class="en">
     <li>An ASN.1 INTEGER can be written to an int or int64. If the encoded value does not fit in the Go type, Unmarshal returns a parse error.</li>
 
     <li>An ASN.1 BIT STRING can be written to a BitString.</li>
@@ -342,12 +434,35 @@ func Unmarshal(val interface{}, b []byte) (rest []byte, err os.Error)
     <li>An ASN.1 SEQUENCE or SET can be written to a struct if each of the elements in the sequence can be written to the corresponding element in the struct.</li>
   </ul>
 
-  <p>Go places real restrictions on ASN.1. For example, ASN.1 allows integers of any size, while the Go implementation will only allow upto signed 64-bit integers. On the other hand, Go distinguishes between signed and unsigned types, while ASN.1 doesn't. So for example, transmitting a value of <code>uint64</code> may fail if it is too large for <code>int64</code>,</p>
+  <ul class="zh">
+    <li>ASN.1 INTEGER 可以被写入int或者int64中. 如果被编码的值与Go类型不匹配,Unmarshal将返回一个解析错误.</li>
 
-  <p>In a similar vein, ASN.1 allows several different character sets. Go only supports PrintableString and IA5String (ASCII). ASN.1 does not support Unicode characters (which require the BMPString ASN.1 extension). The basic Unicode character set of Go is not supported, and if an application requires transport of Unicode characters, then an encoding such as UTF-7 will be needed. Such encodings are discussed in a later chapter on character sets.</p>
+    <li> ASN.1 BIT STRING 可以被写入BitString中.</li>
 
-  <p>We have seen that a value such as an integer can be easily marshalled and unmarshalled. Other basic types such as booleans and reals can be similarly dealt with. Strings which are composed entirely of ASCII characters can be marshalled and unmarshalled. However, if the string is, for example, "hello \u00bc" which contains the non-ASCII character '¼' then an error will occur: "ASN.1 structure error: PrintableString contains invalid character". This code works, as long as the string is only composed of printable characters:</p>
-  <pre><code>
+    <li> ASN.1 OCT STRING可以被写入[]byte中.</li>
+
+    <li>ASN.1 OBJECT IDENTIFIER 可以被写入ObjectIdentifier中.</li>
+
+    <li>ASN.1 ENUMERATED 可以被写入Enumerated中.</li>
+
+    <li>ASN.1 UTCTIME或者GENERALIZEDTIME可以被写入*time.Time中.</li>
+
+    <li>ASN.1 PrintableString 或者 IA5String可以被写入string中.</li>
+
+    <li> 以上的任何ASN.1类型的值都可以作为对应的Go类型的值写入interface{}中，对于整数，类型将是int64.</li>
+
+    <li>如果 x可以被写入某个类型中，那么ASN.1 SEQUENCE OF x 或者 SET OF x,则可以写入此类型构成的slice中.</li>
+
+    <li>如果某个序列中的所有元素都可以被写入到某个结构里与之对应的元素中，那么此ASN.1 SEQUENCE 或者SET则可以写入到此结构中.</li>
+  </ul>
+
+  <p class="en">Go places real restrictions on ASN.1. For example, ASN.1 allows integers of any size, while the Go implementation will only allow upto signed 64-bit integers. On the other hand, Go distinguishes between signed and unsigned types, while ASN.1 doesn't. So for example, transmitting a value of <code>uint64</code> may fail if it is too large for <code>int64</code>,</p>
+  <p class="zh">Go在实现上,为ASN.1添加了一些约束，例如ASN.1允许任意大小的整数,而GO只允许最大为64位有符号整数的值.另一方面Go将类型区分有符号类型与无符号类型,而ASN.1则没有分别.因此传递一个大于<code>int64</code>能表示的最大值的<code>uint64</code>的值,那么可能会失败。</p>
+  <p class="en">In a similar vein, ASN.1 allows several different character sets. Go only supports PrintableString and IA5String (ASCII). ASN.1 does not support Unicode characters (which require the BMPString ASN.1 extension). The basic Unicode character set of Go is not supported, and if an application requires transport of Unicode characters, then an encoding such as UTF-7 will be needed. Such encodings are discussed in a later chapter on character sets.</p>
+  <p class="zh">同理ASN.1允许多个不同的字符集,而Go只支持PrintableString和IA5String(ASCII). ASN.1不支持Unicode字符(它需要BMPString ASN.1扩展)，Go中的基本Unicode字符集它也不支持，如果应用程序需要传输Unicode字符，则可能需要类似UTF-7的编码，编码相关的内容将会在后边有关字符集的章节来讨论。</p>
+  <p class="en">We have seen that a value such as an integer can be easily marshalled and unmarshalled. Other basic types such as booleans and reals can be similarly dealt with. Strings which are composed entirely of ASCII characters can be marshalled and unmarshalled. However, if the string is, for example, "hello \u00bc" which contains the non-ASCII character '¼' then an error will occur: "ASN.1 structure error: PrintableString contains invalid character". This code works, as long as the string is only composed of printable characters:</p>
+  <p class="zh">我们已经看到整型的值很容易被编、解组，类似的boolean与real等基本类型处理手法也类似，由ASCII字符构成的字符串也很容易。但对 "hello \u00bc"这个含有 '¼'这个非ASCII字符的字符串，在处理时,则会出现错误:”ASN.1 结构错误:PrintableString包含非法字符时，以下的代码在处理仅由可打印字符构成的字符串时,工作良好。</p>
+<pre><code>
         s := "hello"
         mdata, _ := asn1.Marshal(s)
 
@@ -355,8 +470,9 @@ func Unmarshal(val interface{}, b []byte) (rest []byte, err os.Error)
         asn1.Unmarshal(mdata, &amp;newstr)
     </code></pre>
 
-  <p>ASN.1 also includes some "useful types" not in the above list, such as UTC time. Go supports this UTC time type. This means that you can pass time values in a way that is not possible for other data values. ASN.1 does not support pointers, but Go has special code to manage pointers to time values. The function <code>GetLocalTime</code> returns <code>*time.Time</code>. The special code marshals this, and it can be unmarshalled into a pointer variable to a <code>time.Time</code> object. Thus this code works</p>
-  <pre><code>
+  <p class="en">ASN.1 also includes some "useful types" not in the above list, such as UTC time. Go supports this UTC time type. This means that you can pass time values in a way that is not possible for other data values. ASN.1 does not support pointers, but Go has special code to manage pointers to time values. The function <code>GetLocalTime</code> returns <code>*time.Time</code>. The special code marshals this, and it can be unmarshalled into a pointer variable to a <code>time.Time</code> object. Thus this code works</p>
+  <p class="zh">ASN.1还包含一些未在上边列表中出现的“有用的类型(useful types)”, 比如UTC时间类型，GO支持此UTC时间类型。这意味着你可以以一种其他数据值不能使用的方式来传递时间值。ASN.1不支持指针,Go中却含有用来管理指向时间值的指针特定代码。函数<codem>GetLocalTime</code>返回<code>*time.Time</code>,特定的代码将执行此编组动作，它也可以解组到一ime.Time对象的指针中。因此以下代码是可以工作的.</p>
+<pre><code>
         t := time.LocalTime()
         mdata, err := asn1.Marshal(t)
 
@@ -364,10 +480,11 @@ func Unmarshal(val interface{}, b []byte) (rest []byte, err os.Error)
         _, err1 := asn1.Unmarshal(&amp;newtime, mdata)
     </code></pre>
 
-  <p>Both <code>LocalTime</code> and <code>new</code> handle pointers to a <code>*time.Time</code>, and Go looks after this special case.</p>
-
-  <p>In general, you will probably want to marshal and unmarshal structures. Apart from the special case of time, Go will happily deal with structures, but not with pointers to structures. Operations such as <code>new</code> create pointers, so you have to dereference them before marshalling/unmarshalling them. Go normally dereferences pointers for you when needed, but not in this case. These both work for a type <code>T</code>:</p>
-  <pre><code>
+  <p class="en">Both <code>LocalTime</code> and <code>new</code> handle pointers to a <code>*time.Time</code>, and Go looks after this special case.</p>
+  <p class="zh"><code>LocalTime</code>与<code>new</code>函数都返回的是*time.Time类型的指针，GO将自己来照管此类特殊情况.</p>
+  <p class="en">In general, you will probably want to marshal and unmarshal structures. Apart from the special case of time, Go will happily deal with structures, but not with pointers to structures. Operations such as <code>new</code> create pointers, so you have to dereference them before marshalling/unmarshalling them. Go normally dereferences pointers for you when needed, but not in this case. These both work for a type <code>T</code>:</p>
+  <p class="zh">除了time这种特殊情况外，一般说来，你可能希望编、解组结构类型.Go在处理结构上，除开指向结构的指针外，还是令人非常愉快的。类以<code>new</code>的操作将会创建指针，因此在编、解组之前，你需要解引用它，通常，在你需要的时候，Go会自动对指针进行解引用，但是在此处并不是这么个情况，对于类型T，以下两种方式均可.</p>
+<pre><code>
 // using variables
 var t1 T
 t1 = ...
@@ -385,18 +502,20 @@ var newT2 = new(T)
 asn1.Unmarshal(newT2, mdata2)
     </code></pre>
 
-  <p>Any suitable mix of pointers and variables will work as well.</p>
-
-  <p>The fields of a structure must all be exportable, that is, field names must begin with an uppercase letter. Go uses the <code>reflect</code> package to marshal/unmarshal structures, so it must be able to examine all fields. This type cannot be marshalled:</p>
-  <pre><code>
+  <p class="en">Any suitable mix of pointers and variables will work as well.</p>
+  <p class="zh">恰当地的混用指针与变量，代码还是会工作得比较好.</p>
+  <p class="en">The fields of a structure must all be exportable, that is, field names must begin with an uppercase letter. Go uses the <code>reflect</code> package to marshal/unmarshal structures, so it must be able to examine all fields. This type cannot be marshalled:</p>
+  <p class="zh">结构的所有字段必须是可导出的，即字段名必须以大写字母开头。Go使用<code>reflect</code>包来编、解组结构，因此他必须检查所有的字段，这个类型不能被编组:</p>
+ <pre><code>
       type T struct {
           Field1 int
           field2 int // not exportable
       }
     </code></pre>
 
-  <p>ASN.1 only deals with the data types. It does not consider the names of structure fields. So the following type <code>T1</code> can be marshalled/unmarshalled into type <code>T2</code> as the corresponding fields are the same types:</p>
-  <pre><code>
+  <p class="en">ASN.1 only deals with the data types. It does not consider the names of structure fields. So the following type <code>T1</code> can be marshalled/unmarshalled into type <code>T2</code> as the corresponding fields are the same types:</p>
+  <p class="zh">ASN.1只处理数据类型，它并不关心结构字段的名字。因此只要对应的字段类型相同那么下面的T1类型将可以被解、解组到T2类型中。</p>
+ <pre><code>
 type T1 struct {
     F1 int
     F2 string
@@ -408,7 +527,8 @@ type T2 struct {
 }
     </code></pre>
 
-  <p>Not only the types of each field must match, but the number must match as well. These two types don't work:</p>
+  <p class="en">Not only the types of each field must match, but the number must match as well. These two types don't work:</p>
+  <p class="zh">不仅每个字段的类型必须匹配，而且字段数目也要相等，下面两个类型将不会正常工作。</p>
   <pre><code>
 type T1 struct {
     F1 int
@@ -420,12 +540,13 @@ type T2 struct {
 }
     </code></pre>
 
-  <h3 id="heading_id_7">ASN.1 daytime client and server</h3>
-
-  <p>Now (finally) let us turn to using ASN.1 to transport data across the network.</p>
-
-  <p>We can write a TCP server that delivers the current time as an ASN.1 Time type, using the techniques of the last chapter. A server is</p>
-  <pre><code><span class="sgc-8">
+  <h3 id="heading_id_7" class="en">ASN.1 daytime client and server</h3>
+  <h3 id="heading_id_7" class="zh">ASN.1 daytime 客户端与服务器</h3>
+  <p class="en">Now (finally) let us turn to using ASN.1 to transport data across the network.</p>
+  <p class="zh">现在(最后)让我们转向使用ASN.1来跨网络传输数据</p>
+  <p class="en">We can write a TCP server that delivers the current time as an ASN.1 Time type, using the techniques of the last chapter. A server is</p>
+   <p class="zh">我们可以使用上一章的技术来编写一个将当前时间作为ASN.Time类型时间来传送的TCP服务器。服务器是:</p>
+<pre><code><span class="sgc-8">
 <span class="sgc-2">/* ASN1 DaytimeServer
  */
 </span><span class="sgc-3">package</span> main
@@ -469,9 +590,10 @@ type T2 struct {
 }
 </span></code></pre>
 
-  <p>which can be compiled to an executable such as <code>ASN1DaytimeServer</code> and run with no arguments. It will wait for connections and then send the time as an ASN.1 string to the client.</p>
-
-  <p>A client is</p>
+  <p class="en">which can be compiled to an executable such as <code>ASN1DaytimeServer</code> and run with no arguments. It will wait for connections and then send the time as an ASN.1 string to the client.</p>
+  <p class="zh">它可以被编译为一个可能叫做<em>ASN1DaytimeServer</em>的可执行程序，运行它不需要任何实际参数，(启动后)它将等待来自客户端的连接，当有新连接后它会将当前时间当作ASN.1字符串传回给客户端.</p>
+  <p class="en">A client is</p>
+ <p class="zh">客户端代码是</p>
   <pre><code><span class="sgc-8">
 <span class="sgc-2">/* ASN.1 DaytimeClient
  */
@@ -535,17 +657,18 @@ type T2 struct {
 }
 </span></code></pre>
 
-  <p>This connects to the service given in a form such as <code>localhost:1200</code>, reads the TCP packet and decodes the ASN.1 content back into a string, which it prints.</p>
-
-  <p>We should note that neither of these two - the client or the server - are compatable with the text-based clients and servers of the last chapter. This client and server are exchanging ASN.1 encoded data values, not textual strings.</p>
-
-  <h2 id="heading_id_8">JSON</h2>
-
-  <p>JSON stands for JavaScript Object Notation. It was designed to be a lighweight means of passing data between JavaScript systems. It uses a text-based format and is sufficiently general that it has become used as a general purpose serialisation method for many programming languages.</p>
-
-  <p>JSON serialises objects, arrays and basic values. The basic values include string, number, boolean values and the null value. Arrays are a comma-separated list of values that can represent arrays, vectors, lists or sequences of various programming languages. They are delimited by square brackets "[ ... ]". Objects are represented by a list of "field: value" pairs enclosed in curly braces "{ ... }".</p>
-
-  <p>For example, the table of employees given earlier could be written as an array of employee objects:</p>
+  <p class="en">This connects to the service given in a form such as <code>localhost:1200</code>, reads the TCP packet and decodes the ASN.1 content back into a string, which it prints.</p>
+  <p class="zh">连接字符串形如:<code>localhost:1200</code>.它将读取应答TCP包然后将ASN.1内容解码成字符串并输出</p>
+  <p class="en">We should note that neither of these two - the client or the server - are compatable with the text-based clients and servers of the last chapter. This client and server are exchanging ASN.1 encoded data values, not textual strings.</p>
+  <p class="zh">我们应当注意,无论是客户端还是服务器都不与兼容前一章介绍的基于文本的客户端与服务器。此地的客户端与服务器交换的是ASN.1编码的数据值，而非文本串.</p>
+  <h2 id="heading_id_8" class="en">JSON</h2>
+  <h2 id="heading_id_8" class="zh">JSON</h2>
+  <p class="en">JSON stands for JavaScript Object Notation. It was designed to be a lighweight means of passing data between JavaScript systems. It uses a text-based format and is sufficiently general that it has become used as a general purpose serialisation method for many programming languages.</p>
+  <p class="zh">JSON全称是JavaScript Object Notation,它是一种应用于JavaScript系统之间传递数据的轻量级格式，它使用基于文本的格式，因为足够通用，现在已经成为了被多种编程语言所采用的通用序列化方法。</p>
+  <p class="en">JSON serialises objects, arrays and basic values. The basic values include string, number, boolean values and the null value. Arrays are a comma-separated list of values that can represent arrays, vectors, lists or sequences of various programming languages. They are delimited by square brackets "[ ... ]". Objects are represented by a list of "field: value" pairs enclosed in curly braces "{ ... }".</p>
+  <p class="zh">JSON 序列化对象，数组和基本值，基本值包括:字符串,数字，布林值和NULL值。数组是逗号分割的一组值的列表，可以用来表示各种编程语言中的数组、向量、列表或者序列。它们由方括号来界定，对象则由一个包含在大括号中的"field: values"对构成的列表来表示。</p>
+  <p class="en">For example, the table of employees given earlier could be written as an array of employee objects:</p>
+  <p class="zh">例如.前面提到过的雇员表可以被编码成如下的一个雇员数组.</p>
   <pre>
 <code>
 [
@@ -556,11 +679,11 @@ type T2 struct {
 </code>
 </pre>
 
-  <p>There is no special support for complex data types such as dates, no distinction between number types, no recursive types, etc. JSON is a very simple language, but nevertheless can be quite useful. Its text-based format makes it easy for people to use, even though it has the overheads of string handling.</p>
-
-  <p>From the Go JSON package specification, marshalling uses the following type-dependent default encodings:</p>
-
-  <ul>
+  <p class="en">There is no special support for complex data types such as dates, no distinction between number types, no recursive types, etc. JSON is a very simple language, but nevertheless can be quite useful. Its text-based format makes it easy for people to use, even though it has the overheads of string handling.</p>
+  <p class="zh">JSON并没有为 类似date这类复杂的数据类型提供特殊支持，也不区别数字类型，没有递归类型等。JSON是一个非常简单但却十分有用的语言，尽管他基于文本的格式在字符串处理上开销过多，但是却很易用。</p>
+  <p class="en">From the Go JSON package specification, marshalling uses the following type-dependent default encodings:</p>
+   <p class="zh">从Go JSON包的规范文档可知，将在编组时使用以下类型相关的默认编码方法:</p>
+  <ul class="en">
     <li>Boolean values encode as JSON booleans.</li>
 
     <li>Floating point and integer values encode as JSON numbers.</li>
@@ -582,7 +705,30 @@ type T2 struct {
     <li>JSON cannot represent cyclic data structures and Marshal does not handle them. Passing cyclic structures to Marshal will result in an infinite recursion.</li>
   </ul>
 
-  <p>A program to store JSON serialised data into a file is</p>
+  <ul class="zh">
+    <li>布林值被编码为JSON的布林值</li>
+
+    <li>浮点数与整数被编码为JSON的数字值.</li>
+
+    <li>字符串被编码为JSON的字符串，对于每一个非法的UTF-8序列将由UTF8替换符U+FFFD替换.</li>
+
+    <li>数组与切片被JSON数组,除开[]byte,它将被编码会base64字符串.</li>
+
+    <li>结构体变量被编码为JSON对象.每一个结构体字段被编码为此对象的对应成员，默认情况下对象的key的名字将是对应结构体字段名转换为小写的结果，如果此字段含有tag.则此tag将成员key的名字.</li>
+
+    <li>map值被编码为JSON对象，此map的key的类型必须是string. map的key直接被当作JSON对象的key.(原文有误？)</li>
+
+    <li>指针值被编码为指针所指向的值(注意:此处只允许出现树(tree),而不允许出现’图(graph),空指针被编码为空JSON对象.</li>
+
+    <li>接口值被编码为接口实际包含的值。空接口被编码为空JSON对象</li>
+
+    <li>程道，复数，函数不能被编码为JSON格式，如果尝试这样做，Marshal将会返回一个InvalidTypeError错误.</li>
+
+    <li>JSON不能表示环形数据结构.Go的Marshal函数也不处理它们，将一个环形结构传递给Marshal将会导致死循环.</li>
+  </ul>
+
+  <p class="en">A program to store JSON serialised data into a file is</p>
+  <p class="zh">将JSON数据存入文件的示例如下:</p>
   <pre><code><span class="sgc-8">
 <span class="sgc-2">/* SaveJSON
  */
@@ -636,7 +782,8 @@ type T2 struct {
 }
 </span></code></pre>
 
-  <p>and to load it back into memory is</p>
+  <p class="en">and to load it back into memory is</p>
+  <p class="zh">可以这样将之重新加载到内存中:</zh>
   <pre><code><span class="sgc-8">
 <span class="sgc-2">/* LoadJSON
  */
@@ -695,7 +842,8 @@ type T2 struct {
 }
 </span></code></pre>
 
-  <p>The serialised form is (formatted nicely)</p>
+  <p class="en">The serialised form is (formatted nicely)</p>
+  <p class="zh">被序列化后的结果型如:(良好格式化后)</p>
   <pre><code>
 {"Name":{"Family":"Newmarch",
          "Personal":"Jan"},
@@ -705,9 +853,10 @@ type T2 struct {
 }
     </code></pre>
 
-  <h3 id="heading_id_9">A client and server</h3>
-
-  <p>A client to send a person's data and read it back ten times is</p>
+  <h3 id="heading_id_9" class="en">A client and server</h3>
+  <h3 id="heading_id_9" class="zh">客户端与服务器</h3>
+  <p class="en"> A client to send a person's data and read it back ten times is</p>
+  <p class="zh">一个将person数据收发10次的客户端</p>
   <pre><code><span class="sgc-8">
 <span class="sgc-2">/* JSON EchoClient
  */
@@ -799,7 +948,8 @@ type T2 struct {
 }
 </span></code></pre>
 
-  <p>and the corrsponding server is</p>
+  <p class="en">and the corrsponding server is</p>
+  <p class="zh">对应的服务器</p>
   <pre><code><span class="sgc-8">
 <span class="sgc-2">/* JSON EchoServer
  */
@@ -871,21 +1021,23 @@ type T2 struct {
 }
 </span></code></pre>
 
-  <h2 id="heading_id_10">The gob package</h2>
-
-  <p>Gob is a serialisation technique specific to Go. It is designed to encode Go data types specifically and does not at present have support for or by any other languages. It supports all Go data types except for channels, functions and interfaces. It supports integers of all types and sizes, strings and booleans, structs, arrays and slices. At present it has some problems with circular structures such as rings, but that will improve over time.</p>
-
-  <p>Gob encodes type information into its serialised forms. This is far more extensive than the type information in say an X.509 serialisation, but far more efficient than the type information contained in an XML document. Type information is only included once for each piece of data, but includes, for example, the names of struct fields.</p>
-
-  <p>This inclusion of type information makes Gob marshalling and unmarshalling fairly robust to changes or differences between the marshaller and unmarshaller. For example, a struct</p>
-  <pre><code>
+  <h2 id="heading_id_10" class="en">The gob package</h2>
+  <h2 id="heading_id_10" class="zh">gob包</h2>
+  <p class="en">Gob is a serialisation technique specific to Go. It is designed to encode Go data types specifically and does not at present have support for or by any other languages. It supports all Go data types except for channels, functions and interfaces. It supports integers of all types and sizes, strings and booleans, structs, arrays and slices. At present it has some problems with circular structures such as rings, but that will improve over time.</p>
+  <p class="zh">gob是一个只能在Go程序中使用的序列化技术，它被设计用于编码特定于Go的数据类型,目前它既不支持其他语言，反之亦然.它支持除interface, function, channel外的所有的Go数据类型。它支持任何整数类型，任何大小的整数，字符串和布林值，结构，数组据与切片，目前它在处理ring等环型数据结构方面还存在一些问题，但假以时日，这将得到改善。</p>
+  <p class="en">Gob encodes type information into its serialised forms. This is far more extensive than the type information in say an X.509 serialisation, but far more efficient than the type information contained in an XML document. Type information is only included once for each piece of data, but includes, for example, the names of struct fields.</p>
+  <p class="zh">Go将类型信息编码到序列化后的表单中，在扩展性方面这远比对应的X.509序列化方法要好。而同时与将类型信息包含在表单中的XML文档相比，则更加高效。对于每一个数据片断，类型信息只包含一次，例如，结构体字段的名字.</p>
+  <p class="en">This inclusion of type information makes Gob marshalling and unmarshalling fairly robust to changes or differences between the marshaller and unmarshaller. For example, a struct</p>
+   <p class="zh">包含类型信息使得Gob在编、解组操作上，当marshaler与unmarshaler不同或者有变化时，具有相当高的健壮性。例如，如下这个结构:</p>
+<pre><code>
  struct T {
      a int
      b int
 }
     </code></pre>
 
-  <p>can be marshalled and then unmarshalled into a different struct</p>
+  <p class="en">can be marshalled and then unmarshalled into a different struct</p>
+  <p class="zh">可以被编组并随需解组到不同的结构中.</p>
   <pre><code>
  struct T {
      b int
@@ -893,21 +1045,23 @@ type T2 struct {
 }
     </code></pre>
 
-  <p>where the order of fields has changed. It can also cope with missing fields (the values are ignored) or extra fields (the fields are left unchanged). It can cope with pointer types, so that the above struct could be unmarshalled into</p>
-  <pre><code>
+  <p class="en">where the order of fields has changed. It can also cope with missing fields (the values are ignored) or extra fields (the fields are left unchanged). It can cope with pointer types, so that the above struct could be unmarshalled into</p>
+  <p class="zh">此处变更了字段的顺序.它也可以处理缺少字段(值将被忽略)或多出字段(此字段原样保持)的情况指针类型，因此上边的结构可以被解组到下面的结构中.</p>
+<pre><code>
  struct T {
      *a int
      **b int
 }
     </code></pre>
 
-  <p>To some extent it can cope with type coercions so that an <code>int</code> field can be broadened into an <code>int64</code>, but not with incompatable types such as <code>int</code> and <code>uint</code>.</p>
-
-  <p>To use Gob to marshall a data value, you first need to create an <code>Encoder</code>. This takes a <code>Writer</code> as parameter and marshalling will be done to this write stream. The encoder has a method <code>Encode</code> which marshalls the value to the stream. This method can be called multiple times on multiple pieces of data. Type information for each data type is only written once, though.</p>
-
-  <p>You use a <code>Decoder</code> to unmarshall the serialised data stream. This takes a <code>Reader</code> and each read returns an unmarshalled data value.</p>
-
-  <p>A program to store gob serialised data into a file is</p>
+  <p class="en">To some extent it can cope with type coercions so that an <code>int</code> field can be broadened into an <code>int64</code>, but not with incompatable types such as <code>int</code> and <code>uint</code>.</p>
+  <p class="zh">在一定程度上，它也可以强转类型，以至于int字段被扩展成为int64。而对于不兼容类型比如int与unit,就无能为力了.</p>
+  <p class="en">To use Gob to marshall a data value, you first need to create an <code>Encoder</code>. This takes a <code>Writer</code> as parameter and marshalling will be done to this write stream. The encoder has a method <code>Encode</code> which marshalls the value to the stream. This method can be called multiple times on multiple pieces of data. Type information for each data type is only written once, though.</p>
+  <p class="zh">为了使用gob编组一个数据值，首先你得创建<code>Encoder</code>.它使用<code>Writer</code>作为参数，编组操作将会将最终结果写入此流中. encoder有个<em>Encode</em>方法，它将执行将值编组成流的操作。此方法可以在多份数据上被调用多次，但是对于每一种数据类型，类型信息却只会被写入一回.</p>
+  <p class ="en">You use a <code>Decoder</code> to unmarshall the serialised data stream. This takes a <code>Reader</code> and each read returns an unmarshalled data value.</p>
+  <p class="zh">你将使用<em>Decoder</em>来执行解组序列化后的数据流的操作.它持有一个Reader参数，每次读取都将返回一个解组后的数据值.</p>
+  <p class="en">A program to store gob serialised data into a file is</p>
+  <p class="zh">将gob序列化后的数据存入文件的示例程序如下:</p>
   <pre><code><span class="sgc-8">
 <span class="sgc-2">/* SaveGob
  */
@@ -961,7 +1115,8 @@ type T2 struct {
 }
 </span></code></pre>
 
-  <p>and to load it back into memory is</p>
+  <p class="en">and to load it back into memory is</p>
+  <p class="zh">将之重新加载回内存的操作如下:</p>
   <pre><code><span class="sgc-8">
 <span class="sgc-2">/* LoadGob
  */
@@ -1020,9 +1175,10 @@ type T2 struct {
 }
 </span></code></pre>
 
-  <h3 id="heading_id_11">A client and server</h3>
-
-  <p>A client to send a person's data and read it back ten times is</p>
+  <h3 id="heading_id_11" class="en">A client and server</h3>
+  <h3 id="heading_id_11" class="zh">客户端与服务器</h3>
+  <p class="en">A client to send a person's data and read it back ten times is</p>
+  <p class="zh">一个将person数据收发10次的客户端</p>
   <pre><code><span class="sgc-8">
 <span class="sgc-2">/* Gob EchoClient
  */
@@ -1114,7 +1270,8 @@ type T2 struct {
 }
 </span></code></pre>
 
-  <p>and the corrsponding server is</p>
+  <p class="en">and the corrsponding server is</p>
+  <p class="zh">对应的服务器</p>
   <pre><code><span class="sgc-8">
 <span class="sgc-2">/* Gob EchoServer
  */
@@ -1186,17 +1343,20 @@ type T2 struct {
 }
 </span></code></pre>
 
-  <h2 id="heading_id_12">Encoding binary data as strings</h2>
+  <h2 id="heading_id_12" class="en">Encoding binary data as strings</h2>
+  <h2 id="heading_id_12">将二进制数据编码为字符串</h2>
+  <p class="en">Once upon a time, transmtting 8-bit data was problematic. It was often transmitted over noisy serial lines and could easily become corrupted. 7-bit data on the other hand could be transmitted more reliably because the 8th bit could be used as check digit. For example, in an "even parity" scheme, the check digit would be set to one or zero to make an even number of 1's in a byte. This allows detection of errors of a single bit in each byte.</p>
+  <p class="zh">以前，传输8-bit数据总是会出现各种问题。它通常由充满噪声的串行线来输入，因此常被中断，另一方面因为第8个比特位可以被用来做数字检验，所以7-bit的传输要值得信任一些。例如在 “偶数奇偶校检”模式下，为了让一个字节中出现偶数个1,校检位可以被设置1或0，这将可侦测每个字节中的单个bit位出现的错误.</p>
+  <p class="en">ASCII is a 7-bit character set. A number of schemes have been developed that are more sophisticated than simple parity checking, but which involve translating 8-bit binary data into 7-bit ASCII format. Essentially, the 8-bit data is stretched out in some way over the 7-bit bytes.</p>
+  <p class="zh">ASCII是一种7-bit字符集。很多比‘奇偶检验’精巧的模式被开发出来，但是本质上都是将8-bit二进制数据转化成7-bit ASCII格式，本质上8-bit数据是7-bit数据的延伸.</p>
+  <p class="en">Binary data transmitted in HTTP responses and requests is often translated into an ASCII form. This makes it easy to inspect the HTTP messages with a simple text reader without worrying about what strange 8-bit bytes might do to your display!</p>
+  <p class="zh">在HTTP的请求与应答中,二进制数据常被转化为ASCII的形式，这使得通过一个简单的文本阅读器来检视HTT消息变得容易，而不需要担心8-bit字节造成的显示乱码的问题。</p>
+  <p class="en">One common format is Base64. Go has support for many binary-to-text formats, including base64.</p>
+  <p class="zh">一个通用的格式是Base64，Go支持包括base64在内的多种binary-to-text格式.</p>
 
-  <p>Once upon a time, transmtting 8-bit data was problematic. It was often transmitted over noisy serial lines and could easily become corrupted. 7-bit data on the other hand could be transmitted more reliably because the 8th bit could be used as check digit. For example, in an "even parity" scheme, the check digit would be set to one or zero to make an even number of 1's in a byte. This allows detection of errors of a single bit in each byte.</p>
+  <p class="en">There are two principal functions to use for Base64 encoding and decoding:</p>
+  <p class="zh">两个编、解码Base64的主要函数:</p>
 
-  <p>ASCII is a 7-bit character set. A number of schemes have been developed that are more sophisticated than simple parity checking, but which involve translating 8-bit binary data into 7-bit ASCII format. Essentially, the 8-bit data is stretched out in some way over the 7-bit bytes.</p>
-
-  <p>Binary data transmitted in HTTP responses and requests is often translated into an ASCII form. This makes it easy to inspect the HTTP messages with a simple text reader without worrying about what strange 8-bit bytes might do to your display!</p>
-
-  <p>One common format is Base64. Go has support for many binary-to-text formats, including base64.</p>
-
-  <p>There are two principal functions to use for Base64 encoding and decoding:</p>
   <pre>
 <code>
 func NewEncoder(enc *Encoding, w io.Writer) io.WriteCloser
@@ -1204,7 +1364,8 @@ func NewDecoder(enc *Encoding, r io.Reader) io.Reader
 </code>
 </pre>
 
-  <p>A simple program just to encode and decode a set of eight binary digits is</p>
+  <p class="en">A simple program just to encode and decode a set of eight binary digits is</p>
+  <p class="zh">一个用以演示编解码8位二进制数的简单程序如下:</p>
   <pre><code><span class="sgc-8">
 <span class="sgc-9">/**
  * Base64
