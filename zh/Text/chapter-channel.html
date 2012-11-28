@@ -61,7 +61,7 @@
     <h2 id="heading_id_3" class="zh">警告</h2>
 
     <p class="en">The netchan package is being reworked. While it was in earlier versions of Go, it is not in Go 1. It is available in the <code>old/netchan</code> package if you still need it. This chapter describes this old version. Do not use it for new code.</p>
-    <p class="zh">现在netchan包正在重新设计。但在因为它在早期的Go版本（早于Go 1）中有被使用，如果你确实需要它，可以在<code>old/netchan</code>下找到。这一章描述的是旧版本的使用。请不要在新代码中使用它.</p>
+    <p class="zh">现在netchan包正在重新设计。出于对Go 1之前版本的兼容性考虑，可以在<code>old/netchan</code>下找到它。这一章描述的是旧版本的使用。请不要在新代码中使用它.</p>
   </div>
 
   <h2 id="heading_id_4" class="en">Introduction</h2>
@@ -74,7 +74,7 @@
   <p class="zh">Go内建channel作为第一等数据类型。一个使用channel的经典例子是Erastophene的素数筛选器：使用一个goroutine从2开始生成整数，将这些数字送入一系列作为过滤器的channel，每一个过滤器由一个不同的素数标识，它们把能被自身代表素数整除的数从流中删除，所以“2”goroutine过滤掉所有偶数，“3”goroutine过滤掉所有3的倍数。第一个从这一系列过滤器中走出来的必然是一个新的素数，然后再开启新的channel，用新素数生成一个新的过滤器，循环往复。</p>
 
   <p class="en">The efficacy of many thousands of goroutines communicating by many thousands of channels depends on how well the implementation of these primitives is done. Go is designed to optimise these, so this type of program is feasible.</p>
-  <p class="zh">无数goroutine之间通过大量channel通信的效率取决于原语设计的好坏。Go天生为此优化，所以这种程序是可行的</p>
+  <p class="zh">大量goroutine之间通过channel通信的效率取决于原语设计的好坏。Go天生为此优化，所以这种程序是可行的</p>
 
   <p class="en">Go also supports distributed channels using the <code>netchan</code> package. But network communications are thousands of times slower than channel communications on a single computer. Running a sieve on a network over TCP would be ludicrously slow. Nevertheless, it gives a programming option that may be useful in many situations.</p>
   <p class="zh">Go也通过<code>netchan</code>包支持分布式channel。但是网络间channel通信的效率远比单一电脑上channel间通信的效率低。在网络上通过TCP协议运行一个筛选器更是慢的可怕。然而，这还是给程序员多了一个选择，而且这在某些情况下十分有用。</p>
@@ -89,7 +89,7 @@
   <p class="zh">要让一个channel对客户端可见，你需要<em>导出</em>它。这可以通过不带参数<code>NewExporter</code>创建一个新的导出，之后服务器调用<code>ListenAndServe</code>监听、处理请求。<code>ListenAndServe</code>带有两个参数，第一个是底层的传输机制，比如“tcp”；第二个是监听地址（通常只是一个端口号）。</p>
 
   <p class="en">For each channel, the server creates a normal local channel and then calls <code>Export</code> to bind this to the network channel. At the time of export, the direction of communication must be specified. Clients search for channels by name, which is a string. This is specified to the exporter.</p>
-  <p class="zh">对每个channel，服务器创建一个普通的本地channel，然后调用<code>Export</code>将它绑定到网络channel上。在导出的同时，必须指定通信的方向。客户端可以通过名字（一个字符串）搜寻channel。8888888888888888888888</p>
+  <p class="zh">对每个channel，服务器创建一个普通的本地channel，然后调用<code>Export</code>将它绑定到网络channel上。在导出的同时，必须指定通信的方向。客户端可以通过名字（一个字符串）搜寻channel。</p>
 
   <p class="en">The server then uses the local channels in the normal way, reading or writing on them. We illustrate with an "echo" server which reads lines and sends them back. It needs two channels for this. The channel that the client writes to we name "echo-out". On the server side this is a read channel. Similarly, the channel that the client reads from we call "echo-in", which is a write channel to the server.</p>
   <p class="zh">服务器之后可以像使用本地channel一样，读取或是写入数据。我们以一个“echo”服务器为例，它读入文本，再原样发送回去。它需要两个channel，我们把客户端用来写入数据的channel叫做“echo-out”，在服务器端，用它来读取数据。相似的，客户端用来读取数据的channel叫做“echo-in”，服务器往里写入数据。</p>
@@ -208,7 +208,7 @@
   <h2 id="heading_id_7" class="zh">处理超时</h2>
 
   <p class="en">Because these channels use the network, there is alwasy the possibility of network errors leading to timeouts. Andrew Gerrand points out a solution using <a href="http://blog.golang.org/2010/09/go-concurrency-patterns-timing-out-and.html">timeouts</a>: "[Set up a timeout channel.] We can then use a select statement to receive from either ch or timeout. If nothing arrives on ch after one second, the timeout case is selected and the attempt to read from ch is abandoned."</p>
-  <p class="zh">因为channel使用网络通信，存在因为网络错误导致超时的可能性。Andrew Gerrand提出了一个办法<a href="http://blog.golang.org/2010/09/go-concurrency-patterns-timing-out-and.html">timeouts</a>: "[Set up a timeout channel.]</p>我们可以使用select语句从ch或是timeout接受信息。如果超过1秒钟ch没有收到信息，timeout通道被选择，放弃从ch获取信息。
+  <p class="zh">因为channel使用网络通信，存在因为网络错误导致超时的可能性。Andrew Gerrand提出了一个办法<a href="http://blog.golang.org/2010/09/go-concurrency-patterns-timing-out-and.html">timeouts</a>: "[Set up a timeout channel.]我们可以使用select语句从ch或是timeout接受信息。如果超过1秒钟ch没有收到信息，timeout通道被选择，放弃从ch获取信息。</p>
   <pre>
 <code>
 timeout := make(chan bool, 1)
@@ -230,9 +230,10 @@ case &lt;- timeout:
   <h2 id="heading_id_8" class="zh">传递channel的channel</h2>
 
   <p class="en">The online Go tutorial at http://golang.org/doc/go_tutorial.html has an example of multiplexing, where channels of channels are used. The idea is that instread of sharing one channel, a new communicator is given their own channel to have a privagye conversation. That is, a client is sent a channel from a server through a shared channel, and uses that private channel.</p>
-  <p class="zh">在线Go指导（http://golang.org/doc/go_tutorial.html）中展示了一个有点复杂的例子，其中使用了传递channel的channel。</p>
+  <p class="zh">在线Go指导（http://golang.org/doc/go_tutorial.html）中展示了一个有点复杂的例子，其中使用了传递channel的channel。这个方法避免了总是使用共享channel，新的进程被赋予他们自己的channel进行私有交流。即，客户端通过共享channel从服务器端获得一个channel，之后使用这个私有channel进行通信。</p>
 
   <p class="en">This doesn't work directly with network channels: a channel cannot be sent over a network channel. So we have to be a little more indirect. Each time a client connects to a server, the server builds new network channels and exports them with new names. Then it sends the <em>names</em> of these new channels to the client which imports them. It uses these new channels for communicaiton.</p>
+  <p class="zh">然而这对网络channel不起作用，网络channel不能发送channel，所以我们要稍微绕点弯路。每次客户端连接服务器，服务器建立一个新的channel，然后用新名字导出他们。之后向导入它们的客户端发送这些新channel的名字。最后使用这些新channel进行通信。</p>
 
   <p class="en">A server is</p>
   <p class="zh">服务器代码如下</p>
