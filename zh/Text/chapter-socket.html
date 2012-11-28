@@ -747,7 +747,8 @@ Sun Aug 29 17:25:19 EST 2010Connection closed by foreign host.
   <h3 id="heading_id_22" class="en">Multi-threaded server</h3>
   <h3 id="heading_id_22" class="zh">多线程服务器</h3>
 
-  <p>"echo" is another simple IETF service. This just reads what the client types, and sends it back:</p>
+  <p class="en">"echo" is another simple IETF service. This just reads what the client types, and sends it back:</p>
+  <p class="zh">"echo"是另一种简单的IETF服务。只是读取客户端数据，并将其发送回去:</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* SimpleEchoServer
  */
@@ -801,7 +802,8 @@ Sun Aug 29 17:25:19 EST 2010Connection closed by foreign host.
 }
 </span></code></pre>
 
-  <p>While it works, there is a significant issue with this server: it is single-threaded. While a client has a connection open to it, no other cllient can connect. Other clients are blocked, and will probably time out. Fortunately this is easly fixed by making the client handler a go-routine. We have also moved the connection close into the handler, as it now belongs there</p>
+  <p class="en">While it works, there is a significant issue with this server: it is single-threaded. While a client has a connection open to it, no other cllient can connect. Other clients are blocked, and will probably time out. Fortunately this is easly fixed by making the client handler a go-routine. We have also moved the connection close into the handler, as it now belongs there</p>
+  <p class="zh">工作时，此服务器有一个显著的问题: 它是单线程的。当有一个客户端连接到它，就没有其他的客户端可以连接上。其他客户端将被阻塞，可能会超时。幸好客户端很容易使用go-routine扩展。我们仅仅需要把连接关闭移到处理程序结束后，示例代码如下：</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* ThreadedEchoServer
  */
@@ -860,29 +862,38 @@ Sun Aug 29 17:25:19 EST 2010Connection closed by foreign host.
 }
 </span></code></pre>
 
-  <h2 id="heading_id_23">Controlling TCP connections</h2>
+  <h2 id="heading_id_23" class="en">Controlling TCP connections</h2>
+  <h2 id="heading_id_23" class="zh">控制TCP连接</h2>
 
-  <h3 id="heading_id_24">Timeout</h3>
+  <h3 id="heading_id_24" class="en">Timeout</h3>
+  <h3 id="heading_id_24" class="zh">超时</h3>
 
-  <p>The server may wish to timeout a client if it does not respond quickly enough i.e. does not write a request to the server in time. This should be a long period (several minutes), because the user may be taking their time. Conversely, the client may want to timeout the server (after a much shorter time). Both do this by</p>
+  <p class="en">The server may wish to timeout a client if it does not respond quickly enough i.e. does not write a request to the server in time. This should be a long period (several minutes), because the user may be taking their time. Conversely, the client may want to timeout the server (after a much shorter time). Both do this by</p>
+  <p class="zh">服务端会断开那些超时的客户端，如果他们相应不够快，比如没有及时往服务端写一个请求。这应该是长时间(几分钟)的，因为用户可能花费了时间。相反, 客户端可能希望超时服务器(一个更短的时间后)。通过下面的来实现这两种：</p>
   <pre><code>
 func (c *TCPConn) SetTimeout(nsec int64) os.Error
 </code></pre>
 
-  <p>before any reads or writes on the socket.</p>
+  <p class="en">before any reads or writes on the socket.</p>
+  <p class="zh">套接字读写前。</p>
 
-  <h3 id="heading_id_25">Staying alive</h3>
+  <h3 id="heading_id_25" class="en">Staying alive</h3>
+  <h3 id="heading_id_25" class="zh">存活状态</h3>
 
-  <p>A client may wish to stay connected to a server even if it has nothing to send. It can use</p>
+  <p class="en">A client may wish to stay connected to a server even if it has nothing to send. It can use</p>
+  <p class="zh">即使没有任何通信，一个客户端可能希望保持连接到服务器的状态。可以使用</p>
   <pre><code>
 func (c *TCPConn) SetKeepAlive(keepalive bool) os.Error
   </code></pre>
 
-  <p>There are several other connection control methods, documented in the "net" package.</p>
+  <p class="en">There are several other connection control methods, documented in the "net" package.</p>
+  <p class="zh">还有几个其他的连接控制方法, 可以查看"net"包。</p>
 
-  <h2 id="heading_id_26">UDP Datagrams</h2>
+  <h2 id="heading_id_26" class="en">UDP Datagrams</h2>
+  <h2 id="heading_id_26" class="zh">UDP数据报</h2>
 
-  <p>In a connectionless protocol each message contains information about its origin and destination. There is no "session" established using a long-lived socket. UDP clients and servers make use of datagrams, which are individual messages containing source and destination information. There is no state maintained by these messages, unless the client or server does so. The messages are not guaranteed to arrive, or may arrive out of order.</p>
+  <p class="en">In a connectionless protocol each message contains information about its origin and destination. There is no "session" established using a long-lived socket. UDP clients and servers make use of datagrams, which are individual messages containing source and destination information. There is no state maintained by these messages, unless the client or server does so. The messages are not guaranteed to arrive, or may arrive out of order.</p>
+  <p class="zh">在一个无连接的协议中，每个消息都包含了关于它的起源和目的地的信息。</p>
 
   <p>The most common situation for a client is to send a message and hope that a reply arrives. The most common situation for a server would be to receive a message and then send one or more replies back to that client. In a peer-to-peer situation, though, the server may just forward messages to other peers.</p>
 
