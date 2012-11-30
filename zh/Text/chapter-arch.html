@@ -93,7 +93,7 @@
   <img alt="" src="../Images/iso.gif" /></p>
 
   <p class="zh">尽管OSI（开放系统互联）协议从未被完整地实现过，但它仍对分布式系统的讨论和设计产生了十分重要的影响。它的结构大致为下图所示：<br />
-  <img alt="" src="../Images/iso-zh.gif" /></p>
+  <img alt="" src="../Images/zh/iso.gif" /></p>
 
   <h3 id="heading_id_6" class="en">OSI layers</h3>
 
@@ -135,7 +135,7 @@
   <img alt="" src="../Images/tcp_stack.gif" /></p>
 
   <p class="zh">当OSI标准模型正在为实现细节闹得不可开交时，DARPA互联网技术项目却在忙着构建TCP/IP协议。它们取得了极大的成功，并引领了Internet（首字母大写），因为这是个更简单的层次结构：<br />
-  <img alt="" src="../Images/tcp_stack.gif" /></p>
+  <img alt="" src="../Images/zh/tcp_stack.gif" /></p>
 
   <h3 id="heading_id_8" class="en">Some Alternative Protocols</h3>
 
@@ -183,25 +183,39 @@
 
   <p class="en">A Wide Area Network (WAN) connects computers across a larger physical area, such as between cities. There are other types as well, such as MANs (Metropolitan Area Network), PANs (Personal Are Networks) and even BANs (Body Are Network).</p>
 
-  <p class="zh">广域网（WAN）连接起一个更大物理区域的计算机，例如城市之间。还有些其它的类型，如城域网（MAN）、个人域网（PAN）甚至体域网（BAN）。</p>
+  <p class="zh">广域网（WAN）连接起一个更大物理区域的计算机，例如城际间。还有些其它的类型，如城域网（MAN）、个人域网（PAN）甚至人体域网（BAN）。</p>
 
   <p class="en">An internet is a connection of two or more distinct networks, typically LANs or WANs. An intranet is an internet with all networks belonging to a single organisation.</p>
 
-  <p class="zh">An internet is a connection of two or more distinct networks, typically LANs or WANs. An intranet is an internet with all networks belonging to a single organisation.</p>
+  <p class="zh">互联网是多个不同网络的连接，一般为LAN或WAN。内联网是属于某个组织的所有网络加上互联网。</p>
 
-  <p>There are significant differences between an internet and an intranet. Typically an intranet will be under a single administrative control, which will impose a single set of coherent policies. An internet on the other hand will not be under the control of a single body, and the controls exercised over different parts may not even be compatable.</p>
+  <p class="en">There are significant differences between an internet and an intranet. Typically an intranet will be under a single administrative control, which will impose a single set of coherent policies. An internet on the other hand will not be under the control of a single body, and the controls exercised over different parts may not even be compatable.</p>
 
-  <p>A trivial example of such differences is that an intranet will often be restricted to computers by a small number of vendors running a standardised version of a particular operating system. On the other hand, an internet will often have a smorgasborg of different computers and operating systems.</p>
+  <p class="zh">互联网与内联网之间有明显的不同。一般来说，一个内联网处在单一的管控之下，它将被应用一组统一的策略。另一方面，一个互联网则不会在单一主体的控制之下，控制的不同部分甚至可能会不兼容。</p>
 
-  <p>The techniques of this book will be applicable to internets. They will also be valid for intranets, but there you will also find specialised, non-portable systems.</p>
+  <p class="en">A trivial example of such differences is that an intranet will often be restricted to computers by a small number of vendors running a standardised version of a particular operating system. On the other hand, an internet will often have a smorgasborg of different computers and operating systems.</p>
 
-  <p>And then there is the "mother" of all internets: The Internet. This is just a very, very large internet that connects us to Google, my computer to your computer and so on.</p>
+  <p class="zh">这种不同的一个例子，就是一个内联网通常被少量供应商提供的，运行着特定操作系统标准化版本的计算机所限制。另一方面，一个互联网通常有各种各样的计算机和操作系统。</p>
 
-  <h2 id="heading_id_10">Gateways</h2>
+  <p class="en">The techniques of this book will be applicable to internets. They will also be valid for intranets, but there you will also find specialised, non-portable systems.</p>
 
-  <p>A gateway is a generic term for an entity used to connect two or more networks. A repeater operates at the physical level copies the information from one subnet to another. A bridge operates at the data link layer level and copies frames between networks. A router operates at the network level and not only moves information between networks but also decides on the route.</p>
+  <p class="zh">本书中的技术可应用于互联网。它们对内联网也是有效的，但你也会发现一些专有的，不可移植的系统。</p>
 
-  <h2 id="heading_id_11">Packet encapsulation</h2>
+  <p class="en">And then there is the "mother" of all internets: The Internet. This is just a very, very large internet that connects us to Google, my computer to your computer and so on.</p>
+
+  <p class="zh">所有互联网都有一个“母网”：因特网。它其实就是个非常巨大的互联网，它将我们与Google、我们的计算机等等互相连接起来。</p>
+
+  <h2 id="heading_id_10" class="en">Gateways</h2>
+
+  <h2 id="heading_id_10" class="zh">网关</h2>
+
+  <p class="en">A gateway is a generic term for an entity used to connect two or more networks. A repeater operates at the physical level copies the information from one subnet to another. A bridge operates at the data link layer level and copies frames between networks. A router operates at the network level and not only moves information between networks but also decides on the route.</p>
+
+  <p class="zh">网关是一个统称，它用于连接起一个或多个网络。其中的网络层面上中继器在物理层面上进行操作，它将信息从一个子网复制到另一个子网上。桥接在数据连接层面上进行操作，它在网络之间复制帧。路由器在网络层面上进行操作，它不仅在网络之间复制信息，还决定了信息的传输路线。</p>
+
+  <h2 id="heading_id_11" class="en">Packet encapsulation</h2>
+
+  <h2 id="heading_id_11" class="zh">数据包封装</h2>
 
   <p>The communication between layers in either the OSI or the TCP/IP stacks is done by sending packets of data from one layer to the next, and then eventually across the network. Each layer has administrative information that it has to keep about its own layer. It does this by adding header information to the packet it receives from the layer above, as the packet passes down. On the receiving side, these headers are removed as the packet moves up.</p>
 
