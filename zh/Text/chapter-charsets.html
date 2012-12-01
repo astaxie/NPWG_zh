@@ -102,7 +102,7 @@
 
     <h1 id="heading_id_2" class="en">Managing character sets and encodings</h1>
 
-    <h1 id="heading_id_2" class="zh">字符集和编码处理</h1>
+    <h1 id="heading_id_2" class="zh">字符集和编码</h1>
 
   </div>
 
@@ -112,7 +112,7 @@
 
     <p class="en">There are many languages in use throughout the world, and they use many different character sets. There are also many ways of encoding character sets into binary formats of bytes. This chapter considers some of the issues in this.</p>
 
- <p class="zh">全世界有许多种语言，他们使用许多不同的字符集。同时还有很多方法对字符集进行二进制编码。本章将讨论几个关于编码的的话题</p>
+ <p class="zh">全世界在用的语言众多，他们使用许多不同的字符集。同时有很多方法对字符集进行二进制字节编码。本章将讨论几个关于编码的问题。</p>
 
   </div>
 
@@ -130,25 +130,25 @@
 
   <p class="en">Once upon a time there was EBCDIC and ASCII... Actually, it was never that simple and has just become more complex over time. There is light on the horizon, but some estimates are that it may be 50 years before we all live in the daylight on this!</p>
 
-  <p class="zh">以前用EBCDIC和ASCII编码，(别看只有两种编码)，但事情从来不是那样简单恰恰相反变得越来越复杂了。但据推测,这就像(黎明前)地平线上闪过了一道光，但要等到天亮还得50年。</p>
+  <p class="zh">以前用EBCDIC和ASCII编码，(别看只有两种编码)，但事情从来没有简单过，恰恰相反变得越来越复杂了。但据推测,编码简化就像(黎明前)地平线上闪过了一道光，但要等到天亮还得50年。</p>
 
 
 
   <p class="en">Early computers were developed in the english-speaking countries of the US, the UK and Australia. As a result of this, assumptions were made about the language and character sets in use. Basically, the Latin alphabet was used, plus numerals, punctuation characters and a few others. These were then encoded into bytes using ASCII or EBCDIC.</p>
 
-  <p class="zh">早期计算机是从美国、英国、澳大利亚这些英语国家发展起来的，结果计算机编码就已这些国家使用的语言和字符进行设计，简单地说，也就是拉丁字母，加上数字、标点和别的字符。他们使用ASCII或EBCDIC进行编码。</p>
+  <p class="zh">早期计算机是从美国、英国、澳大利亚这些英语国家发展起来的，结果计算机字符集就以这些国家使用的语言和字符进行设计，大体上，也就是拉丁字母，加上数字、标点和别的字符。他们使用ASCII或EBCDIC进行编码。</p>
 
 
 
   <p class="en">The character-handling mechanisms were based on this: text files and I/O consisted of a sequence of bytes, with each byte representing a single character. String comparison could be done by matching corresponding bytes; conversions from upper to lower case could be done by mapping individual bytes, and so on.</p>
 
-  <p class="zh">字符处理的机制是这样设计的：文件和输入输出都被定义成字节序列，每个字节代表一个单独的字符。字符串比较可以通过对比字节匹配度实现，大小写转换可以通过单个字节完成，等等。</p>
+  <p class="zh">字符处理的机制是基于此的：文件和输入输出都被定义成字节序列，每个字节代表一个单独的字符。字符串比较可以通过对比相对应的字节实现，字符串的大小写转换可以通过单个字节的操作完成，等等。</p>
 
 
 
   <p class="en">There are about 6,000 living languages in the world (3,000 of them in Papua New Guinea!). A few languages use the "english" characters but most do not. The Romanic languages such as French have adornments on various characters, so that you can write "j'ai arrêté", with two differently accented vowels. Similarly, the Germanic languages have extra characters such as '&szlig;'. Even UK English has characters not in the standard ASCII set: the pound symbol '&pound;' and recently the euro '&euro;'</p>
 
-  <p class="zh">世界上现存约有6000种语言（居然有3000种在巴布亚新几内亚）。一小部分使用英文字符，但更多的则不是。想法文这样的拉丁语言还会有字符修饰符号，所以你可以用两种不同的元音来拼写“j'ai arrêté”。同样地，德语也有像'&szlig;'这样的字符，甚至是英式英语也会有不在ASCII编码中的字符：英镑和欧元('&pound;'和 '&euro;')</p>
+  <p class="zh">世界上现存约有6000种语言（居然有3000种在巴布亚新几内亚）。一小部分使用英文字符，但更多的则不是。想法文这样的拉丁语系语言还会有字符修饰符号，所以你可以用两种不同的重读元音来拼写“j'ai arrêté”。同样地，德语也有像'&szlig;'这样的字符，甚至是英式英语也会有不在ASCII编码中的字符：英镑和欧元('&pound;'和 '&euro;')</p>
 
 
 
@@ -172,7 +172,7 @@
 
   <p class="en"><em>Internationalisation</em> (i18n) is how you write your applications so that they can handle the variety of languages and cultures. <em>Localisation</em> (l10n) is the process of customising your internationalised application to a particular cultural group.</p>
 
-  <p class="zh"><em>国际化</em>(i18n)是你的应用可以处理多种语言文化的解决方案。<em>本地化</em>(l10n)是你的一个把你的应用适配成小群体使用的解决方案。</p>
+  <p class="zh"><em>国际化</em>(i18n)是指你的应用可以处理多种语言和文化。<em>本地化</em>(l10n)是说你把国际化的应用适配成小群体使用。</p>
 
 
 
@@ -190,7 +190,7 @@
 
   <p class="en">It is important to be careful about exactly what part of a text handling system you are talking about. Here is a set of definitions that have proven useful.</p>
 
-  <p class="zh">准确定义我们讨论的文本处理是什么，十分重要。下面是有人做的一套定义方法。</p>
+  <p class="zh">准确定义我们讨论的文本处理是什么，十分重要。下面是有人做的一套行之有效的定义方法。</p>
 
 
 
