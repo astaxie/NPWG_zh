@@ -59,19 +59,20 @@
 
   <div class="preface">
     <p class="en">Communication between a client and a service requires the exchange of data. This data may be highly structured, but has to be serialised for transport. This chapter looks at the basics of serialisation and then considers several techniques supported by Go APIs.</p>
-    <p class="zh">客户端与服务之间通过数据交换来通信,数据可能是高度结构化的,但是为了传输它们必须被序列化,这一章将研究序列化基础并介绍一些Go API支持的序列化技术</p>
+    <p class="zh">客户端与服务之间通过数据交换来进行通信。数据可能是高度结构化的，所以必须被序列化才能用于传输。这一章将研究序列化基础并介绍一些Go API提供的序列化技术。</p>
   </div>
 
   <div class="generate_from_h2" id="generated-toc"></div>
 
-  <h2 id="heading_id_3">Introduction</h2>
+  <h2 id="heading_id_3" class='en'>Introduction</h2>
+  <h2 id="heading_id_3" class='zh'>简介</h2>
 
   <p class="en">A client and server need to exchange information via messages. TCP and UDP provide the transport mechanisms to do this. The two processes also have to have a protocol in place so that message exchange can take place meaningfully.</p>
-  <p class="zh">客户端与服务器需要通过消息来交换信息,TCP与UDP是消息传递的两种机制，在这两种机制之上就需要有适当的协议来约定传输的内容的含义了</p>
+  <p class="zh">客户端与服务器需要通过消息来交换信息。TCP与UDP是消息传递的两种机制，在这两种机制之上就需要有合适的协议来约定传输的内容的含义。</p>
   <p class="en">Messages are sent across the network as a sequence of bytes, which has no structure except for a linear stream of bytes. We shall address the various possibilities for messages and the protocols that define them in the next chapter. In this chapter we concentrate on a component of messages - the data that is transferred.</p>
-  <p class="zh">在网络上消息被当作字节序列来传输,除开是线性的字节流之外,它们是没有结构的,我们将在下一章解决定义消息与协议涉及到的的各种问题,这一章,我们将重点关注消息的一个方面-被传输的数据</p>
+  <p class="zh">在网络上，消息被当作字节序列来传输，它们是没有结构的，仅仅只是一串字节流。我们将在下一章讨论定义消息与协议涉及到的的各种问题。本章，我们只重点关注消息的其中一个方面 - 被传输的数据</p>
   <p class="en">A program will typically build complex data structures to hold the current program state. In conversing with a remote client or service, the program will be attempting to transfer such data structures across the network - that is, outside of the application's own address space.</p>
-  <p class="zh">典型地,程序将构造一个复杂的数据结构用来保持其自身当前的状态,在与远程的客户端或服务的交谈中,它可能会尝试通过网络将类似的结构传输过去-即:此数据结构出现在应用自身地址空间之外</p>
+  <p class="zh">程序通常构造一个复杂的数据结构来保存其自身当前的状态。与远程的客户端或服务的交互中，程序会通过网络将这样的数据结构传输到 -应用程序所在的地址空间之外的地方</p>
   <p class="en">Programming languages use structured data such as</p>
   <p class="zh">编程语言使用的结构化的数据类型有</p>
   <ul class="en">
@@ -102,9 +103,9 @@
 
     <li>可变记录</li>
 
-    <li>数组 - 固定大小或可变的</li>
+    <li>数组 - 固定大小或可变大小</li>
 
-    <li>字符串 - 固定大小或可变的</li>
+    <li>字符串 - 固定大小或可变大小</li>
 
     <li>表 - 例如:记录构成的数组</li>
 
@@ -121,7 +122,7 @@
   </ul>
 
   <p class="en">None of IP, TCP or UDP packets know the meaning of any of these data types. All that they can contain is a sequence of bytes. Thus an application has to <em>serialise</em> any data into a stream of bytes in order to write it, and deserialise the stream of bytes back into suitable data structures on reading it. These two operations are known as <em>marshalling</em> and <em>unmarshalling</em> respectively.</p>
-  <p class="zh">没有一个IP,TCP或者UDP包知道这些数据类型的含义,他们能包含的只是字节序列，因此为了写入数据,应用需要将其<em>序列化</em>,反之为了读取数据，应用需要将字节流<em>反序列化</em>到合适的数据结构，这两个操作被分别称为<em>编组</em>与<em>解组</em>。</p>
+  <p class="zh">IP，TCP或者UDP网络包并不知道这些数据类型的含义，它们做的只是包含这些字节序列。因此，写入网络包的时候，应用需要将传输的数据类型 <em>序列化</em> 成字节流，反之，读取网络包的时候，应用需要将字节流<em>反序列化</em>成合适的数据结构，这两个操作被分别称为<em>编组</em>和<em>解组</em>。</p>
   <p class="en">For example, consider sending the following variable length table of two columns of variable length strings:</p>
   <p class="zh">例如:考虑发送如下这样一个由两列可变长度字符串构成的可变长度的表格</p>
   <div class="sgc-1">
@@ -147,7 +148,7 @@
   </div>
 
   <p class="en">This could be done by in various ways. For example, suppose that it is known that the data will be an unknown number of rows in a two-column table. Then a marshalled form could be</p>
-  <p class="zh">这可以通过多种方式来完成.比如:假设知道数据将是一个未知行数的两列表格,那么编组形式可能是:</p>
+  <p class="zh">可以通过多种方式来完成。比如：假设知道数据是一个未知行数的两列表格，那么编组形式可能是:</p>
   <pre><code>
     3                // 3 rows, 2 columns assumed
     4 fred           // 4 char string,col 1
@@ -171,7 +172,7 @@
 </code></pre>
 
   <p class="en"> Alternatively, it may be known that the data is a 3-row fixed table of two columns of strings of length 8 and 10 respectively. Then a serialisation could be</p>
-  <p class="zh">假设数据是一个三行两列且每列长度分别是8或10的表格，那么序列化的结果可能是:<p> 
+  <p class="zh">假设知道数据是一个三行两列且每列长度分别是8或10的表格，那么序列化的结果可能是:<p> 
  <pre><code>
     fred\0\0\0\0
     programmer
@@ -182,7 +183,7 @@
 </code></pre>
 
   <p class="en"><em>Any of these formats is okay - but the message exchange protocol must specify which one is used, or allow it to be determined at runtime.</em></p>
-  <p class="zh"><em>这些格式中的任意一种都是可行的-但是消息交换协议必须指定使用了哪一种或者允许在运行期决定</em></p>
+  <p class="zh"><em>这些格式中的任意一种都是可行的 - 但是消息交换协议必须约定指定使用哪一种，或者约定在运行期再决定。</em></p>
   <h2 id="heading_id_4" class="en">Mutual agreement</h2>
   <h2 id="heading_id_4" class="zh">双方协议</h2>
   <p class="en">The previous section gave an overview of the issue of data serialisation. In practise, the details can be considerably more complex. For example, consider the first possibility, marshalling a table into the stream</p>
