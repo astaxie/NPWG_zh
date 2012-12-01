@@ -185,9 +185,9 @@
   <p class="en"><em>Any of these formats is okay - but the message exchange protocol must specify which one is used, or allow it to be determined at runtime.</em></p>
   <p class="zh"><em>这些格式中的任意一种都是可行的 - 但是消息交换协议必须约定指定使用哪一种，或者约定在运行期再决定。</em></p>
   <h2 id="heading_id_4" class="en">Mutual agreement</h2>
-  <h2 id="heading_id_4" class="zh">双方协议</h2>
+  <h2 id="heading_id_4" class="zh">交互协议</h2>
   <p class="en">The previous section gave an overview of the issue of data serialisation. In practise, the details can be considerably more complex. For example, consider the first possibility, marshalling a table into the stream</p>
-  <p class="zh">前一小节总结了在数据序列化过程中可能遇到的各种问题。而在实际操作中，需要考虑的细节还更多一些，例如:首先考虑将如下这个表编组成流.</p>
+  <p class="zh">前一小节总结了在数据序列化过程中可能遇到的各种问题。而在实际操作中，需要考虑的细节还更多一些，例如：先考虑下面这个问题，如何将下面这个表编组成流.</p>
  <pre><code>
     3
     4 fred
@@ -199,13 +199,16 @@
     </code></pre>
 
   <p class="en">Many questions arise. For example, how many rows are possible for the table - that is, how big an integer do we need to describe the row size? If it is 255 or less, then a single byte will do, but if it is more, then a short, integer or long may be needed. A similar problem occurs for the length of each string. With the characters themselves, to which character set do they belong? 7 bit ASCII? 16 bit Unicode? The question of character sets is discussed at length in a later chapter.</p>
-  <p class="zh">许多问题冒出来了.例如：这个表格可能 有多少行？-即我们需要多大的整数来表示表格的大小,如果它只有255行或者更少,那么一个字节就够了,如果更大一些,就可能需要short, integer或者long 来表示了。对于字符串的长度也存在同样的问题，对字符本身来说,它们属于哪种字符集? 7位的 ASCII? 16位的Unicode? 字符集的问题将会在后面的章节里详细讨论。</p>
+  <p class="zh">许多问题冒出来了。例如：这个表格可能有多少行？- 即我们需要多大的整数来表示表格的大小，如果它只有255行或者更少，那么一个字节就够了，如果更大一些，就可能需要short，integer或者long来表示了。对于字符串的长度也存在同样的问题，对字符本身来说，它们属于哪种字符集? 7位的ASCII？16位的Unicode？字符集的问题将会在后面的章节里详细讨论。</p>
+
   <p class="en">The above serialisation is <em>opaque</em> or <em>implicit</em>. If data is marshalled using the above format, then there is nothing in the serialised data to say how it should be unmarshalled. The unmarshalling side has to know exactly how the data is serialised in order to unmarshal it correctly. For example, if the number of rows is marshalled as an eight-bit integer, but unmarshalled as a sixteen-bit integer, then an incorrect result will occur as the receiver tries to unmarshall 3 and 4 as a sixteen-bit integer, and the receiving program will almost certainly fail later.</p>
-  <p class="zh">上面的序列化是<em>不透明的</em>或者被称为<em>隐式的</em>，如果采用这种格式来编组数据，那么在被序列化后的数据中没有任何信息用来指示它应该被如何解组。为了正确的解组，解组的一端需要精确的知晓编组的方式。如果表格的行数被以8位整型数的方式编组,但却被当作16位整型来解组，那么接收者在尝试将3与4当作16位整型解组的时候将会得到不正确的结果，几乎可以肯定的是:接收数据的程序将会在后来的某个时候失败。</p>
+  <p class="zh">上面的序列化是<em>不透明的</em>或者被称为<em>隐式的</em>，如果采用这种格式来编组数据，那么序列化后的数据中没有包含任何信息标示它应该被如何解组。为了正确的解组，解组的一端需要精确的知晓编组的方式。如果数据的行数以8位整型数的方式编组，却以16位整型的方式解组，那么接收者将得到错误的解码结果。比如接受者尝试将3与4当作16位整型解组，肯定会在后续的程序运行的时候失败。</p>
+
   <p class="en">An early well-known serialisation method is XDR (external data representation) used by Sun's RPC, later known as ONC (Open Network Computing). XDR is defined by RFC 1832 and it is instructive to see how precise this specification is. Even so, XDR is inherently type-unsafe as serialised data contains no type information. The correctness of its use in ONC is ensured primarily by compilers generating code for both marshalling and unmarshalling.</p>
-  <p class="zh">早期比较出名的序列化方法是Java使用的XDR(外部资料表示法)。后来就是ONC(开放式网络运算)。XDR由 RFC 1832定义,阅读一下这个规范的详细定义是有意义的，即便如此，当被序列化的数据中不包含类型信息的时候,XDR是天生不安全的。在ONC中主要通过由编译器为编、解组生成额外的代码来确保数据的正确性。</p>
+  <p class="zh">早期比较出名的序列化方法是Java使用的XDR(外部资料表示法)，比如被Sun公司的RPC使用。后来就是ONC(开放式网络运算)。XDR由 RFC 1832定义，阅读一下这个规范的详细定义是有意义的，即便如此，由于序列化的数据中不包含类型信息，XDR是天生不安全的。ONC中主要通过由编译器为编、解组生成额外的代码来确保数据的正确性。</p>
+
   <p class="en">Go contains no explicit support for marshalling or unmarshalling opaque serialised data. The RPC package in Go does not use XDR, but instead uses "gob" serialisation, described later in this chapter.</p>
-  <p class="zh">Go没有为编、解组不透明的序列化数据提供显式的支持,标准包中的RPC包也没有使用XDR，而是使用了这一章后面的小节中将要介绍的gob来作为替代方案.</p>
+  <p class="zh">Go没有为编、解组不透明的序列化数据提供显式的支持,标准包中的RPC包也没有使用XDR，而是使用了这一章后面的小节中将要介绍的gob来作为替代方案。</p>
 
   <h2 id="heading_id_5" class="en">Self-describing data</h2>
   <h2 id="heading_id_5" class="zh">自描述数据</h2>
@@ -236,9 +239,9 @@ string
     </code></pre>
 
   <p class="en">Of course, a real encoding would not normally be as cumbersome and verbose as in the example: small integers would be used as type markers and the whole data would be packed in as small a byte array as possible. (XML provides a counter-example, though.). However, the principle is that the marshaller will generate such type information in the serialised data. The unmarshaller will know the type-generation rules and will be able to use this to reconstruct the correct data structure.</p>
-  <p class="zh">当然，实际使用的编码不会如这个例子般啰嗦与累赘.小整数可能被用作类型标记，整个数据被尽可能的当作一个小的字节数组(XML是一个反例)，然而主要原则就是marshaller会在被编码后的数据中生成类型信息,unmarshaller知晓类型生成的规则，并使用此规则重构出正确的数据结构</p>
+  <p class="zh">当然，实际使用的编码不会如这个例子般啰嗦与累赘。小整数可能被用作类型标记，并且整个数据编码后的字节数组会尽量的小（XML是一个反例）。原则就是编组器会在序列化后的数据中包含类型信息。解组器就会知道类型生成的规则，并使用此规则重组出正确的数据结构。</p>
   <h2 id="heading_id_6" class="en">ASN.1</h2>
-  <h2 id="heading_id_6" class="zh"> 抽象语法表示法</h2>
+  <h2 id="heading_id_6" class="zh">抽象语法表示法</h2>
   <p class="en">Abstract Syntax Notation One (ASN.1) was originally designed in 1984 for the telecommunications industry. ASN.1 is a complex standard, and a subset of it is supported by Go in the package "asn1". It builds self-describing serialised data from complex data structures. Its primary use in current networking systems is as the encoding for X.509 certificates which are heavily used in authentication systems. The support in Go is based on what is needed to read and write X.509 certificates.</p>
   <p class="zh"> 抽象语法表示法/1(ASN.1)最初出现在1984年，它是一个为电信行业设计的复杂标准，Go的标准包asn1实现了它的一个子集，它可以将复杂的数据结构序列化成 自描述的数据。在当前的网络系统中，它主要用于对认证系统中重度使用的X.509证书的编码。Go对ASN.1的支持主要是X.509证书的读写上。</p>
   <p class="en">Two functions allow us to marshal and unmarshal data</p>
