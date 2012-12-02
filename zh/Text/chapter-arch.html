@@ -217,93 +217,179 @@
 
   <h2 id="heading_id_11" class="zh">数据包封装</h2>
 
-  <p>The communication between layers in either the OSI or the TCP/IP stacks is done by sending packets of data from one layer to the next, and then eventually across the network. Each layer has administrative information that it has to keep about its own layer. It does this by adding header information to the packet it receives from the layer above, as the packet passes down. On the receiving side, these headers are removed as the packet moves up.</p>
+  <p class="en">The communication between layers in either the OSI or the TCP/IP stacks is done by sending packets of data from one layer to the next, and then eventually across the network. Each layer has administrative information that it has to keep about its own layer. It does this by adding header information to the packet it receives from the layer above, as the packet passes down. On the receiving side, these headers are removed as the packet moves up.</p>
 
-  <p>For example, the TFP (Trivial File Transfer Protocol) moves files from one computer to another. It uses the UDP protocol on top of the IP protocol, which may be sent over Ethernet. This looks like:<br />
+  <p class="zh">在OIS或TCP/IP协议栈层与层之间的通信，是通过将数据包从一个层发送到下一个层，最终穿过整个网络的。每一层都有必须保持其自身层的管理信息。从上层接收到的数据包在向下传递时，会添加头信息。在接收端，这些头信息会在向上传递时移除。</p>
+
+  <p class="en">For example, the TFP (Trivial File Transfer Protocol) moves files from one computer to another. It uses the UDP protocol on top of the IP protocol, which may be sent over Ethernet. This looks like:<br />
   <img alt="" src="../Images/packets.gif" /><br />
   The packet transmitted over ethernet, is of course the bottom one.</p>
 
-  <h2 id="heading_id_12">Connection Models</h2>
+  <p class="zh">例如，TFTP（普通文件传输协议）将文件从一台计算机移动到另一台上。它使用IP协议上的UDP协议，该协议可通过以太网发送。看起来就像这样：<br />
+  <img alt="" src="../Images/zh/packets.gif" /><br />
+  通过以太网发送的数据包，当然是底部那个。</p>
 
-  <p>In order for two computers to communicate, they must set up a path whereby they can send at least one message in a session. There are two major models for this:</p>
+  <h2 id="heading_id_12" class="en">Connection Models</h2>
 
-  <ul>
+  <h2 id="heading_id_12" class="zh">连接模型</h2>
+
+  <p class="en">In order for two computers to communicate, they must set up a path whereby they can send at least one message in a session. There are two major models for this:</p>
+
+  <p class="zh">为了两个计算机进行通信，就必须建立一个路径，使他们能够在一个会话中发送至少一条消息。有两个主要的模型：</p>
+
+  <ul class="en">
     <li>Connection oriented</li>
 
     <li>Connectionless</li>
   </ul>
 
-  <h3 id="heading_id_13">Connection oriented</h3>
+  <ul class="zh">
+    <li>面向连接模型</li>
 
-  <p>A single connection is established for the session. Two-way communications flow along the connection. When the session is over, the connection is broken. The analogy is to a phone conversation. An example is TCP</p>
+    <li>无连接模型</li>
+  </ul>
 
-  <h3 id="heading_id_14">Connectionless</h3>
+  <h3 id="heading_id_13" class="en">Connection oriented</h3>
 
-  <p>In a connectionless system, messages are sent independant of each other. Ordinary mail is the analogy. Connectionless messages may arrive out of order. An example is the IP protocol. Connection oriented transports may be established on top of connectionless ones - TCP over IP. Connectionless transports my be established on top of connection oriented ones - HTTP over TCP.</p>
+  <h3 id="heading_id_13" class="zh">面向连接模型</h3>
 
-  <p>There can be variations on these. For example, a session might enforce messages arriving, but might not guarantee that they arrive in the order sent. However, these two are the most common.</p>
+  <p class="en">A single connection is established for the session. Two-way communications flow along the connection. When the session is over, the connection is broken. The analogy is to a phone conversation. An example is TCP</p>
 
-  <h2 id="heading_id_15">Communications Models</h2>
+  <p class="zh">即为会话建立单个连接，沿着连接进行双向通信。当会话结束后，该连接就会断开。这类似于电话交谈。例子就是TCP。</p>
 
-  <h3 id="heading_id_16">Message passing</h3>
+  <h3 id="heading_id_14" class="en">Connectionless</h3>
 
-  <p>Some non-procedural languages are built on the principle of <em>message passing</em>. Concurrent languages often use such a mechanism, and the most well known example is probably the Unix pipeline. The Unix pipeline is a pipeline of bytes, but there is not an inherent limitation: Microsoft's PowerShell can send objects along its pipelines, and concurrent languages such as Parlog could send arbitrary logic data structures in messages between concurrent processes.</p>
+  <h3 id="heading_id_14" class="zh">无连接模型</h3>
 
-  <p>Message passing is a primitive mechanism for distributed systems. Set up a connection and pump some data down it. At the other end, figure out what the message was and respond to it, possibly sending messages back. This is illustrated by<br />
+  <p class="en">In a connectionless system, messages are sent independant of each other. Ordinary mail is the analogy. Connectionless messages may arrive out of order. An example is the IP protocol. Connection oriented transports may be established on top of connectionless ones - TCP over IP. Connectionless transports my be established on top of connection oriented ones - HTTP over TCP.</p>
+
+  <p class="zh">在无连接系统中，消息的发送彼此独立。这类似于普通的邮件。无连接模型的消息可能不按顺序抵达。例子就是IP协议。面向连接的传输可通过无连接模型——基于IP的TCP协议建立。无连接传输可通过面向连接模型——基于IP的HTTP协议建立。</p>
+
+  <p class="en">There can be variations on these. For example, a session might enforce messages arriving, but might not guarantee that they arrive in the order sent. However, these two are the most common.</p>
+
+  <p class="zh">这些是可变的。例如，会话可能会强制消息抵达，但可能无法保证它们按照发送的顺序抵达。不过这两个是最常见的。</p>
+
+  <h2 id="heading_id_15" class="en">Communications Models</h2>
+
+  <h2 id="heading_id_15" class="zh">通信模型</h2>
+
+  <h3 id="heading_id_16" class="en">Message passing</h3>
+
+  <h3 id="heading_id_16" class="zh">消息传递</h3>
+
+  <p class="en">Some non-procedural languages are built on the principle of <em>message passing</em>. Concurrent languages often use such a mechanism, and the most well known example is probably the Unix pipeline. The Unix pipeline is a pipeline of bytes, but there is not an inherent limitation: Microsoft's PowerShell can send objects along its pipelines, and concurrent languages such as Parlog could send arbitrary logic data structures in messages between concurrent processes.</p>
+
+  <p class="zh">一些非过程化语言建立在<em>消息传递</em>原理上。并发语言经常使用这种机制，最有名的大概要数Unix的管道了。Unix管道就是一管字节，但它并没有固定的限制：微软的PowerShell可沿着其管道发送对象；而像Parlog这样的并发语言，则能在并发的进程之间，将任意的逻辑数据结构当做消息来发送。</p>
+
+  <p class="en">Message passing is a primitive mechanism for distributed systems. Set up a connection and pump some data down it. At the other end, figure out what the message was and respond to it, possibly sending messages back. This is illustrated by<br />
   <img alt="" src="../Images/msg.gif" /></p>
 
-  <p>Low level event driven systems such as the X Window System function in a somewhat similar way: wait for message from a user (mouse clicks, etc), decode them and act on them.</p>
+  <p class="zh">消息传递是分布式系统最基本的机制，也就是建立连接并通过它传输一些数据。在另一端则需要理解这些消息的意思并做出响应，有时还需要返回一些消息。如下图所示：<br />
+  <img alt="" src="../Images/zh/msg.gif" /></p>
 
-  <p>Higher level event driven systems assume that this decoding has been done by the underlying system and the event is then dispatched to an appropriate object such as a ButtonPress handler. This can also be done in distributed message passing systems, whereby a message received across the network is partly decoded and dispatched to an appropriate handler.</p>
+  <p class="en">Low level event driven systems such as the X Window System function in a somewhat similar way: wait for message from a user (mouse clicks, etc), decode them and act on them.</p>
 
-  <h3 id="heading_id_17">Remote procedure call</h3>
+  <p class="zh">诸如X窗口系统之类的底层事件驱动系统功能也采用了类似的方式：等待用户的消息（如鼠标点击等），对它们进行解码并做出反应。</p>
 
-  <p>In any system, there is a transfer of information and flow control from one part of the system to another. In procedural languages this may consist of the procedure call, where information is placed on a call stack and then control flow is transferred to another part of the program.</p>
+  <p class="en">Higher level event driven systems assume that this decoding has been done by the underlying system and the event is then dispatched to an appropriate object such as a ButtonPress handler. This can also be done in distributed message passing systems, whereby a message received across the network is partly decoded and dispatched to an appropriate handler.</p>
 
-  <p>Even with procedure calls, there are variations. The code may be statically linked so that control transfers from one part of the program's executable code to another part. Due to the increasing use of library routines, it has become commonplace to have such code in dynamic link libraries (DLLs), where control transfers to an independent piece of code.</p>
+  <p class="zh">更高层的事件驱动系统则假定底层系统已经解码完成，接着该事件被分配给适当的对象，如ButtonPress处理程序。这也适用于分布式消息传递系统，通过对从网络接收的消息进行部分解码，并分配给适当的处理程序。</p>
 
-  <p>DLLs run in the same machine as the calling code. it is a simple (conceptual) step to transfer control to a procedure running in a different machine. The mechanics of this are not so simple! However, this model of control has given rise to the "remote procedure call" (RPC) which is discussed in much detail in a later chapter. This is illustrated by<br />
+  <h3 id="heading_id_17" class="en">Remote procedure call</h3>
+
+  <h3 id="heading_id_17" class="zh">远程过程调用</h3>
+
+  <p class="en">In any system, there is a transfer of information and flow control from one part of the system to another. In procedural languages this may consist of the procedure call, where information is placed on a call stack and then control flow is transferred to another part of the program.</p>
+
+  <p class="zh">在任何系统中，都有信息传输和流程控制来将该系统的一部分传到另一部分。在过程化语言中，它由过程调用来组成，其中的信息被放置到调用栈上，接着控制流程被传递至该程序的另一部分。</p>
+
+  <p class="en">Even with procedure calls, there are variations. The code may be statically linked so that control transfers from one part of the program's executable code to another part. Due to the increasing use of library routines, it has become commonplace to have such code in dynamic link libraries (DLLs), where control transfers to an independent piece of code.</p>
+
+  <p class="zh">甚至过程调用也有变化。代码可被静态链接，以便于控制从该程序可执行代码的一部分传输到另一部分。随着库例程的使用日益增多，将这类代码作为动态链接库（DLL）也变得司空见惯了，它用来控制传输独立的代码片段。</p>
+
+  <p class="en">DLLs run in the same machine as the calling code. it is a simple (conceptual) step to transfer control to a procedure running in a different machine. The mechanics of this are not so simple! However, this model of control has given rise to the "remote procedure call" (RPC) which is discussed in much detail in a later chapter. This is illustrated by<br />
   <img alt="" src="../Images/rpc.gif" /></p>
 
-  <p>There is an historical oddity called the "lightweight remote procedure call" invented by Microsoft as they transitioned from 16-bit to 32-bit applications. A 16-bit application might need to transfer data to a 32-bit application <em>on the same machine</em>. That made it lightweight as there was no networking! But it had many of the other issues of RPC systems in data representations and conversion.</p>
+  <p class="zh">DLL作为调用代码运行在相同的机器上。尽管对于不同机器上运行的过程传输控制来说，这种机制（在概念上）是一种简单的手段，但它实际上可不怎么简单！不过，这种控制模型却催生了“远程过程调用”（RPC），更多关于它的详情会在后面的章节中讨论。如下图所示：<br />
+  <img alt="" src="../Images/zh/rpc.gif" /></p>
 
-  <h2 id="heading_id_18">Distributed Computing Models</h2>
+  <p class="en">There is an historical oddity called the "lightweight remote procedure call" invented by Microsoft as they transitioned from 16-bit to 32-bit applications. A 16-bit application might need to transfer data to a 32-bit application <em>on the same machine</em>. That made it lightweight as there was no networking! But it had many of the other issues of RPC systems in data representations and conversion.</p>
 
-  <p>At the highest lvel, we could consider the equivalence or the non-equivalence of components of a distributed system. The most common occurrence is an asymmetric one: a client sends requests to a server, and the server responds. This is a <em>client-server</em> system.</p>
+  <p class="zh">微软在从16位应该过渡到32位时，曾发明过一种称为“轻量远程过程调用”的奇怪东西。16位应用可能需要<em>在相同的机器上</em>向32位应用传输数据。由于没有网络，竟使得它很轻量！不过，它也有RPC系统在数据表达和转换上的其它问题。</p>
 
-  <p>If both components are equivalent, both able to initiate and to respond to messages, then we have a <em>peer-to-peer</em> system. Note that this is a logical classification: one peer may be a 16,000 core mainframe, the other might be a mobile phone. But if both can act similarlym then they are peers.</p>
+  <h2 id="heading_id_18" class="en">Distributed Computing Models</h2>
 
-  <p>A third model is the so-called <em>filter</em>. Here one component passes information to another which modifies it before passing it to a third. This is a fairly common model: for example, the middle component gets information from a database as SQl records and transforms it into an HTML table for the third component (which might be a browser).</p>
+  <h2 id="heading_id_18" class="zh">分布式计算模型</h2>
 
-  <p>These are illustrated as:<br />
+  <p class="en">At the highest lvel, we could consider the equivalence or the non-equivalence of components of a distributed system. The most common occurrence is an asymmetric one: a client sends requests to a server, and the server responds. This is a <em>client-server</em> system.</p>
+
+  <p class="zh">在最上层，我们可以考虑分布式系统的组件是否等价。最常见的就是不对等的情况：客户端向服务器发送请求，然后服务端响应。这就是<em>客户端-服务器</em>系统。</p>
+
+  <p class="en">If both components are equivalent, both able to initiate and to respond to messages, then we have a <em>peer-to-peer</em> system. Note that this is a logical classification: one peer may be a 16,000 core mainframe, the other might be a mobile phone. But if both can act similarlym then they are peers.</p>
+
+  <p class="zh">若两个组件等价，且均可发起并响应信息，那么我们就有了一个<em>点对点</em>系统。注意这是个逻辑上的分类：一点可能是16,000个核心主机，而另一点可能只是个移动电话。但如果二者的行为类似，那么它们就都是点。</p>
+
+  <p class="en">A third model is the so-called <em>filter</em>. Here one component passes information to another which modifies it before passing it to a third. This is a fairly common model: for example, the middle component gets information from a database as SQl records and transforms it into an HTML table for the third component (which might be a browser).</p>
+
+  <p class="zh">第三种模型也就是所谓的<em>过滤器</em>。有一个组件将信息传至另一个组件，它在修改该信息后会传至第三个组件。这是个相当普遍的模型：例如，中间组件通过SQL从数据库中获取信息，并将其转换为HTML表单提供给第三个组件（它可能是个浏览器）。</p>
+
+  <p class="en">These are illustrated as:<br />
   <img alt="" src="../Images/peer.gif" /></p>
 
-  <h2 id="heading_id_19">Client/Server System</h2>
+  <p class="zh">如下所示：<br />
+  <img alt="" src="../Images/zh/peer.gif" /></p>
 
-  <p>Another view of a client server system is<br />
+  <h2 id="heading_id_19" class="en">Client/Server System</h2>
+
+  <h2 id="heading_id_19" class="zh">客户端/服务器系统</h2>
+
+  <p class="en">Another view of a client server system is<br />
   <img alt="" src="../Images/cs-system.gif" /></p>
 
-  <h2 id="heading_id_20">Client/Server Application</h2>
+  <p class="zh">客户端/服务器系统的另一种方式：<br />
+  <img alt="" src="../Images/zh/cs-system.gif" /></p>
 
-  <p>And a third view is<br />
+  <h2 id="heading_id_20" class="en">Client/Server Application</h2>
+
+  <h2 id="heading_id_20" class="zh">客户端/服务器应用</h2>
+
+  <p class="en">And a third view is<br />
   <img alt="" src="../Images/cs-application.gif" /></p>
 
-  <h2 id="heading_id_21">Server Distribution</h2>
+  <p class="zh">第三种方式：<br />
+  <img alt="" src="../Images/zh/cs-application.gif" /></p>
 
-  <p>A client-server systems need not be simple. The basic model is single client, single server<br />
+  <h2 id="heading_id_21" class="en">Server Distribution</h2>
+
+  <h2 id="heading_id_21" class="zh">服务器分布</h2>
+
+  <p class="en">A client-server systems need not be simple. The basic model is single client, single server<br />
   <img alt="" src="../Images/one-one.gif" /><br />
   but you can also have multiple clients, single server<br />
   <img alt="" src="../Images/many-one.gif" /><br />
   In this, the master receives requests and instead of handling them one at a time itself, passes them off to other servers to handle. This is a common model when concurrent clients are possible.</p>
 
-  <p>There are also single client, multiple servers<br />
+  <p class="zh">客户端/服务器系统并不简单。其基本模型是单一客户端，单一服务器：<br />
+  <img alt="" src="../Images/zh/one-one.gif" /><br />
+  不过你也可以有多个客户端，单一服务器：<br />
+  <img alt="" src="../Images/zh/many-one.gif" /><br />
+  这样，主站只需接收请求并处理一次，而无需将它们传递给其它服务器来处理。当客户端可能并发时，这就是个通用的模型。</p>
+
+  <p class="en">There are also single client, multiple servers<br />
   <img alt="" src="../Images/one-many.gif" /> which occurs frequently when a server needs to act as a client to other servers, such as a business logic server getting information from a database server. And of course, there could be multiple clients with multiple servers</p>
 
-  <h2 id="heading_id_22">Component Distribution</h2>
+  <p class="zh">还有单一客户端，多个服务器的情况：<br />
+  <img alt="" src="../Images/zh/one-many.gif" />当一个服务器需要作为其它服务器的客户端时，这种情况就会经常发生，例如当业务逻辑服务器从数据库服务器获取信息时。当然，还可以有多个客户端，多个服务器的情况。</p>
 
-  <p>A simple but effective way of decomposing many applications is to consider them as made up of three parts:</p>
+  <h2 id="heading_id_22" class="en">Component Distribution</h2>
 
-  <ul>
+  <h2 id="heading_id_22" class="zh">组件分布</h2>
+
+  <p class="en">A simple but effective way of decomposing many applications is to consider them as made up of three parts:</p>
+
+  <p class="zh">分解一些应用的一个简单有效的方式就是把它们看做三部分：</p>
+
+  <ul class="en">
     <li>Presentation component</li>
 
     <li>Application logic</li>
@@ -311,78 +397,157 @@
     <li>Data access</li>
   </ul>
 
-  <p>The <em>presentation component</em> is responsible for interactions with the user, both displaying data and gathering input. it may be a modern GUI interface with buttons, lists, menus, etc, or an older command-line style interface, asking questions and getting answers. The details are not important at this level.</p>
+  <ul class="zh">
+    <li>表现组件</li>
 
-  <p>The <em>application logic</em> is responsible for intrepreting the users' responses, for applying business rules, for preparing queries and managing responses from the thir component.</p>
+    <li>应用逻辑</li>
 
-  <p>The <em>data access</em> component is responsible for stroing and retrieving data. This will often be through a database, but not necessarily.</p>
+    <li>数据访问</li>
+  </ul>
 
-  <h3 id="heading_id_23">Gartner Classification</h3>
+  <p class="en">The <em>presentation component</em> is responsible for interactions with the user, both displaying data and gathering input. it may be a modern GUI interface with buttons, lists, menus, etc, or an older command-line style interface, asking questions and getting answers. The details are not important at this level.</p>
 
-  <p>Based on this threefold decomposition of applicaitons, Gartner considered how the components might be distributed in a client-server sysem. They came up with five models:<br />
+  <p class="zh"><em>表现组件</em>负责与用户进行交互，即显示数据和采集输入。它可以是带有按钮、列表和菜单等等的现代GUI界面，或较老的命令行式界面，询问问题并获取答案。在这一层上，具体详情并不重要。</p>
+
+  <p class="en">The <em>application logic</em> is responsible for intrepreting the users' responses, for applying business rules, for preparing queries and managing responses from the thir component.</p>
+
+  <p class="zh"><em>应用逻辑</em>组件负责解释用户的响应，根据应用业务规则，准备查询并管理来自其组件的响应。</p>
+
+  <p class="en">The <em>data access</em> component is responsible for stroing and retrieving data. This will often be through a database, but not necessarily.</p>
+
+  <p class="zh"><em>数据访问</em>组件负责存储并检索数据。这一般是通过数据库进行，不过也不一定。</p>
+
+  <h3 id="heading_id_23" class="en">Gartner Classification</h3>
+
+  <h3 id="heading_id_23" class="zh">Gartner分类</h3>
+
+  <p class="en">Based on this threefold decomposition of applicaitons, Gartner considered how the components might be distributed in a client-server sysem. They came up with five models:<br />
   <img alt="" src="../Images/gartner.gif" /></p>
 
-  <h3 id="heading_id_24">Example: Distributed Database</h3>
+  <p class="zh">基于这三部分的应用划分，Gartner公司考虑了这些组件在客户端-服务器系统中如何分布。他们想出了五种模型：<br />
+  <img alt="" src="../Images/zh/gartner.gif" /></p>
 
-  <ul>
+  <h3 id="heading_id_24" class="en">Example: Distributed Database</h3>
+
+  <h3 id="heading_id_24" class="zh">示例：分布式数据库</h3>
+
+  <ul class="en">
     <li>Gartner classification: 1</li>
   </ul>
 
-  <p><img alt="" src="../Images/gartner1.gif" /><br />
+  <ul class="zh">
+    <li>Gartner第一种分类：</li>
+  </ul>
+
+  <p class="en"><img alt="" src="../Images/gartner1.gif" /><br />
   Modern mobile phones make good examples of this: due to limited memory they may store a small part of a database locally so that they can usuall respond quickly. However, if data is required that is not held locally, then a request may be made to a remote database for that additional data.</p>
 
-  <p>Google maps forms another good example. Al of the maps reside on Google's servers. When one is requested by a user, the "nearby" maps are also downloaded into a small database in the browser. When the user moves the map a little bit, the extra bits required are already in the local store for quick response.</p>
+  <p class="zh"><img alt="" src="../Images/zh/gartner1.gif" /><br />
+  现代的移动电话就是个很好的例子：由于内存有限，它们只能通过存储一小部分本地数据库，因此它们通常能快速响应。若请求的数据不在本地，那么可为该附加数据请求远程数据库。</p>
 
-  <h3 id="heading_id_25">Example: Network File Service</h3>
+  <p class="en">Google maps forms another good example. Al of the maps reside on Google's servers. When one is requested by a user, the "nearby" maps are also downloaded into a small database in the browser. When the user moves the map a little bit, the extra bits required are already in the local store for quick response.</p>
 
-  <p>Gartner classification 2 allows remote clients acess to a shared file system<br />
+  <p class="zh">Google地图的形式是另一个很好的例子。所有的地图都在Google的服务器上。当用户请求时，“附近的”地图也会下载为一个浏览器中的小型数据库。当用户移动了一点地图时，额外的一点请求已经为快速响应在本地存储中了。</p>
+
+  <h3 id="heading_id_25" class="en">Example: Network File Service</h3>
+
+  <h3 id="heading_id_25" class="zh">示例：网络文件服务</h3>
+
+  <p class="en">Gartner classification 2 allows remote clients acess to a shared file system<br />
   <img alt="" src="../Images/gartner2.gif" /><br />
   There are many examples of scuh systems: NFS, Microsoft shares, DCE, etc</p>
 
-  <h3 id="heading_id_26">Example: Web</h3>
+   <p class="zh">Gartner第二种分类允许远程客户端访问已共享的文件系统：<br />
+  <img alt="" src="../Images/zh/gartner2.gif" /><br />
+  这里有一些这类系统的例子：NFS、Microsoft共享和DCE等等。</p>
 
-  <p>An example of Gartner classification 3 is the Web with Java applets. This is a distributed hypertext system, with many additional mechanisms<br />
+  <h3 id="heading_id_26" class="en">Example: Web</h3>
+
+  <h3 id="heading_id_26" class="zh">示例：Web</h3>
+
+  <p class="en">An example of Gartner classification 3 is the Web with Java applets. This is a distributed hypertext system, with many additional mechanisms<br />
   <img alt="" src="../Images/gartner3.gif" /></p>
 
-  <h3 id="heading_id_27">Example: Terminal Emulation</h3>
+  <p class="zh">Gartner第三种分类的一个例子就是Web上的小型Java应用。以下为带有一些附加机制的分布式超文本系统：<br />
+  <img alt="" src="../Images/zh/gartner3.gif" /></p>
 
-  <p>An example of Gartner classification 4 is terminal emulation. This allows a remote system to act as a normal terminal on a local system.<br />
+  <h3 id="heading_id_27" class="en">Example: Terminal Emulation</h3>
+
+  <h3 id="heading_id_27" class="zh">示例：终端仿真</h3>
+
+  <p class="en">An example of Gartner classification 4 is terminal emulation. This allows a remote system to act as a normal terminal on a local system.<br />
   <img alt="" src="../Images/gartner4.gif" /><br />
   Telnet is the most common example of this.</p>
 
-  <h3 id="heading_id_28">Example: Expect</h3>
+  <p class="zh">Gartner第四种分类就是终端仿真。这允许远程系统在本地系统上作为普通的终端：<br />
+  <img alt="" src="../Images/zh/gartner4.gif" /><br />
+  Telnet就是最常见的例子。</p>
 
-  <p>Expect is a novel illustration of Gartner classification 5. It acts as a wrapper around a classical system such as a command-line interface. It builds an X Window interface around this, so that the user interacts with a GUI, and the GUI in turn interacts with the command-line interface.<br />
+  <h3 id="heading_id_28" class="en">Example: Expect</h3>
+
+  <h3 id="heading_id_28" class="zh">示例：预期（Expect）</h3>
+
+  <p class="en">Expect is a novel illustration of Gartner classification 5. It acts as a wrapper around a classical system such as a command-line interface. It builds an X Window interface around this, so that the user interacts with a GUI, and the GUI in turn interacts with the command-line interface.<br />
   <img alt="" src="../Images/expect.gif" /></p>
 
-  <h3 id="heading_id_29">Example: X Window System</h3>
+  <p class="zh">预期（Expect）是Gartner第五种分类的一种另类的演示。它的行为类似于命令行接口这样的经典系统。它在此之上建立了X窗口界面，以此来让用户与GUI进行交互，然后GUI转而与命令行界面进行交互。<br />
+  <img alt="" src="../Images/zh/expect.gif" /></p>
 
-  <p>The X Window System itself is an example of Gartner classification 5. An application makes GUI calls such as <code>DrawLine</code>, but these are not handled directly but instead passed to an X Window server for rendering. This decouples the application view of windowing and the display view of windowing.<br />
+  <h3 id="heading_id_29" class="en">Example: X Window System</h3>
+
+  <h3 id="heading_id_29" class="zh">示例：X窗口系统</h3>
+
+  <p class="en">The X Window System itself is an example of Gartner classification 5. An application makes GUI calls such as <code>DrawLine</code>, but these are not handled directly but instead passed to an X Window server for rendering. This decouples the application view of windowing and the display view of windowing.<br />
   <img alt="" src="../Images/gartner5.gif" /></p>
 
-  <h3 id="heading_id_30">Three Tier Models</h3>
+  <p class="zh">X窗口系统本身也是Gartner第五种分类的一个例子。一个应用进行一次像 <code>DrawLine</code> 这样的GUI调用，但它并不直接进行处理，而是传递给X窗口服务来渲染。这可以解耦窗口应用视图和窗口显示视图。<br />
+  <img alt="" src="../Images/gartner5.gif" /></p>
 
-  <p>of course, if you have two tiers, then you can have three, four, or more. Some of the three tier possibilities are shown in this diagram:<br />
+  <h3 id="heading_id_30" class="en">Three Tier Models</h3>
+
+  <h3 id="heading_id_30" class="zh">三层模型</h3>
+
+  <p class="en">of course, if you have two tiers, then you can have three, four, or more. Some of the three tier possibilities are shown in this diagram:<br />
   <img alt="" src="../Images/threetier.gif" /></p>
 
-  <p>The modern Web is a good example of the rightmost of these. The backend is made up of a database, often running stored procedures to hold some of the database logic. The middle tier is an HTTP server such as Apache running PHP scripts (or Ruby on Rails, or JSP pages, etc). This will manage some of the logic and will have data such as HTML pages stored locally. The frontend is a browser to display the pages, under the control of some Javascript. In HTML 5, the frontend may also have a local database.</p>
+  <p class="zh">当然，如果你有两层，你也可以有三层、四层甚至多层。下图展示了一些可能的三层模型：<br />
+  <img alt="" src="../Images/zh/threetier.gif" /></p>
 
-  <h3 id="heading_id_31">Fat vs thin</h3>
+  <p class="en">The modern Web is a good example of the rightmost of these. The backend is made up of a database, often running stored procedures to hold some of the database logic. The middle tier is an HTTP server such as Apache running PHP scripts (or Ruby on Rails, or JSP pages, etc). This will manage some of the logic and will have data such as HTML pages stored locally. The frontend is a browser to display the pages, under the control of some Javascript. In HTML 5, the frontend may also have a local database.</p>
 
-  <p>A common labelling of components is "fat" or "thin". Fat components take up lots of memory and do complex processing. Thin components on the other hand, do little of either. There don't seem to be any "normal" size components, only fat or thin!</p>
+  <p class="zh">现代Web就是最右边那种模型很好的例子。后端建立为一个数据库，经常运行存储过程来保存一些数据库逻辑。中间层是一个Apache这样的运行PHP脚本（或Ruby on Rails，或JSP页面等）的HTTP服务器。这会管理一些逻辑和存储在本地的像HTML页面这样的数据。前端为显示由JavaScript控制的页面的浏览器。在HTML5中，前端也可以有一个本地数据库。</p>
 
-  <p>Fatness or thinness is a relative concept. Browsers are often laelled as thin because "all they do is diplay web pages". Firefox on my Linux box takes nearly 1/2 a gigabyte of memory, which I don't regard as small at all!</p>
+  <h3 id="heading_id_31" class="en">Fat vs thin</h3>
 
-  <h2 id="heading_id_32">Middleware model</h2>
+  <h3 id="heading_id_31" class="zh">“胖”与“瘦”</h3>
 
-  <p>Middleware is teh "glue" connecting components of a distributed system. The middleware model is<br />
+  <p class="en">A common labelling of components is "fat" or "thin". Fat components take up lots of memory and do complex processing. Thin components on the other hand, do little of either. There don't seem to be any "normal" size components, only fat or thin!</p>
+
+  <p class="zh">组件一般分为“胖”或“瘦”。“胖”组件占用大量的内存来做复杂的处理；“瘦”组件则恰恰相反，只占少量内存，做简单处理。似乎没有任何“正常”大小的组件，只有“胖”或“瘦”！</p>
+
+  <p class="en">Fatness or thinness is a relative concept. Browsers are often laelled as thin because "all they do is diplay web pages". Firefox on my Linux box takes nearly 1/2 a gigabyte of memory, which I don't regard as small at all!</p>
+
+  <p class="zh">“胖”或“瘦”的概念是相对的。浏览器经常被分为“瘦”组件，因为“它仅仅显示Web页面”。但我的Linux盒子中的Firefox用了将近1/2GB的内存，我可一点也不觉得它很小！</p>
+
+  <h2 id="heading_id_32" class="en">Middleware model</h2>
+
+  <h2 id="heading_id_32" class="zh">中间件模型</h2>
+
+  <p class="en">Middleware is teh "glue" connecting components of a distributed system. The middleware model is<br />
   <img alt="" src="../Images/middleware.gif" /></p>
 
-  <h2 id="heading_id_33">Middleware</h2>
+  <p class="zh">中间件是连接器分布式系统组件的“胶水”层。中间件模型如图所示：<br />
+  <img alt="" src="../Images/zh/middleware.gif" /></p>
 
-  <p>Components of middleware include</p>
+  <h2 id="heading_id_33" class="en">Middleware</h2>
 
-  <ul>
+  <h2 id="heading_id_33" class="zh">中间件</h2>
+
+  <p class="en">Components of middleware include</p>
+
+  <p class="zh">中间件组件包括：</p>
+
+  <ul class="en">
     <li>The network services include things like TCP/IP</li>
 
     <li>The middleware layer is application-independent s/w using the network services</li>
@@ -392,11 +557,25 @@
     <li>Middleware may only perform one function (such as RPC) or many (such as DCE)</li>
   </ul>
 
-  <h3 id="heading_id_34">Middleware examples</h3>
+  <ul class="zh">
+    <li>像TCP/IP这样的网络服务</li>
 
-  <p>Examples of middleware include</p>
+    <li>中间件层是应用独立的，使用网络服务的软件</li>
 
-  <ul>
+    <li>中间件的例子：DCE、RPC、Corba</li>
+
+    <li>中间件可能只执行一种功能（比如RPC）或多种功能（比如DCE）</li>
+  </ul>
+
+  <h3 id="heading_id_34" class="en">Middleware examples</h3>
+
+  <h3 id="heading_id_34" class="zh">中间件示例</h3>
+
+  <p class="en">Examples of middleware include</p>
+
+  <p class="zh">中间件的例子包括：</p>
+
+  <ul class="en">
     <li>Primitive services such as terminal emulators, file transfer, email</li>
 
     <li>Basic services such as RPC</li>
@@ -410,38 +589,65 @@
     <li>World Wide Web</li>
   </ul>
 
-  <h3 id="heading_id_35">Middleware functions</h3>
+  <ul class="zh">
+    <li>像终端模拟器、文件传输或电子邮件这样的基础服务</li>
 
-  <p>The functions of middleware include</p>
+    <li>像RPC这样的基础服务</li>
 
-  <ul>
-    <li>Initiation of processes at different computers</li>
+    <li>像DCE、网络O/S这样的一体化服务</li>
 
-    <li>Session management</li>
+    <li>像CORBA、OLE/ActiveX这样的分布式对象服务</li>
 
-    <li>Directory services to allow clients to locate servers</li>
+    <li>像RMI、Jini这样的移动对象服务</li>
 
-    <li>remote data access</li>
-
-    <li>Concurrency control to allow servers to handle multiple clients</li>
-
-    <li>Security and integrity</li>
-
-    <li>Monitoring</li>
-
-    <li>Termination of processes both local and remote</li>
+    <li>万维网</li>
   </ul>
 
-  <h2 id="heading_id_36">Continuum of Processing</h2>
+  <h3 id="heading_id_35" class="en">Middleware functions</h3>
 
-  <p>The Gartner model is based on a breakdown of an application into the components of presentation, application logic and data handling. A finer grained breakdown is<br />
-  <img alt="" src="../Images/continuum.gif" /></p>
+  <h3 id="heading_id_35" class="zh">中间件的功能</h3>
 
-  <h2 id="heading_id_37">Points of Failure</h2>
+  <p class="en">The functions of middleware include</p>
 
-  <p>Distributed applications run in a complex environment. This makes them much more prone to failure than standalone applications on a single computer. The points of failure include</p>
+  <p class="zh">中间件的功能包括：</p>
 
   <ul>
+    <li>在不同计算机上初始化过程</li>
+
+    <li>进行会话管理</li>
+
+    <li>允许客户端定位服务器的目录服务</li>
+
+    <li>进行远程数据访问</li>
+
+    <li>允许服务器处理多个客户端的并发控制</li>
+
+    <li>保证安全性和完整性</li>
+
+    <li>监控</li>
+
+    <li>终止本地处理和远程处理</li>
+  </ul>
+
+  <h2 id="heading_id_36" class="en">Continuum of Processing</h2>
+
+  <h2 id="heading_id_36" class="zh">连续处理</h2>
+
+  <p class="en">The Gartner model is based on a breakdown of an application into the components of presentation, application logic and data handling. A finer grained breakdown is<br />
+  <img alt="" src="../Images/continuum.gif" /></p>
+
+  <p class="zh">Gartner模型基于将一个应用分解为表现组件、应用逻辑和数据处理。一个更细粒度的分解方式为：<br />
+  <img alt="" src="../Images/zh/continuum.gif" /></p>
+
+  <h2 id="heading_id_37" class="en">Points of Failure</h2>
+
+  <h2 id="heading_id_37" class="zh">故障点</h2>
+
+  <p class="en">Distributed applications run in a complex environment. This makes them much more prone to failure than standalone applications on a single computer. The points of failure include</p>
+
+  <p class="zh">分布式应用一般运行在复杂的环境中。这使得它比单一计算机上的独立应用更易发生故障。故障点包括：</p>
+
+  <ul class="en">
     <li>The client side of the application could crash</li>
 
     <li>The client system may have h/w problems</li>
@@ -467,11 +673,41 @@
     <li>The server's database may become corrupted</li>
   </ul>
 
-  <p>Applications have to be designed with these possible failures in mind. Any action performed by one component must be recoverable if failure occurs in some other part of the system. Techniques such as transactions and continuous error checking need to be employed to avoid errors.</p>
+  <ul class="zh">
+    <li>应用可能会在客户端崩溃</li>
 
-  <h2 id="heading_id_38">Acceptance Factors</h2>
+    <li>客户端系统可能发生硬件问题</li>
 
-  <ul>
+    <li>客户端的网卡可能发生故障</li>
+
+    <li>网络连接可能超时</li>
+
+    <li>网络地址可能冲突</li>
+
+    <li>像路由器这样的网络基础设备可能发生故障</li>
+
+    <li>传输错误可能会失去消息</li>
+
+    <li>客户端与服务器的版本可能不兼容</li>
+
+    <li>服务器的网卡可能发生故障</li>
+
+    <li>服务器系统可能发生硬件问题</li>
+
+    <li>服务器的软件可能崩溃</li>
+
+    <li>服务器的数据库可能损坏</li>
+  </ul>
+
+  <p class="en">Applications have to be designed with these possible failures in mind. Any action performed by one component must be recoverable if failure occurs in some other part of the system. Techniques such as transactions and continuous error checking need to be employed to avoid errors.</p>
+
+  <p class="zh">在设计应用时必须考虑这些可能发生的故障。如果故障发生在系统的其它部分，那么由任何一个组件执行的操作都必须可恢复。这就需要采用事务和持续错误检测这类的计算来避免错误。</p>
+
+  <h2 id="heading_id_38" class="en">Acceptance Factors</h2>
+
+  <h2 id="heading_id_38" class="zh">接受因素</h2>
+
+  <ul class="en">
     <li>Reliability</li>
 
     <li>Performance</li>
@@ -485,11 +721,29 @@
     <li>Security</li>
   </ul>
 
-  <h2 id="heading_id_39">Transparency</h2>
+  <ul class="zh">
+    <li>可靠性</li>
+
+    <li>性能</li>
+
+    <li>响应性</li>
+
+    <li>可扩展性</li>
+
+    <li>可容性</li>
+
+    <li>安全性</li>
+  </ul>
+
+  <h2 id="heading_id_39" class="en">Transparency</h2>
+
+  <h2 id="heading_id_39" class="zh">透明度</h2>
 
   <p>The "holy grails" of distributed systems are to provide the following:</p>
 
-  <ul>
+  <p>分布式系统的“圣杯”就是提供以下几点：</p>
+
+  <ul class="en">
     <li>access transparency</li>
 
     <li>location transparency</li>
@@ -507,11 +761,33 @@
     <li>failure transparency</li>
   </ul>
 
-  <h2 id="heading_id_40">Eight fallacies of distributed computing</h2>
+  <ul class="zh">
+    <li>访问透明度</li>
+
+    <li>位置透明度</li>
+
+    <li>迁移透明度</li>
+
+    <li>赋值透明度</li>
+
+    <li>并发透明度</li>
+
+    <li>扩展透明度</li>
+
+    <li>性能透明度</li>
+
+    <li>故障透明度</li>
+  </ul>
+
+  <h2 id="heading_id_40" class="en">Eight fallacies of distributed computing</h2>
+
+  <h2 id="heading_id_40" class="zh">分布式计算的八个误区</h2>
 
   <p>Sun Microsystems was a company that performed much of the early work in distributed systems, and even had a mantra "The network is the computer." Based on their experience over many years a number of the scientists at Sun came up with the following list of fallacies commonly assumed:</p>
 
-  <ol>
+  <p>Sun微系统公司在分布式系统上做很很多早期的工作，他们甚至有一个口头禅：“网络就是计算机”。基于他们多年的经验，Sun的科学家总结了以下常见误区：</p>
+
+  <ol class="en">
     <li>The network is reliable.</li>
 
     <li>Latency is zero.</li>
@@ -529,14 +805,41 @@
     <li>The network is homogeneous.</li>
   </ol>
 
-  <p>Many of these directly impact on network programming. For example, the design of most remote procedure call systems is based on the premise that the network is reliable so that a remote procedure call will behave in the same way as a local call. The fallacies of zero latency and infinite bandwidth also lead to assumptions about the time duration of an RPC call being the same as a local call, whereas they are magnitudes of order slower.</p>
+  <ol class="zh">
+    <li>网络是可靠的。</li>
 
-  <p>The recognition of these fallacies led Java's RMI (remote method invocation) model to require every RPC call to potentially throw a <code>RemoteException</code>. This forced programmers to at least recognise the possibility of network error and to remind them that they could not expect the same speeds as local calls.</p>
+    <li>风险为零。</li>
 
-  <p>Copyright Jan Newmarch, jan@newmarch.name</p>
+    <li>带宽是无限的。</li>
 
-  <p>If you like this book, please contribute using Flattr <a class="FlattrButton sgc-2" href="http://jan.newmarch.name/go/index.html"></a><br />
+    <li>网络是安全的。</li>
+
+    <li>拓扑结构不会改变。</li>
+
+    <li>没有管理员。</li>
+
+    <li>传输成本为零。</li>
+
+    <li>网络是均等的。</li>
+  </ol>
+
+  <p class="en">Many of these directly impact on network programming. For example, the design of most remote procedure call systems is based on the premise that the network is reliable so that a remote procedure call will behave in the same way as a local call. The fallacies of zero latency and infinite bandwidth also lead to assumptions about the time duration of an RPC call being the same as a local call, whereas they are magnitudes of order slower.</p>
+
+  <p class="zh">这些问题直接影响着网络编程。例如，大部分远程过程调用系统的设计都基于网络是可靠的前提，从而导致了远程过程调用的行为与本地调用如出一辙。零风险和无限带宽的误区也导致了RPC调用的持续时间与本地调用相同的臆断，但实际上它要比本地调用慢很多。</p>
+
+  <p class="en">The recognition of these fallacies led Java's RMI (remote method invocation) model to require every RPC call to potentially throw a <code>RemoteException</code>. This forced programmers to at least recognise the possibility of network error and to remind them that they could not expect the same speeds as local calls.</p>
+
+  <p class="zh">对于这些错误的认识导致了Java的RMI（远程方法调用）模型要求每一个潜在的RPC调用都要抛出一个 <code>RemoteException</code> 异常。这迫使程序员至少认识到了网络错误的可能性，并提醒他们不要期望这会与本地调用的速度相同。</p>
+
+  <p class="en">Copyright Jan Newmarch, jan@newmarch.name</p>
+
+  <p class="zh">版权所有 © Jan Newmarch, jan@newmarch.name</p>
+
+  <p class="en">If you like this book, please contribute using Flattr <a class="FlattrButton sgc-2" href="http://jan.newmarch.name/go/index.html"></a><br />
   or donate using PayPal</p>
+
+  <p class="zh">如果你喜欢本书，请通过Flattr<a class="FlattrButton sgc-2" href="http://jan.newmarch.name/go/index.html"></a><br />
+  或使用PayPal捐赠。</p>
 
   <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
     <input name="cmd" type="hidden" value="_s-xclick" /> <input name="encrypted" type="hidden" value="-----BEGIN PKCS7-----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-----END PKCS7----- " /> <input alt="PayPal - The safer, easier way to pay online." border="0" name="submit" src="https://www.paypalobjects.com/WEBSCR-640-20110401-1/en_AU/i/btn/btn_donateCC_LG.gif" type="image" /> <img alt="" border="0" height="1" src="https://www.paypalobjects.com/WEBSCR-640-20110401-1/en_AU/i/scr/pixel.gif" width="1" />
