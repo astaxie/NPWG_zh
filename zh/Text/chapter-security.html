@@ -68,8 +68,7 @@
   risk.
 </p>
 <p class="zh">
-在合作开发比较可信的环境中,最初的互联网被设计成一个安全的且能抵御敌对代理攻击的系统。
-可惜，那些日子已经一去不复返了。网民自行承担垃圾邮件，拒绝服务攻击，网络钓鱼等攻击风险。
+尽管互联网最初被设计为可以承受敌对代理攻击的系统，但它过去一直是在一个可信的实体和合作的环境中发展起来的。可惜现在已经时过境迁。垃圾邮件，拒绝服务攻击，网络钓鱼这些东西使得每一个上网者都需要自行承担风险。
 </p>
 <p class="en">
   Applications have to be built to work correctly in
@@ -79,18 +78,18 @@
   only to legitimate users and other issues.
 </p>
 <p class="zh">
-应用程序在复杂的互联网环境中应能正确工作.“正确”不再意味着在程序调用的正确，而是在应用中确保数据传输的保密性和完整性，合法访问等问题。
+应用程序应当在复杂的互联网环境中仍然可以正确工作。“正确”不光意味着程序功能的正确，同时还意味着要确保数据传输过程中的保密性和完整性，甚至只允许合法用户进行访问和其它问题。
 </p>
 <p class="en">
   This of course makes your programs much more complex. There are
-  <em>difficult</em> and <em>subtle</em> computing problems involved 
+  <em>difficult</em> and <em>subtle</em> computing problems involved
   in making applications secure. Attempts to do it yourself (such as
   making up your own encryption libraries) are usually doomed
   to failure. Instead, you need to make use of libraries designed
   by security professionals
 </p>
 <p class="zh">
-这一节编程会很复杂,在构建安全的应用程序的过程中将会出现很复杂和微妙的问题.如果你企图这样做(自己实现一个安全库)最后通常是失败.但是我们可以使用安全专家实现好的安全库.
+这自然使得编程更加复杂。在构建安全应用程序的过程中，会出现很<em>复杂</em>和<em>微妙</em>的问题。如果你想自己这样做(如实现一个自有安全库)，通常都会以失败而告终。相反，你需要使用安全专家设计的安全库。
 </p>
 <h2 id="heading_toc_j_1" tabindex="-1" class="en"> ISO security architecture </h2>
 <h2 id="heading_toc_j_1" tabindex="-1" class="zh"> ISO 安全架构 </h2>
@@ -101,7 +100,7 @@
   <img src="./Security_files/iso.gif">
 </p>
 <p class="zh">
-ISO OSI（开放系统互连）七层模型分布式系统是众所周知的，在此重复图<br>
+ISO OSI（开放系统互连）七层模型分布式系统是众所周知的，在此重复如下图：<br>
   <img src="./Security_files/iso.gif">
 </p>
 <p class="en">
@@ -110,7 +109,7 @@ ISO OSI（开放系统互连）七层模型分布式系统是众所周知的，�
   important is the ISO Security Architecture model, ISO 7498-2.
 </p>
 <p class="zh">
-少为人知的国际标准化组织建立了一个全系列的这种架构文档。在这里，最重要的是，ISO安全体系结构模型
+少为人知的是，ISO在此架构的基础上建立了一系列完整的文档。而我们这里最重要的是ISO安全体系结构模型（ISO Security Architecture model）ISO 7498-2。
 </p>
 <h3 id="heading_toc_j_2" tabindex="-1" class="en"> Functions and levels </h3>
 <h3 id="heading_toc_j_2" tabindex="-1" class="zh"> 功能层次 </h3>
@@ -287,8 +286,8 @@ ISO OSI（开放系统互连）七层模型分布式系统是众所周知的，�
 	</li><li>
 	  labels
 	</li>
-      </ul>  
-      
+      </ul>
+
     </li><li>
       Connection confidentiality
       <ul>
@@ -423,7 +422,7 @@ ISO OSI（开放系统互连）七层模型分布式系统是众所周知的，�
 	</li><li>
 	  等级
 	</li>
-      </ul>  
+      </ul>
     </li><li>
       连接保密
       <ul>
@@ -535,7 +534,7 @@ ISO OSI（开放系统互连）七层模型分布式系统是众所周知的，�
   <em>hash</em> or <em>hash value</em>.
 </p>
 <p class="zh">
-确保数据的完整性意味着要提供一个数据不被篡改测试方法，一般通过字节数据生成一个简单的数字.调用hashing方法返回的数字即是hash或者hash值
+确保数据的完整性意味着要提供一个数据未被篡改的测试方法。通常是通过字节数据生成一个简单的数字。这个操作被称为<em>hashing</em>，结果数字成为<em>hash</em>或者<em>hash值</em>。
 </p>
 <p class="en">
   A naive hashing algorithm is just to sum up all the bytes in the
@@ -545,10 +544,10 @@ ISO OSI（开放系统互连）七层模型分布式系统是众所周知的，�
   but could end up with you owing someone $65,536 instead of $256.
 </p>
 <p class="zh">
-一个hash算法是计算所有的输入字节数据.然而,仍然允许修改被计算的数据但是需要保护hash值.例如,一位黑客交换了两个字节.为了保护hash值,最后的计算结果是65535而不是256
+有一个幼稚的hash算法是将数据所有的字节进行总和。然而，这却仍然允许数据在保留hash值不变的情况下对数据进行任意改变。例如，攻击者只需要交换两个字节。这样hash值没有改变，但结果可能是你本来欠别人256美元却变成了65535美元。
 </p>
 <p class="en">
-  Hashing algorithms used for security purposes have to be "strong", 
+  Hashing algorithms used for security purposes have to be "strong",
   so that it is very difficult
   for an attacker to find a different sequence of bytes with the same
   hash value. This makes it hard to modify the data to the attacker's
@@ -559,7 +558,8 @@ ISO OSI（开放系统互连）七层模型分布式系统是众所周知的，�
   algorithms which are believed to be strong.
 </p>
 <P class="zh">
-为了达到很高的安全性,hash算法必须很"强",黑客很难找到一个不同的字节序列具有相同的hash值.这样黑客就不能轻易修改数据.安全研究人员不断的测试看看他们是否能打破他们的hash算法-一个简单的就是找一个字节序列来匹配这个hash值.他们设计了一系列可信的非常强大的加密hash算法.
+用于安全目的的hash算法必须很“强”，这样攻击者才很难在保留相同的hash值时找到一个不同的字节序列。这样攻击者才很难修改数据以达到目的。安全研究人员不断测试是否能攻破hash算法 - 寻找一个简单方法，得到一个字节序列来匹配某个hash值。他们设计了一系列被认为很强的<em>加密</em>hash算法.
+
 </p>
 <p class="en">
   Go has support for several hashing algorithms, including
@@ -570,7 +570,7 @@ ISO OSI（开放系统互连）七层模型分布式系统是众所周知的，�
   from the <code>hash</code> package.
 </p>
 <p class="zh">
-Go支持几个hash算法,包括MD4, MD5, RIPEMD-160, SHA1, SHA224, SHA256, SHA384 and SHA512.它们都尽可能的拥有相同的访问模式:一个适当的包中定义了一个类似的方法<code>New</code>,返回一个<code>hash</code>包中的<code>Hash</code> 对象
+Go支持几个hash算法,包括MD4, MD5, RIPEMD-160, SHA1, SHA224, SHA256, SHA384 and SHA512。它们都尽可能按照Go程序员关注的，遵循相同的模式：在适当的包中定义<code>New</code>或类似的方法，返回一个<code>hash</code>包中的<code>Hash</code> 对象。
 <p/>
 <p class="en">
   A <code>Hash</code> has an <code>io.Writer</code>, and you write
@@ -579,7 +579,7 @@ Go支持几个hash算法,包括MD4, MD5, RIPEMD-160, SHA1, SHA224, SHA256, SHA38
   value by <code>Sum</code>.
 </p>
 <p class="zh">
-一个<code>Hash</code>结构体拥有一个<code>io.Writer</code>接口,你可以通过writer方法写入被hash的数据.你可以通过<code>Size</code>方法获取hash值的长度,<code>Sum</code>方法返回hash值
+一个<code>Hash</code>结构体拥有一个<code>io.Writer</code>接口，你可以通过writer方法写入被hash的数据.你可以通过<code>Size</code>方法获取hash值的长度，<code>Sum</code>方法返回hash值。
 </p>
 <p>
   A typical case is MD5 hashing. This uses the <code>md5</code>
@@ -588,7 +588,7 @@ Go支持几个hash算法,包括MD4, MD5, RIPEMD-160, SHA1, SHA224, SHA256, SHA38
   made of 4 bytes. A simple program is
 </p>
 <p class="zh">
-MD5算法是一个典型的案例,位于<code>md5</code>包中,hash值是一个16位的数组,这通常输出ASCII形式的由4个字节组成的四个十六进制数字,程序如下
+MD5算法是个典型的例子。使用<code>md5</code>包，hash值是一个16位的数组。通常以ASCII形式输出四个由4字节组成的十六进制数。程序如下
 </p>
 <pre><code><font color="black">
 <font color="firebrick">/* MD5Hash
@@ -631,7 +631,7 @@ MD5算法是一个典型的案例,位于<code>md5</code>包中,hash值是一个1
   <code>New</code> by
 </p>
 <p class="zh">
-HMAC(Keyed-Hash消息验证代码)是一个能添加一个key到hash算法的变量.在使用时有一个小小的变化.要使用MD5算法必须要一个key,可以通过以下形式替换<code>New</code>
+在此基础上的一个变化是HMAC(Keyed-Hash Message Authentication Code)，它给hash算法增加了一个key。使用时略有不同。要和key一起使用MD5算法时，可以通过以下形式替换<code>New</code>
 </p>
   <code>
     </code></p><pre><code>func NewMD5(key []byte) hash.Hash
@@ -649,17 +649,17 @@ HMAC(Keyed-Hash消息验证代码)是一个能添加一个key到hash算法的变
   key is transmitted between the agents is not discussed.
 </p>
 <p class="zh">
-数据加密有两种机制,第一种方式是在加密和解密时都使用同一个key,怎样在这两者之间传输暂不讨论
+数据加密有两种机制。第一种方式是在加密和解密时都使用同一个key。加密方和解密方都需要知道这个key。此处如何在这两者之间传输这个key。
 </p>
 <p class="en">
   As with hashing, there are many encryption algorithms.
   Many are now known to have weaknesses, and in general
   algorithms become weaker over time as computers get
   faster. Go has support for several symmetric key algorithms
-  such as Blowfish and DES. 
+  such as Blowfish and DES.
 </p>
 <p class="zh">
-当下有很多hash加密算法,很多算法有弱点,随着时间的推移,计算机越来越快,通用hash算法变得越来越弱.Go已经支持大量的对称加密算法,如Blowfish和DES
+目前有很多使用hash算法的加密算法。其中很多都有弱点，而且随着时间的推移，计算机越来越快，通用hash算法变得越来越弱。Go已经支持好几个对称加密算法，如Blowfish和DES。
 </p>
 <p class="en">
   The algorithms are <em>block</em> algorithms. That is they
@@ -668,7 +668,7 @@ HMAC(Keyed-Hash消息验证代码)是一个能添加一个key到hash算法的变
   at the end.
 </p>
 <p class="zh">
-这些算法是<em>block</em>算法,这是因为它们必须基于block数据.如果你的数据没有指定block大小,那么你必须在最后使用空格来填充多余的空间
+这些算法都是<em>block</em>算法。因为它们必须基于数据块(block)。如果你的数据不匹配block的大小，那就必须在最后使用空格来填充多余的空间。
 </p>
 <p class="en">
   Each algorith is represented by a <code>Cipher</code> object.
@@ -676,7 +676,7 @@ HMAC(Keyed-Hash消息验证代码)是一个能添加一个key到hash算法的变
   package, and takes the symmetric key as parameter.
 </p>
 <p class="zh">
-每个算法都被表示为一个<code>Cipher</code>对象.在适当的包中传入对称key调用<code>NewCipher</code>方法创建这个对象
+每个算法都被表示为一个<code>Cipher</code>对象。可通过在相应的包中使用对称key作为参数调用<code>NewCipher</code>方法来创建该对象。
 </p>
 <p class="en">
   Once you have a cipher, you can use it to encrypt and decrypt
@@ -684,7 +684,7 @@ HMAC(Keyed-Hash消息验证代码)是一个能添加一个key到hash算法的变
   A program to illustrate this is
 </p>
 <p class="zh">
-一旦你拥有cipher对象,就能加密和解密块数据.Blowfish需要8位的block,详见以下程序
+创建cipher对象后，就能通过它加密和解密数据块。Blowfish需要8位的block，详见以下程序
 </p>
 <pre><code><font color="black">
 <font color="firebrick">/* Blowfish
@@ -721,13 +721,13 @@ HMAC(Keyed-Hash消息验证代码)是一个能添加一个key到hash算法的变
 
 <div class="warning">
 <p class="en">
-  Blowfish is not in the Go 1 distribution. Instead it is on the 
+  Blowfish is not in the Go 1 distribution. Instead it is on the
   http://code.google.com/p/ site. You have to install it by running
   "go get"
   in a directory where you have source that needs to use it.
 </p>
 <p class="zh">
-Blowfish不在GO 1中,而是在http://code.google.com/p/.你可以在$GOPATH目录下运行"go get"安装
+Blowfish不在GO 1中，而是在http://code.google.com/p/中。你可以在需要使用它的源码目录下运行“go get”进行安装。
 </p>
 </div>
 
@@ -743,20 +743,20 @@ everyon would be able to decrypt those messages! Public key
 systems aer asymmetric, with different keys for different uses.
 </p>
 <p class="zh">
-公钥加密和解密需要<em>两个</em>key:一个进行加密,另一个进行解密.加密key通常是公开的,这样任何人都可以给你发送加密数据.解密key必须保密,否则任何人都可以解密数据.公钥系统是对称的,用不同的密钥对不同的用途
+公钥加密和解密需要<em>两个</em>key：一个用来加密，另一个用来解密。加密key通常是公开的，这样任何人都可以给你发送加密数据。解密key必须保密，否则任何人都可以解密数据。公钥系统是非对称的，不同的key有不同的用途。
 </p>
 <p class="en">
 There are many public key encryption systems supported by Go.
 A typical one is the RSA scheme.
 </p>
 <P class="zh">
-Go支持很多公钥加密系统,一个典型的就是RSA
+Go支持很多公钥加密系统，RSA就是一个典型的例子。
 </p>
 <p class="en">
   A program generating RSA private and public keys is
 </p>
 <p class="zh">
-  一个生成RSA公钥和私钥的程序
+  下面是一个生成RSA公钥和私钥的程序
 </p>
 <pre><code><font color="black">
 <font color="firebrick">/* GenRSAKeys
@@ -830,7 +830,7 @@ Go支持很多公钥加密系统,一个典型的就是RSA
   serialisation. They can be read back by this program:
 </p>
 <p class="zh">
-  通过<code>gob</code>序列化保存证书.也可以取回证书:
+  程序通过<code>gob</code>序列化保存证书。也可以取回证书:
 </p>
 <pre><code><font color="black">
 <font color="firebrick">/* LoadRSAKeys
@@ -928,12 +928,12 @@ var rsaPrivateKey = &rsa.PrivateKey{
 <h2 id="heading_toc_j_7" tabindex="-1" class="zh"> X.509 证书 </h2>
 <p class="en">
   A Public Key Infrastructure (PKI) is a framework for a collection
-  of public keys, along with additional information such as 
+  of public keys, along with additional information such as
   owner name and location, and links between them giving some
   sort of approval mechanism.
 </p>
 <p class="zh">
-公钥基础设施（PKI）是一个公钥集合框架.连同附加信息,如所有者名称和位置,以及它们之间的联系提供了一些排序的审批机制。
+公钥基础架构（PKI）是一个公钥集合框架，它连同附加信息，如所有者名称和位置，以及它们之间的联系提供了一些审批机制。
 </p>
 <p class="en">
   The principal PKI in use today is based on X.509 certificates.
@@ -941,14 +941,14 @@ var rsaPrivateKey = &rsa.PrivateKey{
   of web sites.
 </p>
 <p class="zh">
-当下主要使用的PKI是基于X.509证书的.例如浏览器使用它验证站点.
+目前主要使用的PKI是就是基于X.509证书的。例如浏览器使用它验证站点的身份。
 </p>
 <p class="en">
   An example program to generate a self-signed X.509 certificate
   for my web site and store it in a <code>.cer</code> file is
 </p>
 <p class="zh">
-下面是为自己的站点生成自签名X.509证书并存储在<code>.cer</code>文件中的一个程序
+下面的程序是为自己的站点生成自签名X.509证书并保存到一个<code>.cer</code>文件中
 </p>
 <pre><code><font color="black">
 <font color="firebrick">/* GenX509Cert
@@ -1039,7 +1039,7 @@ var rsaPrivateKey = &rsa.PrivateKey{
   This can then be read back in by
 </p>
 <p class="zh">
-下面这个程序可以获取这个证书
+下面这个程序可以读取这个证书
 </p>
 <pre><code><font color="black">
 <font color="firebrick">/* GenX509Cert
@@ -1082,16 +1082,16 @@ var rsaPrivateKey = &rsa.PrivateKey{
 <p></p>
 
 <h2 id="heading_toc_j_8" tabindex="-1" class="en"> TLS </h2>
-<h2 id="heading_toc_j_8" tabindex="-1" class="zh"> 安全传输层 </h2>
+<h2 id="heading_toc_j_8" tabindex="-1" class="zh"> TLS</h2>
 <p class="en">
 Encryption/decryption schemes are of limited use if you have to do
 all the heavy lifting yourself. The most popular mechanism on the internet
 to give support for encrypted message passing is currently TLS
-(Transport Layer Security) which was formerly SSL 
+(Transport Layer Security) which was formerly SSL
 (Secure Sockets Layer).
 </p>
 <p class="zh">
-你自己实现的加密和解密方案的使用是有限制的.在互联网上最流行的机制支持加密的消息传递给目前TLS（安全传输层），其前身为SSL（安全套接字层）。
+如果自己实现所有的细节，加解密的方案在使用上是有限制的。当前互联网上最流行的加密消息传输方案是TLS（Transport Layer Security安全传输层），其前身为SSL（Secure Sockets Layer安全套接字层）。
 </p>
 <p class="en">
 In TLS, a client and a server negotiate identity using X.509 certificates.
@@ -1100,9 +1100,9 @@ encryption/decryption is done using this key. The negotiation is
 relatively slow, but once complete a faster private key mechanism is used.
 </p>
 <p class="zh"></p>
-在TLS中，客户端和服务器之间使用X.509证书验证身份.身份验证完成后,在两者之间产生一个密钥,所有的加密和解密过程都使用这个密钥.这个过程虽然很慢,但是一旦完成你将使用一个非常快的私钥机制
+在TLS中，客户端和服务器之间使用X.509证书进行身份验证。身份验证完成后，两者之间会生成一个密钥，所有的加密和解密过程都使用这个密钥。虽然客户端和服务端协商的过程相对较慢，但一旦完成就会使用一个较快的私钥机制。
 <p class="en">
-  A server is 
+  A server is
 </p>
 <p class="zh">
 服务器端程序
@@ -1175,7 +1175,7 @@ relatively slow, but once complete a faster private key mechanism is used.
 <p></p>
 
 <p class="en">
-  The server works  with the following client: 
+  The server works  with the following client:
 </p>
 <p class="zh">
 与服务器端程序对应的客户端程序:
@@ -1233,7 +1233,7 @@ much security needs to be built into the design phase: security as an afterthoug
 is nearly always a failure.
 </p>
 <p class="zh">
-安全本身是一个巨大的领域，在本章中，我们几乎没有触及。然而，主要的概念已覆盖.没有强调的是怎样将安全构建与设计之中:之后的安全总是失败的.
+安全本身是一个巨大的领域，在本章中，我们几乎没有触及，但已经覆盖了主要的概念。尚未强调的是，需要在设计阶段如何考虑安全构建：亡羊补牢几乎是没有意义的。
 </p>
   <p>Copyright Jan Newmarch, jan@newmarch.name</p>
 
