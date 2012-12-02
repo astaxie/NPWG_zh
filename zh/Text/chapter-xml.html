@@ -99,7 +99,7 @@
   <p class='en'>There is argument over the relative value of each way of defining the structure of an XML document. We won't buy into that, as Go does not suport any of them. Go cannot check for validity of any document against a schema, but only for well-formedness.</p>
 <p class='zh'>人们总会争论定义XML文档结构的每一个方式的好坏。我们不会陷入其中,因为Go不支持其中任何一个。Go不能检查任何文档模式的有效性，但只知道良构性。</p>
   <p class='en'>Four topics are discussed in this chapter: parsing an XML stream, marshalling and unmarshalling Go data into XML, and XHTML.</p>
-<p class='zh'>在本章中讨论四个主题:解析一个XML流,编列和反编列Go数据成为XML和XHTML。</p>
+<p class='zh'>在本章中讨论四个主题:解析一个XML流,编组和解组Go数据成为XML和XHTML。</p>
   <h2 id="heading_id_4" class='en'>Parsing XML</h2>
   <h2 id="heading_id_4" class='zh'>解析XML</h2>
   <p class='en'>Go has an XML parser which is created using <code>NewParser</code>. This takes an <code>io.Reader</code> as parameter and returns a pointer to <code>Parser</code>. The main method of this type is <code>Token</code> which returns the next token in the input stream. The token is one of the types <code>StartElement</code>, <code>EndElement</code>, <code>CharData</code>, <code>Comment</code>, <code>ProcInst</code> or <code>Directive</code>.</p>
@@ -310,7 +310,7 @@ person
   <h2 id="heading_id_5" class='en'>Unmarshalling XML</h2>
   <h2 id="heading_id_5" class='zh'>反编排XML</h2>
   <p class='en'>Go provides a function <code>Unmarshal</code> and a method <code>func (*Parser) Unmarshal</code> to unmarshal XML into Go data structures. The unmarshalling is not perfect: Go and XML are different languages.</p>
-<p class='zh'>Go提供一个函数  <code>Unmarshal</code>  和一个方法调用 <code>func (*Parser) Unmarshal</code> 反编列XML转化为Go数据结构。反编列并不是完美的:Go和XML毕竟是是两个不同的语言。</p>
+<p class='zh'>Go提供一个函数  <code>Unmarshal</code>  和一个方法调用 <code>func (*Parser) Unmarshal</code> 解组XML转化为Go数据结构。解组并不是完美的:Go和XML毕竟是是两个不同的语言。</p>
   <p class='en'>We consider a simple example before looking at the details. We take the XML document given earlier of</p>
   <p class='zh'>我们先考虑一个简单的例子再查看细节。我们用前面给出的XML文档</p>
   <pre><code>
@@ -378,7 +378,7 @@ type Person struct {
     <li>But if the tag has attributes, then it must map to a structure. Go assigns the character data to the field with tag <code>,chardata</code>. This occurs with the "email" data and the field <code>Address</code> with tag <code>,chardata</code></li>
   </ol>
 <ol class='zh'>
-  <li> 使用Go reflection包去反编列。这要求所有字段是公有，也就是以一个大写字母开始。早期版本的Go使用不区分大小写匹配来匹配字段,例如XML标签“name”对应<code>Name</code>字段。但是现在使用<code>case-sensitive</code>匹配，要执行一个匹配,结构字段后必须用标记来显示XML标签名,以应付匹配。<code>Person</code>修改下应该是
+  <li> 使用Go reflection包去解组。这要求所有字段是公有，也就是以一个大写字母开始。早期版本的Go使用不区分大小写匹配来匹配字段,例如XML标签“name”对应<code>Name</code>字段。但是现在使用<code>case-sensitive</code>匹配，要执行一个匹配,结构字段后必须用标记来显示XML标签名,以应付匹配。<code>Person</code>修改下应该是
       <pre><code>
 type Person struct {
         Name Name `xml:"name"`
@@ -401,7 +401,7 @@ type Person struct {
   <li>但如果一个标签带有属性,那么它这个特征必须反映到一个结构。Go在字段后标记着 <code>,chardata</code>的文字。如下面例子中通过 <code>Address</code> 后标记<code>,chardata</code>的字段来获取email的文本值</li>
 </ol>
   <p class='en'>A program to unmarshal the document above is</p>
-  <p class='zh'>反编列上面文档的一个程序</p>
+  <p class='zh'>解组上面文档的一个程序</p>
   <pre><code><span class="sgc-6">
 <span class="sgc-1">/* Unmarshal
  */
@@ -467,9 +467,9 @@ type Person struct {
   <p class='en'>(Note the spaces are correct.). The strict rules are given in the package specification.</p>
 <p class='zh'>(注意空间是正确的)。Go在包详解中给出了严格的规则。</p>
   <h2 id="heading_id_6" class='en'>Marshalling XML</h2>
-<h2 id="heading_id_6" class='zh'>编列 XML</h2>
+<h2 id="heading_id_6" class='zh'>编组 XML</h2>
   <p class='en'>Go 1 also has support for marshalling data structures into an XML document. The function is</p>
-  <p class='zh'>Go1也支持将数据结构编列为XML文档的。这个函数是</p>
+  <p class='zh'>Go1也支持将数据结构编组为XML文档的。这个函数是</p>
   <pre>
     <code>
 func Marshal(v interface}{) ([]byte, error)
@@ -484,7 +484,7 @@ func Marshal(v interface}{) ([]byte, error)
   a basic serialisation. The result can be unmarshalled using
   the Go function <code>Unmarshal</code> of the previous section.
 </p>
-<p class='zh'>目前还不支持编列Go数据结构为XML。 在这一节中我们提出一个简单的编列函数,将提供一个基本连载。使用上一节的Go函数<code>Unmarshal</code>编列出结果。</p>
+<p class='zh'>目前还不支持编组Go数据结构为XML。 在这一节中我们提出一个简单的编组函数,将提供一个基本连载。使用上一节的Go函数<code>Unmarshal</code>编组出结果。</p>
 <p class='en'>
   A straightforward but naive approach would be to write code that
   walks over your data structures, printing out results as it goes.

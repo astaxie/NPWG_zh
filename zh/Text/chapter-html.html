@@ -49,7 +49,7 @@
 
   <div class="preface">
     <p class="en">The Web Server was originally created to serve HTML documents. Now it is used to serve all sorts of documents as well as data of different kinds. Nevertheless, HTML is still the main document type delivered over the Web. Go has basic mechanisms for parsing HTML documents, which are covered in this chapter</p>
-    <p class="zh">Web服务器最开始是创建来提供HTML文件服务的。现在它为各种类型的文档和各种不同类型的数据提供服务。然而，HTML仍然是Web服务的主要文件类型。Go有一套基本机制来解析HTML，本章主要阐述此内容。</p>
+    <p class="zh">Web服务器的建立最开始是用来提供HTML文件服务的。现在它能为各种类型的文档和各种不同类型的数据提供服务。然而，HTML依然是互联网网络中传递的主要文档类型。Go有一套基本机制来解析HTML，本章主要阐述此内容。</p>
   </div>
 
   <div class="generate_from_h2" id="generated-toc"></div>
@@ -60,35 +60,38 @@
 
   <p class="en">The Web was originally created to serve HTML documents. Now it is used to serve all sorts of documents as well as data of dirrent kinds. Nevertheless, HTML is still the main document type delivered over the Web</p>
 
-  <p class="zh">Web服务器最开始是创建来提供HTML文件服务的。现在它为各种类型的文档和各种不同类型的数据提供服务。然而，HTML仍然是Web服务的主要文件类型。</p>
+  <p class="zh">Web服务器的建立最开始是用来提供HTML文件服务的。现在它为各种类型的文档和各种不同类型的数据提供服务。然而，HTML仍然是互联网网络中传递的主要文档类型。</p>
 
   <p class="en">HTML has been through a large number of versions, and HTML 5 is currently under development. There have also been many "vendor" versions of HTML, introducing tags that never made it into standards.</p>
 
-  <p class="zh">HTML经历了大量的版本，HTML5目前还在开发阶段。还有不少“供应商”版的HTML，引入的标签从来没有做成标准。</p>
+  <p class="zh">HTML经历了大量的版本变迁，HTML5目前还在开发阶段。此外出现不少“独立供应商”版的HTML，但引入的标签从来没有做成标准。</p>
 
   <p class="en">HTML is simple enough to be edited by hand. Consequently, many HTML documents are "ill formed", not following the syntax of the language. HTML parsers generally are not very strict, and will accept many "illegal" documents.</p>
 
-  <p class="zh">HTML足够简单，以至于可以纯手工编辑。因此，许多HTML文件格式不规范，没有遵守语言的语法。HTML解析器通常也不是很严格，能接受大多数“不严格”的文件。 
+  <p class="zh">HTML足够简单，以至于可以纯手工编写。因此，许多HTML文件格式不规范，没有遵守标准准则的语法。HTML解析器通常也不是很严格，而且能接受大多数格式“不严格”的文件。 
 
 </p>
 
   <p class="en">There wasn't much in earlier versions of Go about handling HTML documents - basically, just a tokenizer. The incomplete nature of the package has led to its removal for Go 1. It can still be found in the <code>exp</code> (experimental) package if you really need it. No doubt some improved form will become available in a later version of Go, and then it will be added back into this book.</p>
 
-  <p class="zh">在早期版本的Go没有太多关于处理HTML文件的东西--基本上，只是一个标记。最早的不完整原始包在Go的版本1中被移除了。如果你真的需要它，仍然可以在实验(<code>exp</code>)包中找到它。 毫无疑问，有些改进的形式将会出现在Go以后的版本，那么它将被添加到本书中。 
+  <p class="zh">在早期版本的Go没有太多关于处理HTML文件的细节--基本上只是一个分词器。不完整的原始包在Go 1的版本中已移除。如果你真的需要它，仍然可以在<code>exp</code>(试验)包中找到它。 毫无疑问，Go未来版本在这方面会有一些改进的地方，那么到时将会添加到本书中。 
 
 </p>
 
   <p class="en">There is limited support for HTML in the XML package, discussed in the next chapter.</p>
 
-  <p class="zh">在XML包中对HTML的支持是有限的，在下一章会讨论到。 </p>
+  <p class="zh">在XML包中对HTML的支持是有限的，在下一章将会讨论。 </p>
   <!--
 
-  Go has basic parsing mechanisms based on a tokeniser.
+  <p class='en'>Go has basic parsing mechanisms based on a tokeniser.
   This allows you to process HTML documents as they are read,
   but if you want to, say, build a parse tree, then you have to do that
-  yourself.
-  The state of this package is currently marked as <em>incomplete</em>
-  so it will change over time.
+  yourself.</p>
+  <p class='zh'>Go的基本解析机制是基于分词器。这允许您边读取HTML文档边处理,
+但是如果你想建立一个解析树,然后你必须靠自己这样做。</p>
+  <p class='en'>The state of this package is currently marked as <em>incomplete</em>
+  so it will change over time.</p>
+<p class='zh'>这个包的状态还是标记<em>未完成</em>所以后面会有变化</p>
 
 <h2 class="en"> Tokenizer </h2>
 <h2 class="zh"> Tokenizer </h2>
