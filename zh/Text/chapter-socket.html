@@ -52,95 +52,137 @@
 
 <body>
   <div class="chapter">
-    <h1 id="heading_id_2">Socket-level Programming</h1>
+    <h1 id="heading_id_2" class="en">Socket-level Programming</h1>
+    <h1 id="heading_id_2" class="zh">套接字级别编程</h1>
   </div>
 
   <div class="preface">
-    <p>This chapter looks at the basic techniques for network programming. It deals with host and service addressing, and then considers TCP and UDP. It shows how to build both servers and clients using the TCP and UDP Go APIs. It also looks at raw sockets, in case you need to implement your own protocol above IP.</p>
+    <p class="en">This chapter looks at the basic techniques for network programming. It deals with host and service addressing, and then considers TCP and UDP. It shows how to build both servers and clients using the TCP and UDP Go APIs. It also looks at raw sockets, in case you need to implement your own protocol above IP.</p>
+    <p class="zh">本章着眼于网络编程技巧。解决TCP和UDP涉及的主机和服务地址。包含了如何使用TCP和UDP的GO API来构建服务器和客户端。还包含使用原始套接字来实现基于IP之上的协议。</p>
   </div>
 
   <div class="generate_from_h2" id="generated-toc"></div>
 
-  <h2 id="heading_id_3">Introduction</h2>
+  <h2 id="heading_id_3" class="en">Introduction</h2>
+  <h2 id="heading_id_3" class="zh">介绍</h2>
 
-  <p>There are many kinds of networks in the world. These range from the very old such as serial links, through to wide area networks made from copper and fibre, to wireless networks of various kinds, both for computers and for telecommunications devices such as phones. These networks obviously differ at the physical link layer, but in many cases they also differed at higher layers of the OSI stack.</p>
+  <p class="en">There are many kinds of networks in the world. These range from the very old such as serial links, through to wide area networks made from copper and fibre, to wireless networks of various kinds, both for computers and for telecommunications devices such as phones. These networks obviously differ at the physical link layer, but in many cases they also differed at higher layers of the OSI stack.</p>
+  <p class="zh">在世界上有许多种网络。这些范围从很老的：如串行链路，通过由铜缆和光纤，各种的无线网络接入到广域网的无论是计算机和手机这样的通讯设备。这些网络在物理链路层显然不同, 但在许多情况下，它们的不同也仅仅体现在高于(OSI)开放系统互连的层。</p>
 
-  <p>Over the years there has been a convergence to the "internet stack" of IP and TCP/UDP. For example, Bluetooth defines physical layers and protocol layers, but on top of that is an IP stack so that the same internet programming techniques can be employed on many Bluetooth devices. Similarly, developing 4G wireless phone technologies such as LTE (Long Term Evolution) will also use an IP stack.</p>
+  <p class="en">Over the years there has been a convergence to the "internet stack" of IP and TCP/UDP. For example, Bluetooth defines physical layers and protocol layers, but on top of that is an IP stack so that the same internet programming techniques can be employed on many Bluetooth devices. Similarly, developing 4G wireless phone technologies such as LTE (Long Term Evolution) will also use an IP stack.</p>
+  <p class="zh">多年以来，IP和TCP/UDP协议基本上就等价于互联网协议。例如, 蓝牙定义了物理层和协议层，但最重要的是IP协议栈，可以在许多蓝牙设备使相同的互联网编程技术。同样, 开发4G无线手机技术，如LTE（Long Term Evolution）也将使用IP协议栈。</p>
 
-  <p>While IP provides the networking layer 3 of the OSI stack, TCP and UDP deal with layer 4. These are not the final word, even in the interenet world: SCTP has come from the telecommunications to challenge both TCP and UDP, while to provide internet services in interplanetary space requires new, under development protocols such as DTN. Nevertheless, IP, TCP and UDP hold sway as principal networking technologies now and at least for a considerable time into the future. Go has full support for this style of programming</p>
+  <p class="en">While IP provides the networking layer 3 of the OSI stack, TCP and UDP deal with layer 4. These are not the final word, even in the interenet world: SCTP has come from the telecommunications to challenge both TCP and UDP, while to provide internet services in interplanetary space requires new, under development protocols such as DTN. Nevertheless, IP, TCP and UDP hold sway as principal networking technologies now and at least for a considerable time into the future. Go has full support for this style of programming</p>
+  <p class="zh">IP提供了第3层的OSI网络协议栈，TCP和UDP则提供了第4层。即使在因特网世界，这些都不是固定不变的：虽然，IP, TCP和UDP至少在当前甚至未来相当长的时间内是主要的网络技术，但是TCP和UDP将面临来自SCTP（STREAM CONTROL TRANSMISSION PROTOCOL 流控制传输协议）的挑战，以及在星际空间中提供互联网服务需要新的像正在开发的DTN协议。</p>
 
-  <p>This chapter shows how to do TCP and UDP programming using Go, and how to use a raw socket for other protocols.</p>
+  <p class="en">This chapter shows how to do TCP and UDP programming using Go, and how to use a raw socket for other protocols.</p>
+  <p class="zh">本章介绍如何使用GO编写TCP和UDP程序，以及如何使用其他协议的原始套接字。</p>
 
-  <h2 id="heading_id_4">The TCP/IP stack</h2>
+  <h2 id="heading_id_4" class="en">The TCP/IP stack</h2>
+  <h2 id="heading_id_4" class="zh">TCP/IP协议栈</h2>
 
-  <p>The OSI model was devised using a committee process wherein the standard was set up and then implemented. Some parts of the OSI standard are obscure, some parts cannot easily be implemented, some parts have not been implemented.</p>
+  <p class="en">The OSI model was devised using a committee process wherein the standard was set up and then implemented. Some parts of the OSI standard are obscure, some parts cannot easily be implemented, some parts have not been implemented.</p>
+  <p class="zh">OSI模型标准的建立和实施是一个委员会（国际标准化组织ISO）设计的。OSI标准中的一些部分是模糊的，有些部件不能很容易地实现，一些地方还没有得到落实。</p>
 
-  <p>The TCP/IP protocol was devised through a long-running DARPA project. This worked by implementation followed by RFCs (Request For Comment). TCP/IP is the principal Unix networking protocol. TCP/IP = Transmission Control Protocol/Internet Protocol.</p>
+  <p class="en">The TCP/IP protocol was devised through a long-running DARPA project. This worked by implementation followed by RFCs (Request For Comment). TCP/IP is the principal Unix networking protocol. TCP/IP = Transmission Control Protocol/Internet Protocol.</p>
+  <p class="zh">TCP/IP协议由长期运行的一个DARPA（美国国防先进研究项目局）项目设计。该工作其次由RFC (Request For Comment)实施。TCP/IP是Unix的首要网络协议。TCP/IP协议等于传输控制协议/互联网协议。</p>
 
-  <p>The TCP/IP stack is shorter than the OSI one:<br />
+  <p class="en">The TCP/IP stack is shorter than the OSI one:<br />
   <img alt="" src="../Images/tcp_stack.gif" /><br />
   TCP is a connection-oriented protocol, UDP (User Datagram Protocol) is a connectionless protocol.</p>
+  <p class="zh">TCP/IP协议栈是OSI模型的一部分：<br />
+  <img alt="" src="../Images/tcp_stack.gif" /><br />
+  TCP是一个面向连接的协议，UDP（User Datagram Protocol，用户数据报协议）是一种无连接的协议。</p>
 
-  <h3 id="heading_id_5">IP datagrams</h3>
+  <h3 id="heading_id_5" class="en">IP datagrams</h3>
+  <h3 id="heading_id_5" class="zh">IP数据包</h3>
 
-  <p>The IP layer provides a connectionless and unreliable delivery system. It considers each datagram independently of the others. Any association between datagrams must be supplied by the higher layers.</p>
+  <p class="en">The IP layer provides a connectionless and unreliable delivery system. It considers each datagram independently of the others. Any association between datagrams must be supplied by the higher layers.</p>
+  <p class="zh">IP层提供了无连接的不可靠传输系统，任何数据包之间的关联必须依赖更高的层来提供。</p>
 
-  <p>The IP layer supplies a checksum that includes its own header. The header includes the source and destination addresses.</p>
+  <p class="en">The IP layer supplies a checksum that includes its own header. The header includes the source and destination addresses.</p>
+  <p class="zh">IP层包头包含了校验数据，包头包括源地址和目的地址。</p>
 
-  <p>The IP layer handles routing through an Internet. It is also responsible for breaking up large datagrams into smaller ones for transmission and reassembling them at the other end.</p>
+  <p class="en">The IP layer handles routing through an Internet. It is also responsible for breaking up large datagrams into smaller ones for transmission and reassembling them at the other end.</p>
+  <p class="zh">IP层通过路由连接到因特网，还负责将大数据包分解为更小的包，并传输到另一端后进行重组。</p>
 
   <h3 id="heading_id_6">UDP</h3>
 
-  <p>UDP is also connectionless and unreliable. What it adds to IP is a checksum for the contents of the datagram and <i>port numbers.</i> These are used to give a client/server model - see later.</p>
+  <p class="en">UDP is also connectionless and unreliable. What it adds to IP is a checksum for the contents of the datagram and <i>port numbers.</i> These are used to give a client/server model - see later.</p>
+  <p class="zh">UDP是无连接的，不可靠的。它包括IP数据报的内容和<i>端口号</i>的校验。在后面，我们会用它来构建一些客户端/服务器例子。</p>
 
   <h3 id="heading_id_7">TCP</h3>
 
-  <p>TCP supplies logic to give a reliable connection-oriented protocol above IP. It provides a <i>virtual circuit</i> that two processes can use to communicate. It also uses port numbers to identify services on a host.</p>
+  <p class="en">TCP supplies logic to give a reliable connection-oriented protocol above IP. It provides a <i>virtual circuit</i> that two processes can use to communicate. It also uses port numbers to identify services on a host.</p>
+  <p class="zh">TCP是构建于IP之上的面向链接的协议。它提供了一个<i>虚电路</i>使得两个应用进程可以通过它来通信。它通过端口号来识别主机上的服务。</p>
 
-  <h2 id="heading_id_8">Internet adddresses</h2>
+  <h2 id="heading_id_8" class="en">Internet addresses</h2>
+  <h2 id="heading_id_8" class="zh">互联网地址</h2>
 
-  <p>In order to use a service you must be able to find it. The Internet uses an address scheme for devices such as computers so that they can be located. This addressing scheme was originally devised when there were only a handful of connected computers, and very generously allowed upto 2^32 addresses, using a 32 bit unsigned integer. These are the so-called IPv4 addresses. In recent years, the number of connected (or at least directly addressable) devices has threatened to exceed this number, and so "any day now" we will switch to IPv6 addressing which will allow upto 2^128 addresses, using an unsigned 128 bit integer. The changeover is most likely to be forced by emerging countries, as the developed world has already taken nearly all of the pool of IPv4 addresses.</p>
+  <p class="en">In order to use a service you must be able to find it. The Internet uses an address scheme for devices such as computers so that they can be located. This addressing scheme was originally devised when there were only a handful of connected computers, and very generously allowed upto 2^32 addresses, using a 32 bit unsigned integer. These are the so-called IPv4 addresses. In recent years, the number of connected (or at least directly addressable) devices has threatened to exceed this number, and so "any day now" we will switch to IPv6 addressing which will allow upto 2^128 addresses, using an unsigned 128 bit integer. The changeover is most likely to be forced by emerging countries, as the developed world has already taken nearly all of the pool of IPv4 addresses.</p>
+  <p class="zh">为了确保能够访问服务，互联网使用一个地址让例如计算机的设备能够被定位。这种寻址方案最初被设计出来只允许极少数的计算机连接上，使用32位无符号整形，拥有高达2^32个地址。这就是所谓的IPv4地址。近年来，连接（至少直接寻址）的设备的数量可能超过这个数字，所以在不久的某一天我们将切换到利用128位无符号整数，拥有高2^128个地址的IPv6寻址。这种转换最有可能被已经耗尽了所有的IPv4地址的新兴国家发达地区。</p>
 
-  <h3 id="heading_id_9">IPv4 addresses</h3>
+  <h3 id="heading_id_9" class="en">IPv4 addresses</h3>
+  <h3 id="heading_id_9" class="zh">IPv4地址</h3>
 
-  <p>The address is a 32 bit integer which gives the IP address. This addresses down to a network interface card on a single device. The address is usually written as four bytes in decimal with a dot '.' between them, as in "127.0.0.1" or "66.102.11.104".</p>
+  <p class="en">The address is a 32 bit integer which gives the IP address. This addresses down to a network interface card on a single device. The address is usually written as four bytes in decimal with a dot '.' between them, as in "127.0.0.1" or "66.102.11.104".</p>
+  <p class="zh">IP地址是一个32位整数构成。每个设备的网络接口都有一个地址。该地址通常使用'.'符号分割的4字节的十进制数，例如："127.0.0.1" 或 "66.102.11.104"。</p>
 
-  <p>The IP address of any device is generally composed of two parts: the address of the network in which the device resides, and the address of the device within that network. Once upon a time, the split between network address and internal address was simple and was based upon the bytes used in the IP address.</p>
+  <p class="en">The IP address of any device is generally composed of two parts: the address of the network in which the device resides, and the address of the device within that network. Once upon a time, the split between network address and internal address was simple and was based upon the bytes used in the IP address.</p>
+  <p class="zh">所有设备的IP地址，通常是由两部分组成：网段地址和网内地址。从前，网络地址和网内地址的分辨很简单，使用字节构建IP地址。</p>
 
-  <ul>
+  <ul class="en">
     <li>In a class A network, the first byte identifies the network, while the last three identify the device. There are only 128 class A networks, owned by the very early players in the internet space such as IBM, the General Electric Company and MIT (http://www.iana.org/assignments/ipv4-address-space/ipv4-address-space.xml)</li>
 
     <li>Class B networks use the first two bytes to identify the network and the last two to identify devices within the subnet. This allows upto 2^16 (65,536) devices on a subnet</li>
 
     <li>Class C networks use the first three bytes to identify the network and the last one to identify devices within that network. This allows upto 2^8 (actually 254, not 256) devices</li>
   </ul>
+  <ul class="zh">
+    <li>一个A类IP地址由1字节的网络地址和3字节主机地址组成。A类网络只有128个, 被很早的互联网成员例如IBM，通用电气公司(the General Electric Company)和MIT所拥有。(http://www.iana.org/assignments/ipv4-address-space/ipv4-address-space.xml)</li>
 
-  <p>This scheme doesn't work well if you want, say, 400 computers on a network. 254 is too small, while 65,536 is too large. In binary arithmetic terms, you want about 512. This can be achieved by using a 23 bit network address and 9 bits for the device addresses. Similarly, if you want upto 1024 devices, you use a 22 bit network address and a 10 bit device address.</p>
+    <li>一个A类IP地址由1字节的网络地址和3字节主机地址组成。这最多允许2^16 (65,536)个设备在同一个子网。</li>
 
-  <p>Given an IP address of a device, and knowing how many bits N are used for the network address gives a relatively straightforward process for extracting the network address and the device address within that network. Form a "network mask" which is a 32-bit binary number with all ones in the first N places and all zeroes in the remaining ones. For example, if 16 bits are used for the network address, the mask is 11111111111111110000000000000000. It's a little inconvenient using binary, so decimal bytes are usually used. The netmask for 16 bit network addresses is 255.255.0.0, for 24 bit network addresses it is 255.255.255.0, while for 23 bit addresses it would be 255.255.254.0 and for 22 bit addresses it would be 255.255.252.0.</p>
+    <li>一个C类IP地址由3字节的网络地址和1字节的主机地址组成。这最多允许2^8 (其实是254, 不是256)个设备。</li>
+  </ul>
 
-  <p>Then to find the network of a device, bit-wise AND it's IP address with the network mask, while the device address within the subnet is found with bit-wise AND of the 1's complement of the mask with the IP address.</p>
+  <p class="en">This scheme doesn't work well if you want, say, 400 computers on a network. 254 is too small, while 65,536 is too large. In binary arithmetic terms, you want about 512. This can be achieved by using a 23 bit network address and 9 bits for the device addresses. Similarly, if you want upto 1024 devices, you use a 22 bit network address and a 10 bit device address.</p>
+  <p class="zh">如果你需要400台计算机在同一个网络，该方案是不可行的。254太小，而65,536又太大。根据二进制计算，你大约需要512(2^9)。这样就可以通过使用一个23位的网络地址和9位的设备地址实现。同样，如果您需要高达1024台设备，使用一个22位网络地址和一个10位的设备地址。</p>
+  
+  <p class="en">Given an IP address of a device, and knowing how many bits N are used for the network address gives a relatively straightforward process for extracting the network address and the device address within that network. Form a "network mask" which is a 32-bit binary number with all ones in the first N places and all zeroes in the remaining ones. For example, if 16 bits are used for the network address, the mask is 11111111111111110000000000000000. It's a little inconvenient using binary, so decimal bytes are usually used. The netmask for 16 bit network addresses is 255.255.0.0, for 24 bit network addresses it is 255.255.255.0, while for 23 bit addresses it would be 255.255.254.0 and for 22 bit addresses it would be 255.255.252.0.</p>
+  <p class="zh">根据设备的IP地址，知道多少字节用于网络地址，通过网络提取网络地址和设备地址给出了一个相对简单的处理。例如：“网络掩码”是一个前面N位为1，其他所有位为0的32位二进制数。例如，如果使用16位的网络地址，掩码为11111111111111110000000000000000。使用二进制有一点不方便，所以通常使用十进制字节。16位网络地址的子网掩码是255.255.0.0，而对于23位地址，这将是255.255.254.0，和22位地址，这将是255.255.252.0。</p>
+  
+  <p class="en">Then to find the network of a device, bit-wise AND it's IP address with the network mask, while the device address within the subnet is found with bit-wise AND of the 1's complement of the mask with the IP address.</p>
+  <p class="zh">接着查找设备的网络，并将其IP地址与网络掩码进行按位与操作，而该设备在子网中的地址，可通过其IP地址同掩码与1的补码的按位与操作发现。</p>
 
-  <h3 id="heading_id_10">IPv6 addresses</h3>
+  <h3 id="heading_id_10" class="en">IPv6 addresses</h3>
+  <h3 id="heading_id_10" class="zh">IPv6地址</h3>
 
-  <p>The internet has grown vastly beyond original expectations. The initially generous 32-bit addressing scheme is on the verge of running out. There are unpleasant workarounds such as NAT addressing, but eventually we will have to switch to a wider address space. IPv6 uses 128-bit addresses. Even bytes becomes cumbersome to express such addresses, so hexadecimal digits are used, grouped into 4 digits and separated by a colon ':'. A typical address might be 2002:c0e8:82e7:0:0:0:c0e8:82e7.</p>
+  <p class="en">The internet has grown vastly beyond original expectations. The initially generous 32-bit addressing scheme is on the verge of running out. There are unpleasant workarounds such as NAT addressing, but eventually we will have to switch to a wider address space. IPv6 uses 128-bit addresses. Even bytes becomes cumbersome to express such addresses, so hexadecimal digits are used, grouped into 4 digits and separated by a colon ':'. A typical address might be 2002:c0e8:82e7:0:0:0:c0e8:82e7.</p>
+  <p class="zh">因特网的迅速发展大大超出了原来的预期。最初富余的32位地址解决方案已经接近用完。虽然有一些例如NAT地址输入这样不是很完美的解决方法，但最终我们将不得不切换到更广阔的地址空间。IPv6使用128位地址，即使表达同样的地址，字节数变得很麻烦，由':'分隔的4位16进制组成。一个典型的例子如：2002:c0e8:82e7:0:0:0:c0e8:82e7。</p>
 
-  <p>These addresses are not easy to remember! DNS will become even more important. There are tricks to reducing some addresses, such as eliding zeroes and repeated digits. For example, "localhost" is 0:0:0:0:0:0:0:1, which can be shortened to ::1</p>
+  <p class="en">These addresses are not easy to remember! DNS will become even more important. There are tricks to reducing some addresses, such as eliding zeroes and repeated digits. For example, "localhost" is 0:0:0:0:0:0:0:1, which can be shortened to ::1</p>
+  <p class="zh">要记住这些地址并不容易！DNS将变得更加重要。有一些技巧用来介绍一些地址，如省略一些零和重复的数字。例如："localhost"地址是：0:0:0:0:0:0:0:1，可以缩短到::1。</p>
 
-  <h2 id="heading_id_11">IP address type</h2>
+  <h2 id="heading_id_11" class="en">IP address type</h2>
+  <h2 id="heading_id_11" class="zh">IP地址类型</h2>
 
-  <h3 id="heading_id_12">The type IP</h3>
+  <h3 id="heading_id_12" class="en">The type IP</h3>
+  <h2 id="heading_id_12" class="zh">IP类型</h2>
 
-  <p>The package "net" defines many types, functions and methods of use in Go network programming. The type <code>IP</code> is defined as an array of bytes</p>
+  <p class="en">The package "net" defines many types, functions and methods of use in Go network programming. The type <code>IP</code> is defined as an array of bytes</p>
+  <p class="zh">"net"包定义了许多类型, 函数，方法用于Go网络编程。<code>IP</code>类型被定义为一个字节数组。</p>
   <pre>
     <code>
       type IP []byte
     </code>
   </pre>
 
-  <p>There are several functions to manipulate a variable of type <code>IP</code>, but you are likely to use only some of them in practice. For example, the function <code>ParseIP(String)</code> will take a dotted IPv4 address or a colon IPv6 address, while the <code>IP</code> method <code>String</code> will return a string. Note that you may not get back what you started with: the string form of 0:0:0:0:0:0:0:1 is ::1.</p>
+  <p class="en">There are several functions to manipulate a variable of type <code>IP</code>, but you are likely to use only some of them in practice. For example, the function <code>ParseIP(String)</code> will take a dotted IPv4 address or a colon IPv6 address, while the <code>IP</code> method <code>String</code> will return a string. Note that you may not get back what you started with: the string form of 0:0:0:0:0:0:0:1 is ::1.</p>
+  <p class="zh">有几个函数来处理一个<code>IP</code>类型的变量, 但是在实践中你很可能只用到其中的一些。例如, <code>ParseIP(String)</code>函数将获取逗号分隔的IPv4或者冒号分隔的IPv6地址, 而<code>IP</code>方法的字符串将返回一个<code>字符串</code>。请注意，您可能无法取回你期望的: 字符串 0:0:0:0:0:0:0:1是::1。</p>
 
-  <p>A program to illustrate this is</p>
+  <p class="en">A program to illustrate this is</p>
+  <p class="zh">下面用一个程序来说明</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* IP
  */
@@ -170,59 +212,69 @@
 }
 </span></code></pre>
 
-  <p>If this is compiled to the executable <code>IP</code> then it can run for example as</p>
+  <p class="en">If this is compiled to the executable <code>IP</code> then it can run for example as</p>
+  <p class="zh">如果编译它为可执行文件<code>IP</code>，那么它可以运行如</p>
   <pre><code>
 IP 127.0.0.1
     </code></pre>
 
-  <p>with response</p>
+  <p class="en">with response</p>
+  <p class="zh">得到结果</p>
   <pre><code>
 The address is 127.0.0.1
     </code></pre>
 
-  <p>or as</p>
+  <p class="en">or as</p>
+  <p class="zh">或</p>
   <pre><code>
 IP 0:0:0:0:0:0:0:1
     </code></pre>
 
-  <p>with response</p>
+  <p>得到结果</p>
   <pre><code>
 The address is ::1
     </code></pre>
 
-  <h3 id="heading_id_13">The type IPmask</h3>
+  <h3 id="heading_id_13" class="en">The type IPmask</h3>
+  <h3 id="heading_id_13" class="zh">IP掩码</h3>
 
-  <p>In order to handle masking operations, there is the type</p>
+  <p class="en">In order to handle masking operations, there is the type</p>
+  <p class="zh">为了处理掩码操作，有下面类型：</p>
   <pre>
     <code>
 type IPMask []byte
     </code>
   </pre>
 
-  <p>There is a function to create a mask from a 4-byte IPv4 address</p>
+  <p class="en">There is a function to create a mask from a 4-byte IPv4 address</p>
+  <p class="zh">下面这个函数用一个4字节的IPv4地址来创建一个掩码</p>
   <pre>
     <code>
 func IPv4Mask(a, b, c, d byte) IPMask
     </code>
   </pre>
 
-  <p>Alternatively, there is a method of <code>IP</code> which returns the default mask</p>
+  <p class="en">Alternatively, there is a method of <code>IP</code> which returns the default mask</p>
+  <p class="zh">另外, 这是一个<code>IP</code>的方法返回默认的掩码</p>
   <pre>
     <code>
 func (ip IP) DefaultMask() IPMask
     </code>
   </pre>
 
-  <p>Note that the string form of a mask is a hex number such as ffff0000 for a mask of 255.255.0.0.</p>
+  <p class="en">Note that the string form of a mask is a hex number such as ffff0000 for a mask of 255.255.0.0.</p>
+  <p class="zh">需要注意的是一个掩码的字符串形式是一个十六进制数，如掩码255.255.0.0为ffff0000。</p>
 
-  <p>A mask can then be used by a method of an IP address to find the network for that IP address</p>
+  <p class="en">A mask can then be used by a method of an IP address to find the network for that IP address</p>
+  <p class="zh">一个掩码可以使用一个IP地址的方法，找到该IP地址的网络</p>
   <pre>
     <code>
 func (ip IP) Mask(mask IPMask) IP
     </code>
   </pre>
 
-  <p>An example of the use of this is the following program:</p>
+  <p class="en">An example of the use of this is the following program:</p>
+  <p class="zh">下面的程序是一个使用了这个的例子：</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* Mask
  */
@@ -259,19 +311,23 @@ func (ip IP) Mask(mask IPMask) IP
 }
 </span></code></pre>
 
-  <p>If this is compiled to <code>Mask</code> and run by</p>
+  <p class="en">If this is compiled to <code>Mask</code> and run by</p>
+  <p class="zh">编译并运行<code>Mask</code></p>
   <pre><code>
 Mask 127.0.0.1
     </code></pre>
 
-  <p>it will return</p>
+  <p class="en">it will return</p>
+  <p class="zh">将返回</p>
   <pre><code>
 Address is  127.0.0.1  Default mask length is  8  Network is  127.0.0.0
     </code></pre>
 
-  <h3 id="heading_id_14">The type IPAddr</h3>
+  <h3 id="heading_id_14" class="en">The type IPAddr</h3>
+  <h3 id="heading_id_14" class="zh">IPAddr类型</h3>
 
-  <p>Many of the other functions and methods in the net package return a pointer to an <code>IPAddr</code>. This is simply a structure containing an <code>IP</code>.</p>
+  <p class="en">Many of the other functions and methods in the net package return a pointer to an <code>IPAddr</code>. This is simply a structure containing an <code>IP</code>.</p>
+  <p class="zh">在net包的许多函数和方法会返回一个指向<code>IPAddr</code>的指针。这是一个简单的结构，它包含一个<code>IP</code>。</p>
   <pre>
     <code>
 type IPAddr {
@@ -280,14 +336,16 @@ type IPAddr {
     </code>
   </pre>
 
-  <p>A primary use of this type is to perform DNS lookups on IP host names.</p>
+  <p class="en">A primary use of this type is to perform DNS lookups on IP host names.</p>
+  <p class="zh">这种类型的主要用途是执行DNS查找IP主机名。</p>
   <pre>
     <code>
 func ResolveIPAddr(net, addr string) (*IPAddr, os.Error)
     </code>
   </pre>
 
-  <p>where <code>net</code> is one of "ip", "ip4" or "ip6". This is shown in the program</p>
+  <p class="en">where <code>net</code> is one of "ip", "ip4" or "ip6". This is shown in the program</p>
+  <p class="zh">其中<code>net</code>是"ip","ip4"或者"ip6"的其中一个. 下面的程序中将会展示。</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* ResolveIP
  */
@@ -318,23 +376,28 @@ func ResolveIPAddr(net, addr string) (*IPAddr, os.Error)
 }
 </span></code></pre>
 
-  <p>Running <code>ResolveIP www.google.com</code> returns</p>
+  <p class="en">Running <code>ResolveIP www.google.com</code> returns</p>
+  <p class="zh">运行<code>ResolveIP www.google.com</code>返回</p>
   <pre><code>
 Resolved address is  66.102.11.104
     </code></pre>
 
-  <h3 id="heading_id_15">Host lookup</h3>
+  <h3 id="heading_id_15" class="en">Host lookup</h3>
+  <h3 id="heading_id_15" class="zh">主机查询</h3>
 
-  <p>The function <code>ResolveIPAddr</code> will perform a DNS lookup on a hostname, and return a single IP address. However, hosts may have multiple IP addresses, usually from multiple network interface cards. They may also have multiple host names, acting as aliases.</p>
+  <p class="en">The function <code>ResolveIPAddr</code> will perform a DNS lookup on a hostname, and return a single IP address. However, hosts may have multiple IP addresses, usually from multiple network interface cards. They may also have multiple host names, acting as aliases.</p>
+  <p class="zh"><code>ResolveIPAddr</code>函数将执行DNS查询的主机名，并返回一个简单的IP地址。然而，通常主机如果有多个网卡，则可以有多个IP地址。它们也可能有多个主机名，作为别名。</p>
   <pre>
     <code>
 func LookupHost(name string) (cname string, addrs []string, err os.Error)
     </code>
   </pre>
 
-  <p>One of these addresses will be labelled as the "canonical" host name. If you wish to find the canonical name, use <code>func LookupCNAME(name string) (cname string, err os.Error)</code></p>
+  <p class="en">One of these addresses will be labelled as the "canonical" host name. If you wish to find the canonical name, use <code>func LookupCNAME(name string) (cname string, err os.Error)</code></p>
+  <p class="zh">这些地址将会被归类为“canonical”主机名。如果你想找到的规范名称，使用<code>func LookupCNAME(name string) (cname string, err os.Error)</code></p>
 
-  <p>This is shown in the following program</p>
+  <p class="en">This is shown in the following program</p>
+  <p class="zh">下面是一个演示程序</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* LookupHost
  */
@@ -367,28 +430,37 @@ func LookupHost(name string) (cname string, addrs []string, err os.Error)
 }
 </span></code></pre>
 
-  <p>Note that this function returns strings, not <code>IPAddress</code> values.</p>
+  <p class="en">Note that this function returns strings, not <code>IPAddress</code> values.</p>
+  <p class="zh">注意，这个函数返回字符串，而不是<code>IPAddress</code>。</p>
 
-  <h2 id="heading_id_16">Services</h2>
+  <h2 id="heading_id_16" class="en">Services</h2>
+  <h2 id="heading_id_16" class="zh">服务</h2>
 
-  <p>Services run on host machines. They are typically long lived and are designed to wait for requests and respond to them. There are many types of services, and there are many ways in which they can offer their services to clients. The internet world bases many of these services on two methods of communication, TCP and UDP, although there are other communication protocols such as SCTP waiting in the wings to take over. Many other types of service, such as peer-to-peer, remote procedure calls, communicating agents, and many others are built on top of TCP and UDP.</p>
+  <p class="en">Services run on host machines. They are typically long lived and are designed to wait for requests and respond to them. There are many types of services, and there are many ways in which they can offer their services to clients. The internet world bases many of these services on two methods of communication, TCP and UDP, although there are other communication protocols such as SCTP waiting in the wings to take over. Many other types of service, such as peer-to-peer, remote procedure calls, communicating agents, and many others are built on top of TCP and UDP.</p>
+  <p class="zh">服务运行在主机。它们通常长期存活目的是等待的请求和响应。有许多类型的服务，有很多途径使他们能够向客户提供服务。互联网的世界基于TCP和UDP这两种通信方法提供许多这些服务，虽然也有其他通信协议如SCTP​​伺机取代。许多其他类型的服务，例如点对点, 远过程调用, 通信代理, 和许多其他建立在TCP和UDP之上的服务。</p>
 
-  <h3 id="heading_id_17">Ports</h3>
+  <h3 id="heading_id_17" class="en">Ports</h3>
+  <h3 id="heading_id_17" class="zh">端口</h3>
 
-  <p>Services live on host machines. The IP address will locate the host. But on each computer may be many services, and a simple way is needed to distinguish between them. The method used by TCP, UDP, SCTP and others is to use a <em>port number</em>. This is an unsigned integer beween 1 and 65,535 and each service will associate itself with one or more of these port numbers.</p>
+  <p class="en">Services live on host machines. The IP address will locate the host. But on each computer may be many services, and a simple way is needed to distinguish between them. The method used by TCP, UDP, SCTP and others is to use a <em>port number</em>. This is an unsigned integer beween 1 and 65,535 and each service will associate itself with one or more of these port numbers.</p>
+  <p class="zh">服务存活于主机内。IP地址可以定位主机。但在每台计算机上可能会提供多种服务，需要一个简单的方法对它们加以区分。TCP，UDP，SCTP或者其他协议使用<em>端口号</em>来加以区分。这里使用一个1到65,535的无符号整数，每个服务将这些端口号中的一个或多个相关联。</p>
 
-  <p>There are many "standard" ports. Telnet usually uses port 23 with the TCP protocol. DNS uses port 53, either with TCP or with UDP. FTP uses ports 21 and 20, one for commands, the other for data transfer. HTTP usually uses port 80, but it often uses ports 8000, 8080 and 8088, all with TCP. The X Window System often takes ports 6000-6007, both on TCP and UDP.</p>
+  <p class="en">There are many "standard" ports. Telnet usually uses port 23 with the TCP protocol. DNS uses port 53, either with TCP or with UDP. FTP uses ports 21 and 20, one for commands, the other for data transfer. HTTP usually uses port 80, but it often uses ports 8000, 8080 and 8088, all with TCP. The X Window System often takes ports 6000-6007, both on TCP and UDP.</p>
+  <p class="zh">有很多“标准”的端口。Telnet服务通常使用端口号23的TCP协议。DNS使用端口号53的TCP或UDP协议。FTP使用端口21和20的命令，进行数据传输。HTTP通常使用端口80，但经常使用，端口8000，8080和8088，协议为TCP。X Window系统往往需要端口6000-6007，TCP和UDP协议。</p>
 
-  <p>On a Unix system, the commonly used ports are listed in the file <code>/etc/services</code>. Go has a function to interrogate this file</p>
+  <p class="en">On a Unix system, the commonly used ports are listed in the file <code>/etc/services</code>. Go has a function to interrogate this file</p>
+  <p class="zh">在Unix系统中, <code>/etc/services</code>文件列出了常用的端口。Go语言有一个函数可以获取该文件。</p>
   <pre>
     <code>
 func LookupPort(network, service string) (port int, err os.Error)
     </code>
   </pre>
 
-  <p>The network argument is a string such as "tcp" or "udp", while the service is a string such as "telnet" or "domain" (for DNS).</p>
+  <p class="en">The network argument is a string such as "tcp" or "udp", while the service is a string such as "telnet" or "domain" (for DNS).</p>
+  <p class="zh">network是一个字符串例如"tcp"或"udp", service也是一个字符串，如"telnet"或"domain"(DNS)。</p>
 
-  <p>A program using this is</p>
+  <p class="en">A program using this is</p>
+  <p class="zh">示例程序如下</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* LookupPort
  */
@@ -422,11 +494,14 @@ func LookupPort(network, service string) (port int, err os.Error)
 }
 </span></code></pre>
 
-  <p>For example, running <code>LookupPort tcp telnet</code> prints <code>Service port: 23</code></p>
+  <p class="en">For example, running <code>LookupPort tcp telnet</code> prints <code>Service port: 23</code></p>
+  <p class="zh">如例子所示, 运行<code>LookupPort tcp telnet</code> 打印 <code>Service port: 23</code></p>
 
-  <h3 id="heading_id_18">The type TCPAddr</h3>
+  <h3 id="heading_id_18" class="en">The type TCPAddr</h3>
+  <h3 id="heading_id_18" class="zh">TCPAddr类型</h3>
 
-  <p>The type <code>TCPAddr</code> is a structure containing an <code>IP</code> and a <code>port</code>:</p>
+  <p class="en">The type <code>TCPAddr</code> is a structure containing an <code>IP</code> and a <code>port</code>:</p>
+  <p class="zh"><code>TCPAddr</code>类型包含一个<code>IP</code>和一个<code>port</code>的结构:</p>
   <pre>
     <code>
 type TCPAddr struct {
@@ -436,46 +511,59 @@ type TCPAddr struct {
     </code>
   </pre>
 
-  <p>The function to create a <code>TCPAddr</code> is <code>ResolveTCPAddr</code></p>
+  <p class="en">The function to create a <code>TCPAddr</code> is <code>ResolveTCPAddr</code></p>
+  <p class="zh">函数<code>ResolveTCPAddr</code>用来创建一个<code>TCPAddr</code></p>
   <pre>
     <code>
 func ResolveTCPAddr(net, addr string) (*TCPAddr, os.Error)
     </code>
   </pre>
 
-  <p>where <code>net</code> is one of "tcp", "tcp4" or "tcp6" and the <code>addr</code> is a string composed of a host name or IP address, followed by the port number after a ":", such as "www.google.com:80" or '127.0.0.1:22". if the address is an IPv6 address, which already has colons in it, then the host part must be enclosed in square brackets, such as "[::1]:23". Another special case is often used for servers, where the host address is zero, so that the TCP address is really just the port name, as in ":80" for an HTTP server.</p>
+  <p class="en">where <code>net</code> is one of "tcp", "tcp4" or "tcp6" and the <code>addr</code> is a string composed of a host name or IP address, followed by the port number after a ":", such as "www.google.com:80" or '127.0.0.1:22". if the address is an IPv6 address, which already has colons in it, then the host part must be enclosed in square brackets, such as "[::1]:23". Another special case is often used for servers, where the host address is zero, so that the TCP address is really just the port name, as in ":80" for an HTTP server.</p>
+  <p class="zh"><code>net</code>是"tcp", "tcp4"或"tcp6"其中之一，<code>addr</code>是一个字符串，由主机名或IP地址，以及":"后跟随着端口号组成，例如： "www.google.com:80" 或 '127.0.0.1:22"。如果地址是一个IPv6地址，由于已经有冒号，主机部分，必须放在方括号内, 例如："[::1]:23". 另一种特殊情况是经常用于服务器, 主机地址为0, 因此，TCP地址实际上就是端口名称, 例如：":80" 用来表示HTTP服务器。</p>
 
-  <h2 id="heading_id_19">TCP Sockets</h2>
+  <h2 id="heading_id_19" class="en">TCP Sockets</h2>
+  <h2 id="heading_id_19" class="zh">TCP套接字</h2>
 
-  <p>When you know how to reach a service via its network and port IDs, what then? If you are a client you need an API that will allow you to connect to a service and then to send messages to that service and read replies back from the service.</p>
+  <p class="en">When you know how to reach a service via its network and port IDs, what then? If you are a client you need an API that will allow you to connect to a service and then to send messages to that service and read replies back from the service.</p>
+  <p class="zh">当你知道如何通过网络和端口ID查找一个服务器时，然后呢？如果你是一个客户端，你需要一个API，让您连接到服务，然后将消息发送到该服务，并从服务读取回复。</p>
 
-  <p>If you are a server, you need to be able to bind to a port and listen at it. When a message comes in you need to be able to read it and write back to the client.</p>
+  <p class="en">If you are a server, you need to be able to bind to a port and listen at it. When a message comes in you need to be able to read it and write back to the client.</p>
+  <p class="zh">如果你是一个服务器，你需要能够绑定到一个端口，监听它。当有消息到来，你需要能够读取它并写回消息到客户端。</p>
 
-  <p>The <code>net.TCPConn</code> is the Go type which allows full duplex communication between the client and the server. Two major methods of interest are</p>
+  <p class="en">The <code>net.TCPConn</code> is the Go type which allows full duplex communication between the client and the server. Two major methods of interest are</p>
+  <p class="zh"><code>net.TCPConn</code>是允许在客户端和服务器之间的全双工通信的Go类型。两种主要方法是</p>
   <pre><code>
 func (c *TCPConn) Write(b []byte) (n int, err os.Error)
 func (c *TCPConn) Read(b []byte) (n int, err os.Error)   
     </code></pre>
 
-  <p>A <code>TCPConn</code> is used by both a client and a server to read and write messages.</p>
+  <p class="en">A <code>TCPConn</code> is used by both a client and a server to read and write messages.</p>
+  <p class="zh"><code>TCPConn</code>被用来客户端和服务器来读取和写入的消息。/p>
 
-  <h3 id="heading_id_20">TCP client</h3>
+  <h3 id="heading_id_20" class="en">TCP client</h3>
+  <h3 id="heading_id_20" class="zh">TCP客户端</h3>
 
-  <p>Once a client has established a TCP address for a service, it "dials" the service. If succesful, the dial returns a <code>TCPConn</code> for communication. The client and the server exchange messages on this. Typically a client writes a request to the server using the <code>TCPConn</code>, and reads a response from the <code>TCPConn</code>. This continues until either (or both) sides close the connection. A TCP connection is established by the client using the function</p>
+  <p class="en">Once a client has established a TCP address for a service, it "dials" the service. If succesful, the dial returns a <code>TCPConn</code> for communication. The client and the server exchange messages on this. Typically a client writes a request to the server using the <code>TCPConn</code>, and reads a response from the <code>TCPConn</code>. This continues until either (or both) sides close the connection. A TCP connection is established by the client using the function</p>
+  <p class="zh">一旦客户端已经建立TCP服务, 就可以和对方设备"通话"了. 如果成功，该调用返回一个用于通信的<code>TCPConn</code>。客户端和服务器通过它交换消息。通常情况下，客户端使用<code>TCPConn</code>写入请求到服务器, 并从<code>TCPConn</code>的读取响应。持续这样，直到任一（或两者）的两侧关闭连接。客户端使用该函数建立一个TCP连接。</p>
   <pre><code>
 func DialTCP(net string, laddr, raddr *TCPAddr) (c *TCPConn, err os.Error)
     </code></pre>
 
-  <p>where <code>laddr</code> is the local address which is usually set to <code>nil</code> and <code>raddr</code> is the remote address of the service, and the <code>net</code> string is one of "tcp4", "tcp6" or "tcp" depending on whether you want a TCPv4 connection, a TCPv6 connection or don't care.</p>
+  <p class="en">where <code>laddr</code> is the local address which is usually set to <code>nil</code> and <code>raddr</code> is the remote address of the service, and the <code>net</code> string is one of "tcp4", "tcp6" or "tcp" depending on whether you want a TCPv4 connection, a TCPv6 connection or don't care.</p>
+  <p class="zh">其中<code>laddr</code>是本地地址，通常设置为<code>nil</code>和<code>raddr</code>是一个服务的远程地址, <code>net</code>是一个字符串，根据您是否希望是一个TCPv4连接，TCPv6连接或不关心来设置为"tcp4", "tcp6"或"tcp"中的一个。</p>
 
-  <p>A simple example can be provided by a client to a web (HTTP) server. We will deal in substantially more detail with HTTP clients and servers in a later chapter, but for now we will keep it simple.</p>
+  <p class="en">A simple example can be provided by a client to a web (HTTP) server. We will deal in substantially more detail with HTTP clients and servers in a later chapter, but for now we will keep it simple.</p>
+  <p class="zh">一个简单的例子，可以展示有一个客户端连接到一个网页(HTTP)服务器。在后面的章节，我们将处理大量的HTTP客户端和服务器细节。</p>
 
-  <p>One of the possible messages that a client can send is the "HEAD" message. This queries a server for information about the server and a document on that server. The server returns information, but does not return the document itself. The request sent to query an HTTP server could be</p>
+  <p class="en">One of the possible messages that a client can send is the "HEAD" message. This queries a server for information about the server and a document on that server. The server returns information, but does not return the document itself. The request sent to query an HTTP server could be</p>
+  <p class="zh">其中一个可能的消息，一个客户端可以发送“HEAD”消息. 查询关于服务器的信息和文档。 服务器返回的信息，不返回文档本身，可能是对一个HTTP服务器发送查询请求。</p>
   <pre><code>
 "HEAD / HTTP/1.0\r\n\r\n"
     </code></pre>
 
-  <p>which asks for information about the root document and the server. A typical response might be</p>
+  <p class="en">which asks for information about the root document and the server. A typical response might be</p>
+  <p class="zh">它返回关于服务器的根文件信息。 一个典型的响应可能是</p>
   <pre><code>
 HTTP/1.0 200 OK
 ETag: "-9985996"
@@ -486,12 +574,14 @@ Date: Sat, 28 Aug 2010 00:43:48 GMT
 Server: lighttpd/1.4.23
     </code></pre>
 
-  <p>We first give the program (GetHeadInfo.go) to establish the connection for a TCP address, send the request string, read and print the response. Once compiled it can be invoked by e.g.</p>
+  <p class="en">We first give the program (GetHeadInfo.go) to establish the connection for a TCP address, send the request string, read and print the response. Once compiled it can be invoked by e.g.</p>
+  <p class="zh">我们首先给出(GetHeadInfo.go)程序来建立TCP连接，发送请求字符串，读取并打印响应。编译后就可以调用，例如：</p>
   <pre><code>
 GetHeadInfo www.google.com:80
     </code></pre>
 
-  <p>The program is</p>
+  <p class="en">The program is</p>
+  <p class="en">程序</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* GetHeadInfo
  */
@@ -537,9 +627,9 @@ GetHeadInfo www.google.com:80
 }
 </span></code></pre>
 
-  <p>The first point to note is the almost excessive amount of error checking that is going on. This is normal for networking programs: the opportunities for failure are substantially greater than for standalone programs. Hardware may fail on the client, the server, or on any of the routers and switches in the middle; communication may be blocked by a firewall; timeouts may occur due to network load; the server may crash while the client is talking to it. The following checks are performed:</p>
-
-  <ol>
+  <p class="en">The first point to note is the almost excessive amount of error checking that is going on. This is normal for networking programs: the opportunities for failure are substantially greater than for standalone programs. Hardware may fail on the client, the server, or on any of the routers and switches in the middle; communication may be blocked by a firewall; timeouts may occur due to network load; the server may crash while the client is talking to it. The following checks are performed:</p>
+  <p class="zh">第一个要注意的点是几乎过量的错误检查是怎么回事。这是正常的网络程序：失败的机会大大超过单独的程序。在客户端，服务器端或任何路由和中间交换上，硬件可能失败；通信可能会被防火墙阻塞;因网络负载可能会出现超时;当客户端联系服务器，服务器可能会崩溃。进行下列检查：</p>
+  <ol class="en">
     <li>There may be syntax errors in the address specified</li>
 
     <li>The attempt to connect to the remote service may fail. For example, the service requested might not be running, or there may be no such host connected to the network</li>
@@ -548,28 +638,46 @@ GetHeadInfo www.google.com:80
 
     <li>Similarly, the reads might fail</li>
   </ol>
+  <ol class="zh">
+    <li>指定的地址中可能存在语法错误</li>
 
-  <p>Reading from the server requires a comment. In this case, we read essentially a single response from the server. This will be terminated by end-of-file on the connection. However, it may consist of several TCP packets, so we need to keep reading till the end of file. The <code>io/ioutil</code> function <code>ReadAll</code> will look after these issues and return the complete response. (Thanks to Roger Peppe on the golang-nuts mailing list.).</p>
+    <li>尝试连接到远程服务可能会失败。例如, 所请求的服务可能没有运行, 或者有可能是主机没有连接到网络</li>
 
-  <p>There are some language issues involved. First, most of the functions return a dual value, with possible error as second value. If no error occurs, then this will be <code>nil</code>. In C, the same behaviour is gained by special values such as <code>NULL</code>, or -1, or zero being returned - if that is possible. In Java, the same error checking is managed by throwing and catching exceptions, which can make the code look very messy.</p>
+    <li>虽然连接已经建立，如果连接突然丢失也可能导致写失败，或网络超时</li>
 
-  <p>In earlier versions of this program, I returned the result in the array <code>buf</code>, which is of type <code>[512]byte</code>. Attempts to coerce this to a string failed - only byte arrays of type <code>[]byte</code> can be coerced. This is a bit of a nuisance.</p>
+    <li>同样，读操作也可能会失败</li>
+  </ol>
 
-  <h3 id="heading_id_21">A Daytime server</h3>
+  <p class="en">Reading from the server requires a comment. In this case, we read essentially a single response from the server. This will be terminated by end-of-file on the connection. However, it may consist of several TCP packets, so we need to keep reading till the end of file. The <code>io/ioutil</code> function <code>ReadAll</code> will look after these issues and return the complete response. (Thanks to Roger Peppe on the golang-nuts mailing list.).</p>
+  <p class="zh">值得一提的是,如何从服务端读取数据，在这种情况下，读本质上是一个单一的来自服务器的响应，这将终止文件结束的连接。但是，它可能包括多个TCP数据包，所以我们需要不断地读，直到文件的末尾。在<code>io/ioutil</code>下的<code>ReadAll</code>函数考虑这些问题，并返回完整响应。(感谢Roger Peppe在golang-nuts上的邮件列表。)。</p>
 
-  <p>About the simplest service that we can build is the daytime service. This is a standard Internet service, defined by RFC 867, with a default port of 13, on both TCP and UDP. Unfortunately, with the (justified) increase in paranoia over security, hardly any sites run a daytime server any more. Never mind, we can build our own. (For those interested, if you install <code>inetd</code> on your system, you usually get a daytime server thrown in.)</p>
+  <p class="en">There are some language issues involved. First, most of the functions return a dual value, with possible error as second value. If no error occurs, then this will be <code>nil</code>. In C, the same behaviour is gained by special values such as <code>NULL</code>, or -1, or zero being returned - if that is possible. In Java, the same error checking is managed by throwing and catching exceptions, which can make the code look very messy.</p>
+  <p class="zh">有一些涉及语言的问题，首先, 大多数函数返回两个值, 第二个值是可能出现的错误。如果没有错误发生, 那么它的值为<code>nil</code>。在C中, 如果需要的话，同样的行为通过定义特殊值例如<code>NULL</code>, 或 -1, 或0来返回。在Java中, 同样的错误检查通过抛出和捕获异常来管理，它会使代码看起来很凌乱。</p>
 
-  <p>A server registers itself on a port, and listens on that port. Then it blocks on an "accept" operation, waiting for clients to connect. When a client connects, the accept call returns, with a connection object. The daytime service is very simple and just writes the current time to the client, closes the connection, and resumes waiting for the next client.</p>
+  <p class="en">In earlier versions of this program, I returned the result in the array <code>buf</code>, which is of type <code>[512]byte</code>. Attempts to coerce this to a string failed - only byte arrays of type <code>[]byte</code> can be coerced. This is a bit of a nuisance.</p>
+  <p class="zh">在这个程序的早期版本, 我在返回结果中返回<code>buf</code>数组, 它的类型是<code>[512]byte</code>。我试图强迫类型为一个字符串但失败 - 只有字节数组类型<code>[]byte</code>可以强制转换。这确实有点困扰。</p>
 
-  <p>The relevant calls are</p>
+  <h3 id="heading_id_21" class="en">A Daytime server</h3>
+  <h3 id="heading_id_21" class="zh">一个时间(Daytime)服务器</h3>
+
+  <p class="en">About the simplest service that we can build is the daytime service. This is a standard Internet service, defined by RFC 867, with a default port of 13, on both TCP and UDP. Unfortunately, with the (justified) increase in paranoia over security, hardly any sites run a daytime server any more. Never mind, we can build our own. (For those interested, if you install <code>inetd</code> on your system, you usually get a daytime server thrown in.)</p>
+  <p class="zh">关于最简单的服务，我们可以建立是时间(Daytime)服务。这是一个标准的互联网服务, 由RFC 867定义, 默认的端口13, 协议是TCP和UDP。很遗憾, 对安全的偏执，几乎没有任何站点运行着时间(Daytime)服务器。不过没关系，我们可以建立我们自己的。 (对于那些有兴趣, 你可以在你的系统安装<code>inetd</code>, 你通常可以得到一个时间(Daytime)服务器。)</p>
+
+  <p class="en">A server registers itself on a port, and listens on that port. Then it blocks on an "accept" operation, waiting for clients to connect. When a client connects, the accept call returns, with a connection object. The daytime service is very simple and just writes the current time to the client, closes the connection, and resumes waiting for the next client.</p>
+  <p class="zh">在一个服务器上注册并监听一个端口。然后它阻塞在一个"accept"操作，并等待客户端连接。当一个客户端连接, accept调用返回一个连接(connection)对象。时间(Daytime)服务非常简单，只是将当前时间写入到客户端, 关闭该连接，并继续等待下一个客户端。</p>
+
+  <p class="en">The relevant calls are</p>
+  <p class="zh">有关调用</p>
   <pre><code>
 func ListenTCP(net string, laddr *TCPAddr) (l *TCPListener, err os.Error)
 func (l *TCPListener) Accept() (c Conn, err os.Error)
     </code></pre>
 
-  <p>The argument <code>net</code> can be set to one of the strings "tcp", "tcp4" or "tcp6". The IP address should be set to zero if you want to listen on all network interfaces, or to the IP address of a single network interface if you only want to listen on that interface. If the port is set to zero, then the O/S will choose a port for you. Otherwise you can choose your own. Note that on a Unix system, you cannot listen on a port below 1024 unless you are the system supervisor, root, and ports below 128 are standardised by the IETF. The example program chooses port 1200 for no particular reason. The TCP address is given as ":1200" - all interfaces, port 1200.</p>
+  <p class="en">The argument <code>net</code> can be set to one of the strings "tcp", "tcp4" or "tcp6". The IP address should be set to zero if you want to listen on all network interfaces, or to the IP address of a single network interface if you only want to listen on that interface. If the port is set to zero, then the O/S will choose a port for you. Otherwise you can choose your own. Note that on a Unix system, you cannot listen on a port below 1024 unless you are the system supervisor, root, and ports below 128 are standardised by the IETF. The example program chooses port 1200 for no particular reason. The TCP address is given as ":1200" - all interfaces, port 1200.</p>
+  <p class="zh"><code>net</code>参数可以设置为字符串"tcp", "tcp4"或者"tcp6"中的一个。如果你想监听所有网络接口，IP地址应设置为0，或如果你只是想监听一个简单网络接口，IP地址可以设置为该网络的地址。如果端口设置为0，O/S会为你选择一个端口。否则，你可以选择你自己的。需要注意的是，在Unix系统上，除非你是监控系统，否则不能监听低于1024的端口，小于128的端口是由IETF标准化。该示例程序选择端口1200没有特别的原因。TCP地址如下":1200" - 所有网络接口, 端口1200。</p>
 
-  <p>The program is</p>
+  <p class="en">The program is</p>
+  <p class="zh">程序</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* DaytimeServer
  */
@@ -611,16 +719,20 @@ func (l *TCPListener) Accept() (c Conn, err os.Error)
 }
 </span></code></pre>
 
-  <p>If you run this server, it will just wait there, not doing much. When a client connects to it, it will respond by sending the daytime string to it and then return to waiting for the next client.</p>
+  <p class="en">If you run this server, it will just wait there, not doing much. When a client connects to it, it will respond by sending the daytime string to it and then return to waiting for the next client.</p>
+  <p class="zh">如果你运行该服务器, 它会在那里等候, 没有做任何事。当一个客户端连接到该服务器, 它会响应发送时间(Daytime)字符串，然后继续等待下一个客户端。</p>
 
-  <p>Note the changed error handling in the server as compared to a client. The server should run forever, so that if any error occurs with a client, the server just ignores that client and carries on. A client could otherwise try to mess up the connection with the server, and bring it down!</p>
+  <p class="en">Note the changed error handling in the server as compared to a client. The server should run forever, so that if any error occurs with a client, the server just ignores that client and carries on. A client could otherwise try to mess up the connection with the server, and bring it down!</p>
+  <p class="zh">注意，相比客户端服务器改变了的错误处理。服务器应该永远运行，所以，如果出现任何错误与客户端，服务器只是忽略客户端继续运行。否则，客户端可以尝试搞砸了与服务器的连接，并导致服务器宕机。</p>
 
-  <p>We haven't built a client. That is easy, just changing the previous client to omit the initial write. Alternatively, just open up a <code>telnet</code> connection to that host:</p>
+  <p class="en">We haven't built a client. That is easy, just changing the previous client to omit the initial write. Alternatively, just open up a <code>telnet</code> connection to that host:</p>
+  <p class="zh">我们还没有建立一个客户端。这很简单，只是改变以前的客户端省略的初始写入。另外, 只需打开一个<code>telnet</code>连接到该主机：</p>
   <pre><code>
 telnet localhost 1200
     </code></pre>
 
-  <p>This will produce output such as</p>
+  <p class="en">This will produce output such as</p>
+  <p class="zh">输出如下：</p>
   <pre><code>
 $telnet localhost 1200
 Trying ::1...
@@ -629,11 +741,14 @@ Escape character is '^]'.
 Sun Aug 29 17:25:19 EST 2010Connection closed by foreign host.
     </code></pre>
 
-  <p>where "Sun Aug 29 17:25:19 EST 2010" is the output from the server.</p>
+  <p class="en">where "Sun Aug 29 17:25:19 EST 2010" is the output from the server.</p>
+  <p class="zh">服务器输出："Sun Aug 29 17:25:19 EST 2010"。</p>
 
-  <h3 id="heading_id_22">Multi-threaded server</h3>
+  <h3 id="heading_id_22" class="en">Multi-threaded server</h3>
+  <h3 id="heading_id_22" class="zh">多线程服务器</h3>
 
-  <p>"echo" is another simple IETF service. This just reads what the client types, and sends it back:</p>
+  <p class="en">"echo" is another simple IETF service. This just reads what the client types, and sends it back:</p>
+  <p class="zh">"echo"是另一种简单的IETF服务。只是读取客户端数据，并将其发送回去:</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* SimpleEchoServer
  */
@@ -687,7 +802,8 @@ Sun Aug 29 17:25:19 EST 2010Connection closed by foreign host.
 }
 </span></code></pre>
 
-  <p>While it works, there is a significant issue with this server: it is single-threaded. While a client has a connection open to it, no other cllient can connect. Other clients are blocked, and will probably time out. Fortunately this is easly fixed by making the client handler a go-routine. We have also moved the connection close into the handler, as it now belongs there</p>
+  <p class="en">While it works, there is a significant issue with this server: it is single-threaded. While a client has a connection open to it, no other cllient can connect. Other clients are blocked, and will probably time out. Fortunately this is easly fixed by making the client handler a go-routine. We have also moved the connection close into the handler, as it now belongs there</p>
+  <p class="zh">工作时，此服务器有一个显著的问题: 它是单线程的。当有一个客户端连接到它，就没有其他的客户端可以连接上。其他客户端将被阻塞，可能会超时。幸好客户端很容易使用go-routine扩展。我们仅仅需要把连接关闭移到处理程序结束后，示例代码如下：</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* ThreadedEchoServer
  */
@@ -746,33 +862,44 @@ Sun Aug 29 17:25:19 EST 2010Connection closed by foreign host.
 }
 </span></code></pre>
 
-  <h2 id="heading_id_23">Controlling TCP connections</h2>
+  <h2 id="heading_id_23" class="en">Controlling TCP connections</h2>
+  <h2 id="heading_id_23" class="zh">控制TCP连接</h2>
 
-  <h3 id="heading_id_24">Timeout</h3>
+  <h3 id="heading_id_24" class="en">Timeout</h3>
+  <h3 id="heading_id_24" class="zh">超时</h3>
 
-  <p>The server may wish to timeout a client if it does not respond quickly enough i.e. does not write a request to the server in time. This should be a long period (several minutes), because the user may be taking their time. Conversely, the client may want to timeout the server (after a much shorter time). Both do this by</p>
+  <p class="en">The server may wish to timeout a client if it does not respond quickly enough i.e. does not write a request to the server in time. This should be a long period (several minutes), because the user may be taking their time. Conversely, the client may want to timeout the server (after a much shorter time). Both do this by</p>
+  <p class="zh">服务端会断开那些超时的客户端，如果他们相应不够快，比如没有及时往服务端写一个请求。这应该是长时间(几分钟)的，因为用户可能花费了时间。相反, 客户端可能希望超时服务器(一个更短的时间后)。通过下面的来实现这两种：</p>
   <pre><code>
 func (c *TCPConn) SetTimeout(nsec int64) os.Error
 </code></pre>
 
-  <p>before any reads or writes on the socket.</p>
+  <p class="en">before any reads or writes on the socket.</p>
+  <p class="zh">套接字读写前。</p>
 
-  <h3 id="heading_id_25">Staying alive</h3>
+  <h3 id="heading_id_25" class="en">Staying alive</h3>
+  <h3 id="heading_id_25" class="zh">存活状态</h3>
 
-  <p>A client may wish to stay connected to a server even if it has nothing to send. It can use</p>
+  <p class="en">A client may wish to stay connected to a server even if it has nothing to send. It can use</p>
+  <p class="zh">即使没有任何通信，一个客户端可能希望保持连接到服务器的状态。可以使用</p>
   <pre><code>
 func (c *TCPConn) SetKeepAlive(keepalive bool) os.Error
   </code></pre>
 
-  <p>There are several other connection control methods, documented in the "net" package.</p>
+  <p class="en">There are several other connection control methods, documented in the "net" package.</p>
+  <p class="zh">还有几个其他的连接控制方法, 可以查看"net"包。</p>
 
-  <h2 id="heading_id_26">UDP Datagrams</h2>
+  <h2 id="heading_id_26" class="en">UDP Datagrams</h2>
+  <h2 id="heading_id_26" class="zh">UDP数据报</h2>
 
-  <p>In a connectionless protocol each message contains information about its origin and destination. There is no "session" established using a long-lived socket. UDP clients and servers make use of datagrams, which are individual messages containing source and destination information. There is no state maintained by these messages, unless the client or server does so. The messages are not guaranteed to arrive, or may arrive out of order.</p>
+  <p class="en">In a connectionless protocol each message contains information about its origin and destination. There is no "session" established using a long-lived socket. UDP clients and servers make use of datagrams, which are individual messages containing source and destination information. There is no state maintained by these messages, unless the client or server does so. The messages are not guaranteed to arrive, or may arrive out of order.</p>
+  <p class="zh">在一个无连接的协议中，每个消息都包含了关于它的来源和目的地的信息。没有"session"建立在使用长寿命的套接字。UDP客户端和服务器使用的数据包，单独包含来源和目的地的信息。除非客户端或服务器这样做，否则消息的状态不会保持。这些消息不能保证一定到达，也可能保证按顺序到达。</p>
 
-  <p>The most common situation for a client is to send a message and hope that a reply arrives. The most common situation for a server would be to receive a message and then send one or more replies back to that client. In a peer-to-peer situation, though, the server may just forward messages to other peers.</p>
+  <p class="en">The most common situation for a client is to send a message and hope that a reply arrives. The most common situation for a server would be to receive a message and then send one or more replies back to that client. In a peer-to-peer situation, though, the server may just forward messages to other peers.</p>
+  <p class="zh">客户端最常见的情况发送消息，并希望响应正常到达。服务器最常见的情况为将收到一条消息，然后发送一个或多个回复给客户端。而在点对点的情况下， 服务器可能仅仅是把消息转发到其他点。</p>
 
-  <p>The major difference between TCP and UDP handling for Go is how to deal with packets arriving from possibly multiple clients, without the cushion of a TCP session to manage things. The major calls needed are</p>
+  <p class="en">The major difference between TCP and UDP handling for Go is how to deal with packets arriving from possibly multiple clients, without the cushion of a TCP session to manage things. The major calls needed are</p>
+  <p class="zh">Go下处理TCP和UDP之间的主要区别是如何处理多个客户端可能同时有数据包到达，没有一个管理TCP会话的缓冲。主要需要调用的是</p>
   <pre><code>
 func ResolveUDPAddr(net, addr string) (*UDPAddr, os.Error)
 func DialUDP(net string, laddr, raddr *UDPAddr) (c *UDPConn, err os.Error)
@@ -781,7 +908,8 @@ func (c *UDPConn) ReadFromUDP(b []byte) (n int, addr *UDPAddr, err os.Error
 func (c *UDPConn) WriteToUDP(b []byte, addr *UDPAddr) (n int, err os.Error)
     </code></pre>
 
-  <p>The client for a UDP time service doesn't need to make many changes, just changing <code>...TCP...</code> calls to <code>...UDP...</code> calls:</p>
+  <p class="en">The client for a UDP time service doesn't need to make many changes, just changing <code>...TCP...</code> calls to <code>...UDP...</code> calls:</p>
+  <p class="zh">UDP时间服务的客户端并不需要做很多的变化，仅仅改变<code>...TCP...</code>调用为<code>...UDP...</code>调用:</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* UDPDaytimeClient
  */
@@ -826,7 +954,8 @@ func (c *UDPConn) WriteToUDP(b []byte, addr *UDPAddr) (n int, err os.Error)
 }
 </span></code></pre>
 
-  <p>while the server has to make a few more:</p>
+  <p class="en">while the server has to make a few more:</p>
+  <p class="zh">服务器也有很少的改动:</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* UDPDaytimeServer
  */
@@ -875,26 +1004,34 @@ func (c *UDPConn) WriteToUDP(b []byte, addr *UDPAddr) (n int, err os.Error)
 }
 </span></code></pre>
 
-  <h2 id="heading_id_27">Server listening on multiple sockets</h2>
+  <h2 id="heading_id_27" class="en">Server listening on multiple sockets</h2>
+  <h2 id="heading_id_27" class="zh">服务器侦听多个套接字</h2>
 
-  <p>A server may be attempting to listen to multiple clients not just on one port, but on many. In this case it has to use some sort of polling mechanism between the ports.</p>
+  <p class="en">A server may be attempting to listen to multiple clients not just on one port, but on many. In this case it has to use some sort of polling mechanism between the ports.</p>
+  <p class="zh">一个服务器可能试图不止在一个端口监听多个客户端，或是更多，在这种情况下，它在端口之间使用某种轮询机制。</p>
 
-  <p>In C, the select() call lets the kernel do this work. The call takes a number of file descriptors. The process is suspended. When I/O is ready on one of these, a wakeup is done, and the process can continue. This is cheaper than busy polling. In Go, accomplish the same by using a different goroutine for each port. A thread will become runnable when the lower-level select() discovers that I/O is ready for this thread.</p>
+  <p class="en">In C, the select() call lets the kernel do this work. The call takes a number of file descriptors. The process is suspended. When I/O is ready on one of these, a wakeup is done, and the process can continue. This is cheaper than busy polling. In Go, accomplish the same by using a different goroutine for each port. A thread will become runnable when the lower-level select() discovers that I/O is ready for this thread.</p>
+  <p class="zh">在C中, 调用的内核select()可以完成这项工作。 调用需要一个文件描述符的数字。该进程被暂停。当I/O准备好其中一个，一个唤醒被完成，并且该过程可以继续。This is cheaper than busy polling. 在G中, 完成相同的功能，通过为每个端口使用一个不同的goroutine。低级别的select()时发现，I/O已经准备好该线程，一个线程将运行。</p>
 
-  <h2 id="heading_id_28">The types Conn, PacketConn and Listener</h2>
+  <h2 id="heading_id_28" class="en">The types Conn, PacketConn and Listener</h2>
+  <h2 id="heading_id_28" class="zh">Conn，PacketConn和Listener类型</h2>
 
-  <p>So far we have differentiated between the API for TCP and the API for UDP, using for example <code>DialTCP</code> and <code>DialUDP</code> returning a <code>TCPConn</code> and <code>UDPConn</code> respectively. The type <code>Conn</code> is an interface and both <code>TCPConn</code> and <code>UDPConn</code> implement this interface. To a large extent you can deal with this interface rather than the two types.</p>
+  <p class="en">So far we have differentiated between the API for TCP and the API for UDP, using for example <code>DialTCP</code> and <code>DialUDP</code> returning a <code>TCPConn</code> and <code>UDPConn</code> respectively. The type <code>Conn</code> is an interface and both <code>TCPConn</code> and <code>UDPConn</code> implement this interface. To a large extent you can deal with this interface rather than the two types.</p>
+  <p class="zh">迄今为止我们已经区分TCP和UDP API的不同，使用例子<code>DialTCP</code>和<code>DialUDP</code>分别返回一个<code>TCPConn</code>和 <code>UDPConn</code>。<code>Conn</code>类型是一个接口，<code>TCPConn</code>和<code>UDPConn</code>实现了该接口。在很大程度上，你可以通过该接口处理而不是用这两种类型。</p>
 
-  <p>Instead of separate dial functions for TCP and UDP, you can use a single function</p>
+  <p class="en">Instead of separate dial functions for TCP and UDP, you can use a single function</p>
+  <p class="zh">你可以使用一个简单的函数，而不是单独使用TCP和UDP的dial函数。</p>
   <pre>
     <code>
 func Dial(net, laddr, raddr string) (c Conn, err os.Error)
     </code>
   </pre>
 
-  <p>The <code>net</code> can be any of "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only), "udp", "udp4" (IPv4-only), "udp6" (IPv6-only), "ip", "ip4" (IPv4-only) and "ip6" IPv6-only). It will return an appropriate implementation of the <code>Conn</code> interface. Note that this function takes a string rather than address as <code>raddr</code> argument, so that programs using this can avoid working out the address type first.</p>
+  <p class="en">The <code>net</code> can be any of "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only), "udp", "udp4" (IPv4-only), "udp6" (IPv6-only), "ip", "ip4" (IPv4-only) and "ip6" (IPv6-only). It will return an appropriate implementation of the <code>Conn</code> interface. Note that this function takes a string rather than address as <code>raddr</code> argument, so that programs using this can avoid working out the address type first.</p>
+  <p class="zh"><code>net</code>可以是"tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only), "udp", "udp4" (IPv4-only), "udp6" (IPv6-only), "ip", "ip4" (IPv4-only)和"ip6" (IPv6-only)任何一种。它将返回一个实现了<code>Conn</code>接口的类型。注意此函数接受一个字符串而不是<code>raddr</code>地址参数，因此，使用此程序可避免的地址类型。</p>
 
-  <p>Using this function makes minor changes to programs. For example, the earlier program to get HEAD information from a Web page can be re-written as</p>
+  <p class="en">Using this function makes minor changes to programs. For example, the earlier program to get HEAD information from a Web page can be re-written as</p>
+  <p class="zh">使用该函数需要对程序轻微的调整。例如, 前面的程序从一个Web页面获取HEAD信息可以被重新写为</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* IPGetHeadInfo
  */
@@ -955,19 +1092,22 @@ func Dial(net, laddr, raddr string) (c Conn, err os.Error)
 }
 </span></code></pre>
 
-  <p>Writing a server can be similarly simplified using the function</p>
+  <p class="en">Writing a server can be similarly simplified using the function</p>
+  <p class="zh">使用该函数同样可以简化一个服务器的编写</p>
   <pre>
     <code>
 func Listen(net, laddr string) (l Listener, err os.Error)
     </code>
   </pre>
 
-  <p>which returns an object implementing the <code>Listener</code> interface. This interface has a method</p>
+  <p class="en">which returns an object implementing the <code>Listener</code> interface. This interface has a method</p>
+  <p class="zh">返回一个实现<code>Listener</code>接口的对象. 该接口有一个方法</p>
   <pre><code>
 func (l Listener) Accept() (c Conn, err os.Error)
     </code></pre>
 
-  <p>which will allow a server to be built. Using this, the multi-threaded Echo server given earlier becomes</p>
+  <p class="en">which will allow a server to be built. Using this, the multi-threaded Echo server given earlier becomes</p>
+  <p class="zh">这将允许构建一个服务器。使用它, 将使前面给出的多线程Echo服务器改变</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* ThreadedIPEchoServer
  */
@@ -1018,26 +1158,34 @@ func (l Listener) Accept() (c Conn, err os.Error)
 }
 </span></code></pre>
 
-  <p>If you want to write a UDP server, then there is an interface <code>PacketConn</code> and a method to return an implementation of this:</p>
+  <p class="en">If you want to write a UDP server, then there is an interface <code>PacketConn</code> and a method to return an implementation of this:</p>
+  <p class="zh">如果你想写一个UDP服务器, 这里有一个<code>PacketConn</code>的接口，和一个实现了该接口的方法:</p>
   <pre><code>
 func ListenPacket(net, laddr string) (c PacketConn, err os.Error)
     </code></pre>
 
-  <p>This interface has primary methods <code>ReadFrom</code> and <code>WriteTo</code> to handle packet reads and writes.</p>
+  <p class="en">This interface has primary methods <code>ReadFrom</code> and <code>WriteTo</code> to handle packet reads and writes.</p>
+  <p class="zh">这个接口的主要方法<code>ReadFrom</code>和<code>WriteTo</code>用来处理数据包的读取和写入。</p>
 
-  <p>The Go <code>net</code> package recommends using these interface types rather than the concrete ones. But by using them, you lose specific methods such as <code>SetKeepAlive</code> or <code>TCPConn</code> and <code>SetReadBuffer</code> of <code>UDPConn</code>, unless you do a type cast. It is your choice.</p>
+  <p class="en">The Go <code>net</code> package recommends using these interface types rather than the concrete ones. But by using them, you lose specific methods such as <code>SetKeepAlive</code> or <code>TCPConn</code> and <code>SetReadBuffer</code> of <code>UDPConn</code>, unless you do a type cast. It is your choice.</p>
+  <p class="zh">Go的<code>net</code>包建议使用接口类型而不是具体的实现类型。但是，通过使用它们，你失去了具体的方法，比如<code>SetKeepAlive</code>或<code>TCPConn</code>和<code>UDPConn</code>的<code>SetReadBuffer</code>，除非你做一个类型转换。如何选择在于你。</p>
 
-  <h2 id="heading_id_29">Raw sockets and the type IPConn</h2>
+  <h2 id="heading_id_29" class="en">Raw sockets and the type IPConn</h2>
+  <h2 id="heading_id_29" class="zh">原始套接字和IPConn类型</h2>
 
-  <p>This section covers advanced material which most programmers are unlikely to need. it deals with <em>raw sockets</em>, which allow the programmer to build their own IP protocols, or use protocols other than TCP or UDP</p>
+  <p class="en">This section covers advanced material which most programmers are unlikely to need. it deals with <em>raw sockets</em>, which allow the programmer to build their own IP protocols, or use protocols other than TCP or UDP</p>
+  <p class="zh">本节涵盖了大多数程序员可能需要的高级资料。它涉及<em>raw sockets</em>, ，允许程序员建立自己的IP协议，或使用TCP或UDP协议。</p>
 
-  <p>TCP and UDP are not the only protocols built above the IP layer. The site http://www.iana.org/assignments/protocol-numbers lists about 140 of them (this list is often available on Unix systems in the file <code>/etc/protocols</code>). TCP and UDP are only numbers 6 and 17 respectively on this list.</p>
+  <p class="en">TCP and UDP are not the only protocols built above the IP layer. The site http://www.iana.org/assignments/protocol-numbers lists about 140 of them (this list is often available on Unix systems in the file <code>/etc/protocols</code>). TCP and UDP are only numbers 6 and 17 respectively on this list.</p>
+  <p class="zh">TCP和UDP并不是建立在IP层之上唯一的协议。该网站：http://www.iana.org/assignments/protocol-numbers 列表上大约有140关于它们(该列表往往在Unix系统的<code>/etc/protocols</code>文件上。)。TCP和UDP在这个名单上分别为6和17。</p>
 
-  <p>Go allows you to build so-called raw sockets, to enable you to communicate using one of these other protocols, or even to build your own. But it gives minimal support: it will connect hosts, and write and read packets between the hosts. In the next chapter we will look at designing and implementing your own protocols above TCP; this section considers the same type of problem, but at the IP layer.</p>
+  <p class="en">Go allows you to build so-called raw sockets, to enable you to communicate using one of these other protocols, or even to build your own. But it gives minimal support: it will connect hosts, and write and read packets between the hosts. In the next chapter we will look at designing and implementing your own protocols above TCP; this section considers the same type of problem, but at the IP layer.</p>
+  <p class="zh">Go允许你建立所谓的原始套接字，使您可以使用这些其它协议通信，或甚至建立你自己的。但它提供了最低限度的支持: 它会连接主机, 写入和读取和主机之间的数据包。在接下来的章节中，我们将着眼于设计和实现自己的基于TCP之上的协议; 这部分认为同样的问题存在于IP层。</p>
 
-  <p>To keep things simple, we shall use almost the simplest possible example: how to send a ping message to a host. Ping uses the "echo" command from the ICMP protocol. This is a byte-oriented protocol, in which the client sends a stream of bytes to another host, and the host replies. the format is:</p>
+  <p class="en">To keep things simple, we shall use almost the simplest possible example: how to send a ping message to a host. Ping uses the "echo" command from the ICMP protocol. This is a byte-oriented protocol, in which the client sends a stream of bytes to another host, and the host replies. the format is:</p>
+  <p class="zh">为了简单起见，我们将使用几乎最简单的例子: 如何发送一个ping消息给主机。Ping使用"echo"命令的ICMP协议。这是一个面向字节协议, 客户端发送一个字节流到另一个主机, 并等待主机的答复。格式如下:</p>
 
-  <ul>
+  <ul class="en">
     <li>The first byte is 8, standing for the echo message</li>
 
     <li>The second byte is zero</li>
@@ -1050,8 +1198,22 @@ func ListenPacket(net, laddr string) (c PacketConn, err os.Error)
 
     <li>The rest of the packet is user data</li>
   </ul>
+  <ul class="zh">
+    <li>首字节是8, 表示echo消息</li>
 
-  <p>The following program will prepare an IP connection, send a ping request to a host and get a reply. You may need to have root access in order to run it successfully.</p>
+    <li>第二个字节是0</li>
+
+    <li>第三和第四字节是整个消息的校验和</li>
+
+    <li>第五和第六字节是一个任意标识</li>
+
+    <li>第七和第八字节是一个任意的序列号</li>
+
+    <li>该数据包的其余部分是用户数据</li>
+  </ul>
+
+  <p class="en">The following program will prepare an IP connection, send a ping request to a host and get a reply. You may need to have root access in order to run it successfully.</p>
+  <p class="zh">下面的程序将准备一个IP连接，发送一个ping请求到主机，并得到答复。您可能需要root权限才能运行成功。</p>
   <pre><code><span class="sgc-5">
 <span class="sgc-1">/* Ping
  */
@@ -1186,13 +1348,16 @@ usually set at 15.
 </p>
 -->
 
-  <h2 id="heading_id_30">Conclusion</h2>
+  <h2 id="heading_id_30" class="en">Conclusion</h2>
+  <h2 id="heading_id_30" class="zh">结论</h2>
 
-  <p>This chapter has considered programming at the IP, TCP and UDP levels. This is often necessary if you wish to implement your own protocol, or build a client or server for an existing protocol.</p>
+  <p class="en">This chapter has considered programming at the IP, TCP and UDP levels. This is often necessary if you wish to implement your own protocol, or build a client or server for an existing protocol.</p>
+  <p class="zh">本章注重IP, TCP和UDP级别的编程。如果你想实现自己的协议，或用现有的协议建立一个客户端或服务器，这往往很重要。</p>
 
-  <p>Copyright Jan Newmarch, jan@newmarch.name</p>
+  <p class="en">Copyright Jan Newmarch, jan@newmarch.name</p>
+  <p class="zh">版权所有 Jan Newmarch, jan@newmarch.name</p>
 
-  <p>If you like this book, please contribute using Flattr <a class="FlattrButton sgc-8" href="http://jan.newmarch.name/go/index.html"></a><br />
+  <p class="en">If you like this book, please contribute using Flattr <a class="FlattrButton sgc-8" href="http://jan.newmarch.name/go/index.html"></a><br />
   or donate using PayPal</p>
 
   <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
