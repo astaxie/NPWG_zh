@@ -4,8 +4,6 @@
 ​
   "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 
-
-
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
@@ -16,15 +14,7 @@
 
   <script src="../toc.js" type="text/javascript">
 
-
-
-
-
-
-
   //<![CDATA[
-
-
 
    <!-- empty -->
 
@@ -33,14 +23,6 @@
   </script>
 
   <script type="text/javascript">
-
-
-
-
-
-
-
-
 
   /* <![CDATA[ */
 
@@ -66,11 +48,7 @@
 
 /*<![CDATA[*/
 
-
-
   body { counter-reset: chapter 6; }
-
-
 
   a.sgc-8 {display:none;}
 
@@ -94,8 +72,6 @@
 
 </head>
 
-
-
 <body>
 
   <div class="chapter">
@@ -106,8 +82,6 @@
 
   </div>
 
-
-
   <div class="preface">
 
     <p class="en">There are many languages in use throughout the world, and they use many different character sets. There are also many ways of encoding character sets into binary formats of bytes. This chapter considers some of the issues in this.</p>
@@ -116,93 +90,60 @@
 
   </div>
 
-
-
   <div class="generate_from_h2" id="generated-toc"></div>
-
-
 
   <h2 id="heading_id_3" class="en">Introduction</h2>
 
   <h2 id="heading_id_3" class="zh">引言</h2>
 
-
-
   <p class="en">Once upon a time there was EBCDIC and ASCII... Actually, it was never that simple and has just become more complex over time. There is light on the horizon, but some estimates are that it may be 50 years before we all live in the daylight on this!</p>
 
   <p class="zh">以前用EBCDIC和ASCII编码，(别看只有两种编码)，但事情从来没有简单过，恰恰相反变得越来越复杂了。但据推测,编码简化就像(黎明前)地平线上闪过了一道光，但要等到天亮还得50年。</p>
-
-
 
   <p class="en">Early computers were developed in the english-speaking countries of the US, the UK and Australia. As a result of this, assumptions were made about the language and character sets in use. Basically, the Latin alphabet was used, plus numerals, punctuation characters and a few others. These were then encoded into bytes using ASCII or EBCDIC.</p>
 
   <p class="zh">早期计算机是从美国、英国、澳大利亚这些英语国家发展起来的，结果计算机字符集就以这些国家使用的语言和字符进行设计，大体上，也就是拉丁字母，加上数字、标点和别的字符。他们使用ASCII或EBCDIC进行编码。</p>
 
-
-
   <p class="en">The character-handling mechanisms were based on this: text files and I/O consisted of a sequence of bytes, with each byte representing a single character. String comparison could be done by matching corresponding bytes; conversions from upper to lower case could be done by mapping individual bytes, and so on.</p>
 
   <p class="zh">字符处理的机制是基于此的：文件和输入输出都被定义成字节序列，每个字节代表一个单独的字符。字符串比较可以通过对比相对应的字节实现，字符串的大小写转换可以通过单个字节的操作完成，等等。</p>
-
-
 
   <p class="en">There are about 6,000 living languages in the world (3,000 of them in Papua New Guinea!). A few languages use the "english" characters but most do not. The Romanic languages such as French have adornments on various characters, so that you can write "j'ai arrêté", with two differently accented vowels. Similarly, the Germanic languages have extra characters such as '&szlig;'. Even UK English has characters not in the standard ASCII set: the pound symbol '&pound;' and recently the euro '&euro;'</p>
 
   <p class="zh">世界上现存约有6000种语言（居然有3000种在巴布亚新几内亚）。一小部分使用英文字符，但更多的则不是。想法文这样的拉丁语系语言还会有字符修饰符号，所以你可以用两种不同的重读元音来拼写“j'ai arrêté”。同样地，德语也有像'&szlig;'这样的字符，甚至是英式英语也会有不在ASCII编码中的字符：英镑和欧元('&pound;'和 '&euro;')</p>
 
-
-
   <p class="en">But the world is not restricted to variations on the Latin alphabet. Thailand has its own alphabet, with words looking like this: "ภาษาไทย". There are many other alphabets, and Japan even has two, Hiragana and Katagana.</p>
 
   <p class="zh">但是世界并不严格局限在拉丁字母中，泰国有它自己的字母，长这样子：“ภาษาไทย”。还有许多的字母形式像是日文，他居然有两种，平假文和片假文。</p>
-
-
 
   <p class="en">There are also the hierographic languages such as Chinese where you can write "百度一下，你就知道".</p>
 
   <p class="zh">还有一些象形文字，比如汉语，你可以这样写“百度一下，你就知道”。</p>
 
-
-
   <p class="en">It would be nice from a technical viewpoint if the world just used ASCII. However, the trend is in the opposite direction, with more and more users demanding that software use the language that they are familiar with. If you build an application that can be run in different countries then users will demand that it uses their own language. In a distributed system, different components of the system may be used by users expecting different languages and characters.</p>
 
   <p class="zh">用理工科的眼光看，世界上只有ASCII一种编码就清静了。但实际正是相反的趋势，越来越多的人需要计算机软件中使用自己熟悉的语言。如果你的软件可以在不同的国家运行，那你的用户就需要软件使用他们自己的语言。在分布式的系统中，使用不同的系统模块的人可能希望不同的语言和字符。</p>
-
-
 
   <p class="en"><em>Internationalisation</em> (i18n) is how you write your applications so that they can handle the variety of languages and cultures. <em>Localisation</em> (l10n) is the process of customising your internationalised application to a particular cultural group.</p>
 
   <p class="zh"><em>国际化</em>(i18n)是指你的应用可以处理多种语言和文化。<em>本地化</em>(l10n)是说你把国际化的应用适配成小群体使用。</p>
 
-
-
   <p class="en">i18n and l10n are big topics in themselves. For example, they cover issues such as colours: while white means "purity" in Western cultures, it means "death" to the Chinese and "joy" to Egyptians. In this chapter we just look at issues of character handling.</p>
 
   <p class="zh">国际化和本地化各自都是一个很大的课题。举个例子，关于颜色的话题：白色在西方表示纯洁，在中国表示死亡，在埃及表示喜悦。在这章中我们只关注字符的处理。</p>
 
-
-
   <h2 id="heading_id_4" class="en">Definitions</h2>
-
   <h2 id="heading_id_4" class="en">定义</h2>
-
-
 
   <p class="en">It is important to be careful about exactly what part of a text handling system you are talking about. Here is a set of definitions that have proven useful.</p>
 
   <p class="zh">准确定义我们讨论的文本处理是什么，十分重要。下面是有人做的一套行之有效的定义方法。</p>
 
-
-
   <h3 id="heading_id_5">Character</h3>
-
-
 
   <p class="en">A character is a "unit of information that roughly corresponds to a grapheme (written symbol) of a natural language, such as a letter, numeral, or punctuation mark" (Wikipedia). A character is "the smallest component of written language that has a semantic value" (Unicode). This includes letters such as 'a' and 'À' (or letters in any other language), digits such as '2', punctuation characters such as ',' and various symbols such as the English pound currency symbol '£'.</p>
 
   <p class="zh">字符是＂自然语言中代表某种书写符号，比如字母、数字、标点的信息单位＂（维基百科），字符是有价值的最小书写单位（Unicode）这就包括了a和A，或其他语言字符，也包括2数字和标点，还有像英镑这样的字符。</p>
-
-
 
   <p class="en">A character is some sort of abstraction of any actual symbol: the character 'a' is to any written 'a' as a Platonic circle is to any actual circle. The concept of character also includes control characters, which do not correspond to natural language symbols but to other bits of information used to process texts of the language.</p>
   <p class="zh">字符是实际符号的抽象组合，也就是说a代表了所有手写的a，有点像柏拉图圆也是圆的关系。原则上字符也包括控制字符，也就是实际中不存在只是为了处理语言的格式用的。</p>
@@ -222,63 +163,43 @@
   <h3 id="heading_id_7" class="en">Character code</h3>
   <h3 id="heading_id_7" class="zh">字符编码</h3>
 
-
-
   <p class="en">A character code is a mapping from characters to integers. The mapping for a character set is also called a coded character set or code set. The value of each character in this mapping is often called a code point. ASCII is a code set. The codepoint for 'a' is 97 and for 'A' is 65 (decimal).</p>
 
   <p class="zh">字符编码是从字符到整数的映射。一个字符集的映射也被称为一个编码字符集或字符集。这个映射中的每个字符的值通常被称为一个编码（code point)。 ASCII也是一个字符集，'a'的编码是97，'A'是65（十进制）。</p>
-
-
 
   <p class="en">The character code is still an abstraction. It isn't yet what we will see in text files, or in TCP packets. However, it is getting close. as it supplies the mapping from human oriented concepts into numerical ones.</p>
 
   <p class="zh">字符编码仍然是一个抽象的概念。它不是我们可以看到的文件或者TCP的包。不过，确和这两个概念很像，它就是一种把人抽象出来的概念转化为数字的映射关系。</p>
 
-
-
   <h3 id="heading_id_8" class="en">Character encoding</h3>
 <h3 id="heading_id_8" class="zh">编码字符</h3>
-
 
   <p class="en">To communicate or store a character you need to encode it in some way. To transmit a string, you need to encode all characters in the string. There are many possible encodings for any code set.</p>
 
   <p class="zh">字符的交互（传输）和存储都要以某种方式编码。要发送一个字符串，你需要将字符串中的所有字符进行编码。每种字符集都有很多的编码方案。</p>
 
-
-
   <p class="en">For example, 7-bit ASCII code points can be encoded as themselves into 8-bit bytes (an octet). So ASCII 'A' (with codepoint 65) is encoded as the 8-bit octet 01000001. However, a different encoding would be to use the top bit for parity checking e.g. with odd parity ASCII 'A" would be the octet 11000001. Some protocols such as Sun's XDR use 32-bit word-length encoding. ASCII 'A' would be encoded as 00000000 00000000 0000000 01000001.</p>
 
   <p class="zh">例如，7位字节ASCII编码转换成8位字节（8进制）。所以，ASCII的'A'（编码值65）可以被编码为8进制的01000001。不过，另一种不同的编码方式对最高位别有用途，如奇偶校验，带有奇校验的ASCII编码“A”将是这个8进制数11000001。还有一些协议，如Sun的XDR，使用32位字长编码ASCII编码。所以，'A'将被编码为00000000 00000000000000001000001。</p>
-
-
 
   <p class="en">The character encoding is where we function at the programming level. Our programs deal with encoded characters. It obviously makes a difference whether we are dealing with 8-bit characters with or without parity checking, or with 32-bit characters.</p>
 
   <p class="zh">字符编码​​是在程序应用层面使用的。应用程序处理编码的字符时，是否带包含奇偶校验处理8位字符或32位字符，显然有很大的差别。</p>
 
-
-
   <p class="en">The encoding extends to strings of characters. A word-length even parity encoding of "ABC" might be 10000000 (parity bit in high byte) 0100000011 (C) 01000010 (B) 01000001 (A in low byte). The comments about the importance of an encoding apply equally strongly to strings, where the rules may be different.</p>
 
   <p class="zh">把字符编码延伸到字符串。一个字节宽、带有奇偶校验的“ABC”编码为10000000（高位奇偶校验）0100000011（C）01000010（B）01000001（A在低位）。对于编码在字符串上的讨论也很重要，虽然编码规则可能不同。</p>
 
-
-
   <h3 id="heading_id_9" class="en">Transport encoding</h3>
 <h3 id="heading_id_9" class="zh">编码传输</h3>
-
 
   <p class="en">A character encoding will suffice for handling characters within a single application. However, once you start sending text <em>between</em> applications, then there is the further issue of how the bytes, shorts or words are put on the wire. An encoding can be based on space-and hence bandwidth-saving techniques such as <code>zip</code>'ping the text. Or it could be reduced to a 7-bit format to allow a parity checking bit, such as <code>base64</code>.</p>
 
   <p class="zh">某个应用程序的字符编码只要内部能处理字符串就足够了。然而，一旦你需要在不同应用程序<em>之间</em>交互，那怎么编码可就成了需要进一步讨论问题了：字节、字符、字是怎么传输的。字符编码可能有很多空白字符（待商议），从而可以使用如<code>zip算法</code>对文本进行压缩，从而节省带宽。或者，它可以减少到7位字节，奇偶校验位，使用<code> base64编码</code>来代替。</p>
 
-
-
   <p class="en">If we do know the character and transport encoding, then it is a matter of programming to manage characters and strings. If we don't know the character or transport encoding then it is a matter of guesswork as to what to do with any particular string. There is no convention for files to signal the character encoding.</p>
 
   <p class="zh">如果我们知道的字符编码和传输编码，那么问题就成了如何通过编程处理字符和字符串；如果我们不知道字符编码和传输编码，那么如何猜到某个特定字符串的编码方式就是大问题。因为没有约定发送文件的字符编码</p>
-
-
 
   <p class="en">There <em>is</em> however a convention for signalling encoding in text transmitted across the internet. It is simple: the header of a text message contains information about the encoding. For example, an HTTP header can contain lines such as</p>
 
@@ -292,23 +213,16 @@ Content-Encoding: gzip
 
      </code></pre>
 
-
-
   <p class="en">which says that the character set is ISO 8859-4 (corresponding to certain countries in Europe) with the default encoding, but then <code>gzip</code>ed. The second part - content encoding - is what we are referring to as "transfer encoding" (IETF RFC 2130).</p>
 
   <p class="zh">上面是说，将字符集是ISO 8859-4（对应到欧洲的某些国家）作为默认编码，然后用<code> gzip</code>压缩。内容类型的第二部分就是我们指的是“传输编码”（IETF RFC2130）。</p>
-
-
 
   <p class="en">But how do you read this information? Isn't it encoded? Don't we have a chicken and egg situation? Well, no. The convention is that such information is given in ASCII (to be precise, US ASCII) so that a program can read the headers and then adjust its encoding for the rest of the document.</p>
 
   <p class="zh">但是，怎么读懂这个信息呢？它没有编码？这不就是先有鸡还是先有蛋的问题么？嗯，不是的。按照惯例，这样的信息使用ASCII编码（准确地说，美国ASCII），所以程序可以读取headers，然后适配其文档的其余部分的编码。</p>
 
-
-
   <h2 id="heading_id_10" class="en">ASCII</h2>
 	  <h2 id="heading_id_10" class="zh">ASCII编码</h2>
-
 
   <p class="en">ASCII has the repertoire of the English characters plus digits, punctuation and some control characters. The code points for ASCII are given by the familiar table</p>
 
@@ -450,82 +364,55 @@ Content-Encoding: gzip
 
       </pre>
 
-
-
   <p class="en">The most common encoding for ASCII uses the code points as 7-bit bytes, so that the encoding of 'A' for example is 65.</p>
 
   <p class="zh">最常见的ASCII编码使用7位字节，所以A的码是65。</p>
-
-
 
   <p class="en">This set is actually <em>US ASCII</em>. Due to European desires for accented characters, some punctuation characters are omitted to form a minimal set, ISO 646, while there are "national variants" with suitable European characters. The page <a href="http://www.cs.tut.fi/~jkorpela/chars.html">http://www.cs.tut.fi/~jkorpela/chars.html</a> by Jukka Korpela has more information for those interested. We shall not need these variants though.</p>
 
   <p class="zh">这个字符集是实际的<em>美国ASCII</em>。鉴于欧洲需要处理重音字符，于是省略一些标点字符，形成一个最小的字符集，ISO 646，同时有合适的欧洲本国字符的“国家变种字符集”。有兴趣的可以看看Jukka Korpel的这个网页<a href="http://www.cs.tut.fi/~jkorpela/chars.html"> http://www.cs.tut.fi/〜jkorpela/ chars.html</a>。当然我们并不需要这些变种。</p>
 
-
-
   <h2 id="heading_id_11" class="en">ISO 8859</h2>
 <h2 id="heading_id_11" class="zh">ISO 8859字符集</h2>
-
 
   <p class="en">Octets are now the standard size for bytes. This allows 128 extra code points for extensions to ASCII. A number of different code sets to capture the repertoires of various subsets of European languages are the ISO 8859 series. ISO 8859-1 is also known as Latin-1 and covers many languages in western Europe, while others in this series cover the rest of Europe and even Hebrew, Arabic and Thai. For example, ISO 8859-5 includes the Cyrillic characters of countries such as Russia, while ISO 8859-8 includes the Hebrew alphabet.</p>
 
   <p class="zh">8进制是字节的标准长度。这使得ASCII可以有128个额外的编码。 ISO 8859系列的字符集可以包含众多的欧洲语言字符集。。 ISO 8859-1也被称为Latin-1，覆盖了许多在西欧国家的语言，同时这一系列的其他字符集包括欧洲其他国家，甚至希伯来语，阿拉伯语和泰语。例如，ISO 8859-5包括使用斯拉夫语字符的俄罗斯等，而ISO 8859-8则包含希伯来文字母。</p>
 
-
-
   <p class="en">The standard encoding for these character sets is to use their code point as an 8-bit value. For example, the character 'Á' in ISO 8859-1 has the code point 193 and is encoded as 193. All of the ISO 8859 series have the bottom 128 values identical to ASCII, so that the ASCII characters are the same in all of these sets.</p>
 
   <p class="zh">这些字符集使用8进制作为标准的编码格式。例如，在ISO 8859-1字符' 'Á'的字符编码为193，同时被编码为193。所有的ISO 8859系列前128个保持和ASCII相同的值，所以，ASCII字符在所有这些集合都是相同的。</p>
-
-
 
   <p class="en">The HTML specifications used to recommend the ISO 8859-1 character set. HTML 3.2 was the last one to do so, and after that HTML 4.0 recommended Unicode. In 2010 Google made an estimate that of the pages it sees, about 20% were still in ISO 8859 format while 20% were still in ASCII ("Unicode nearing 50% of the web" http://googleblog.blogspot.com/2010/01/unicode-nearing-50-of-web.html).</p>
 
   <p class="zh">HTML语言规范曾经推荐ISO 8859-1字符集，不过HTML3.2之后的规范就不再推荐，4.0开始推荐Unicode编码。2010年Google通过它抓取的网页做出了一个估算，20%的网页使用ISO 8859编码，20%使用ASCII（unicode 接近50%，http://googleblog.blogspot.com/2010/01/unicode-nearing-50-of-web.html）</p>
 
-
-
   <h2 id="heading_id_12" class="en">Unicode</h2>
 <h2 id="heading_id_12" class="zh">Unicode编码</h2>
-
 
   <p class="en">Neither ASCII nor ISO 8859 cover the languages based on hieroglyphs. Chinese is estimated to have about 20,000 separate characters, with about 5,000 in common use. These need more than a byte, and typically two bytes has been used. There have been many of these two-byte character sets: Big5, EUC-TW, GB2312 and GBK/GBX for Chinese, JIS X 0208 for Japanese, and so on. These encodings are generally not mutually compatable.</p>
 
   <p class="zh">ASCII和ISO 8859都不能覆盖象形文字。中文大约有20000个独立的字符，其中5000个常用字符。这些字符需要不知一个字节，基本上双字节都会被用上。也有一些多字节的编码：中文的Big5, EUC-TW, GB2312 和GBK/GBX，日文的 JIS X 0208，等等。这些编码通常是不兼容的</p>
 
-
   <p class="en">Unicode is an embracing standard character set intended to cover all major character sets in use. It includes European, Asian, Indian and many more. It is now up to version 5.2 and has over 107,000 characters. The number of code points now exceeds 65,536, that is. more than 2^16. This has implications for character encodings.</p>
 
   <p class="zh">Unincode是一个受到拥护的字符集编码标准，旨在统一主要使用的编码。它包含了欧洲文字、亚洲文字和印度文字等。现在Unicode已经到了5.2的版本，包含107,0000个字符。编码字符超过65536，也就是2^16。这已经覆盖了整个编码。</p>
-
-
 
   <p class="en">The first 256 code points correspond to ISO 8859-1, with US ASCII as the first 128. There is thus a backward compatability with these major character sets, as the code points for ISO 8859-1 and ASCII are exactly the same in Unicode. The same is not true for other character sets: for example, while most of the Big5 characters are also in Unicode, the code points are not the same. The page http://moztw.org/docs/big5/table/unicode1.1-obsolete.txt contains one example of a (large) table mapping from Big5 to Unicode.</p>
 
   <p class="zh">(Unicode编码)前256个编码对应 ISO 8859-1，同时前128个也是美式ASCII编码。所以主流的编码都是相互兼容的，ISO 8859-1、ASCII和Unicode是一样的。对其他字符集则不一定正确：例如，虽然Big5编码也在Unicode中，但他们的编码值并不相同。http://moztw.org/docs/big5/table/unicode1.1-obsolete.txt这个页面就是证明：一张Big5到Unicode的大的映射表。</p>
 
-
-
   <p class="en">To represent Unicode characters in a computer system, an encoding must be used. The encoding UCS is a two-byte encoding using the code point values of the Unicode characters. However, since there are now too many characters in Unicode to fit them all into 2 bytes, this encoding is obsolete and no longer used. Instead there are:</p>
 
   <p class="zh">为了在计算机系统中表示Unicode字符，必须使用一个编码方案。UCS编码使用两个字节来编码一个字符值。然而，Unicode现在有太多的字符需要对应到双字节的编码。以下方案是替代原来陈旧的编码方案的：</p>
-
-
 
   <ul class="en">
 
     <li>UTF-32 is a 4-byte encoding, but is not commonly used, and HTML 5 warns explicitly against using it</li>
 
-
-
     <li>UTF-16 encodes the most common characters into 2 bytes with a further 2 bytes for the "overflow", with ASCII and ISO 8859-1 having the usual values</li>
 
-
-
     <li>UTF-8 uses between 1 and 4 bytes per character, with ASCII having the usual values (but not ISO 8859-1)</li>
-
-
 
     <li>UTF-7 is used sometimes, but is not common</li>
 
@@ -534,42 +421,28 @@ Content-Encoding: gzip
 
     <li>UTF-32使用4个字节编码，但是已经不在推荐，HTML5甚至严重警告反对使用</li>
 
-
-
     <li>UTF-16是最常见的，它通过溢出两个字节来处理ASCII和ISO 8859-1外的字符</li>
 
-
-
     <li>UTF-8每个字符使用1到4个字节，所以ASCII值不变，但ISO 8859-1的值会变化</li>
-
-
 
     <li>UTF-7有时会用到，但不常见</li>
 
   </ul>
 
-
   <h2 id="heading_id_13" class="en">UTF-8, Go and runes</h2>
   <h2 id="heading_id_13" class="zh">UTF-8, Go语言和runes</h2>
-
 
   <p class="en">UTF-8 is the most commonly used encoding. Google estimates that 50% of the pages that it sees are encoded in UTF-8. The ASCII set has the same encoding values in UTF-8, so a UTF-8 reader can read text consisting of just ASCII characters as well as text from the full Unicode set.</p>
 
   <p class="zh">UTF - 8是最常用的编码。谷歌估计它抓取的网页有50%使用UTF-8编码。ASCII字符集具有相同的在UTF-8中编码值相同，所以UTF-8的读取方法可以用Unicode字符集读取一个ASCII字符组成的网页。</p>
 
-
-
   <p class="en">Go uses UTF-8 encoded characters in its strings. Each character is of type <code>rune</code>. This is a alias for <code>int32</code> as a Unicode character can be 1, 2 or 4 bytes in UTF-8 encoding. In terms of characters, a string is an array of runes.</p>
 
   <p class="zh">Go语言使用UTF-8编码字符串。每个字符类型都是<code>rune</code>。<code>rune</code>是 <code>int32</code>的一个别名，因为Unicode编码可以是1,2或4个字节。字符和字符串其实都是一个runes的数组</p>
 
-
-
   <p class="en">A string is also an array of bytes, but you have to be careful: only for the ASCII subset is a byte equal to a character. All other characters occupy two, three or four bytes. This means that the length of a string in characters (runes) is generally not the same as the length of its byte array. They are only equal when the string consists of ASCII characters only.</p>
 
   <p class="zh">Unicode中一个字符串其实是一个字节数组，但是你要注意：只有ASCII这个字符集是一个字节等于一个字符。所有其他字符占用2个，三个或四个字节。这意味着，一个字符串的长度（runes）通常是不一样的长度的字节数组。他们只有在全是ASCII字符是才相同。</p>
-
-
 
   <p class="en">The following program fragment illustrates this. If we take a UTF-8 string and test its length, you get the length of the underlying byte array. But if you cast the string to an array of runes <code>[]rune</code> then you get an array of the Unicode code points which is generally the number of characters:</p>
 
@@ -579,15 +452,11 @@ Content-Encoding: gzip
 
 str := "百度一下，你就知道"
 
-
-
 println("String length", len([]rune(str)))
 
 println("Byte length", len(str))
 
     </code></pre>
-
-
 
   <p class="en">prints</p>
 
@@ -601,50 +470,34 @@ Byte length 27
 
     </code></pre>
 
-
-
   <h3 id="heading_id_14">UTF-8 client and server</h3>
-
-
 
   <p class="en">Possibly surprisingly, you need do nothing special to handle UTF-8 text in either the client or the server. The underlying data type for a UTF-8 string in Go is a byte array, and as we saw just above, Go looks after encoding the string into 1, 2, 3 or 4 bytes as needed. The length of the string is the length of the byte array, so you write any UTF-8 string by writing the byte array.</p>
 
   <p class="zh">可能令人惊讶的是，无论是客户端或服务器你不需要对utf-8的文本做任何特殊的处理。UTF-8字符串的长度就是一个字节数组，如上所示。Go语言自动处理编码后的字符串是1，2，3或4个字节。所以utf-8的字符串你可以随便写。</p>
 
-
-
   <p class="en">Similarly to read a string, you just read into a byte array and then cast the array to a string using <code>string([]byte)</code>. If Go cannot properly decode bytes into Unicode characters, then it gives the Unicode Replacement Character \uFFFD. The length of the resulting byte array is the length of the legal portion of the string.</p>
 
   <p class="zh">类似于读取字符串，只要读入一个字节数组，然后使用<code>string([]byte)</code>将数组转换成一个字符串。如果Go语言不能正确解码，将字节转换为Unicode字符，那么它给使用Unicode替换字符\uFFFD。生成的字节数组的长度是有效字符串的长度。</p>
-
-
 
   <p class="en">So the clients and servers given in earlier chapters work perfectly well with UTF-8 encoded text.</p>
 
   <p class="zh">所以前面章节中提到的客户端和服务端使用uft-8编码会表现的比较好</p>
 
-
-
   <h3 id="heading_id_15" class="en">ASCII client and server</h3>
   <h3 id="heading_id_15" class="zh">ASCII 编码的客户端和服务器</h3>
-
 
   <p class="en">The ASCII characters have the same encoding in ASCII and in UTF-8. So ordinary UTF-8 character handling works fine for ASCII characters. No special handling need to be done.</p>
 
   <p class="zh">ASCII字符的ASCII编码和UTF-8编码的值相同，所以普通的UTF-8字符能正常处理ASCII字符，不需要做任何特殊的处理。</p>
 
-
-
   <h2 id="heading_id_16" class="en">UTF-16 and Go</h2>
 
   <h2 id="heading_id_16" class="zh">Go语言和utf-16</h2>
 
-
   <p class="en">UTF-16 deals with arrays of short 16-bit unsigned integers. The package <code>utf16</code> is designed to manage such arrays. To convert a normal Go string, that is a UTF-8 string, into UTF-16, you first extract the code points by coercing it into a <code>[]rune</code> and then use <code>utf16.Encode</code> to produce an array of type <code>uint16</code>.</p>
 
   <p class="zh">utf-16可以用16位字节无符号整形数处理。 <code>utf16</code> 包就是用来处理这样的字串的。将一个Go语言的utf-8正常编码的字串转换utf-16的编码，你应先将字串转换成<code>[]rune</code>rune数组，然后使用 <code>utf16.Encode</code> 生成一个 <code>uint16</code>类型的数组。</p>
-
-
 
   <p class="en">Similarly, to decode an array of unsigned short UTF-16 values into a Go string, you use <code>utf16.Decode</code> to convert it into code points as type <code>[]rune</code> and then to a string. The following code fragment illustrates this</p>
 
@@ -654,48 +507,32 @@ Byte length 27
 
 str := "百度一下，你就知道"
 
-
-
 runes := utf16.Encode([]rune(str))
 
 ints := utf16.Decode(runes)
-
-
 
 str = string(ints)
 
     </code></pre>
 
-
-
   <p class="en">These type conversions need to be applied by clients or servers as appropriate, to read and write 16-bit short integers, as shown below.</p>
 
   <p class="zh">类型的转换需要客户端和服务器在合适的时机读取和写入16位的整数，如下图所示。（……图呢？）</p>
 
-
-
   <h3 id="heading_id_17" class="en">Little-endian and big-endian</h3>
    <h3 id="heading_id_17" class="zh">Little-endian and big-endian</h3>
-
-
 
   <p class="en">Unfortunately, there is a little devil lurking behind UTF-16. It is basically an encoding of characters into 16-bit short integers. The big question is: for each short, how is it written as two bytes? The top one first, or the top one second? Either way is fine, as long as the receiver uses the same convention as the sender.</p>
 
   <p class="zh">然而，UTF-16编码潜藏着一个小的恶魔。它基本上是一个16字节字符编码。最大的问题是：每一个短字，是如何拼写的？高位在前还是高位在后？无论哪种方式，只要是发生器和接收器约定好就可以。</p>
 
-
-
   <p class="en">Unicode has addressed this with a special character known as the BOM (byte order marker). This is a zero-width non-printing character, so you never see it in text. But its value 0xfffe is chosen so that you can tell the byte-order:</p>
 
   <p class="zh">Unicode通过一个特殊字节标记了寻址方式，这个字节就被称为BOM（字节顺序标记）。这是一个零宽度非打印字符，所以你永远不会在文本中看到它。但是它通过0xFFFE的值，可以告诉你编码的顺序</p>
 
-
-
   <ul class="en">
 
     <li>In a big-endian system it is FF FE</li>
-
-
 
     <li>In a little-endian system it is FE FF</li>
 
@@ -704,22 +541,16 @@ str = string(ints)
 
     <li>在big-endian 系统中，它是FF FE</li>
 
-
-
     <li>在little-endian 系统中，它是FE FF</li>
 
   </ul>
-
 
   <p class="en">Text will sometimes place the BOM as the first character in the text. The reader can then examine these two bytes to determine what endian-ness has been used.</p>
 
   <p class="zh">有时BOM会位于文本的第一个字符。文本被读入是可以检查，以确定使用的是那种系统。</p>
 
-
-
   <h3 id="heading_id_18" class="en">UTF-16 client and server</h3>
   <h3 id="heading_id_18" class="zh">UTF-16 编码的客户端和服务器</h3>
-
 
   <p class="en">Using the BOM convention, we can write a server that prepends a BOM and writes a string in UTF-16 as</p>
 
@@ -733,8 +564,6 @@ str = string(ints)
 
 </span><span class="sgc-2">package</span> main
 
-
-
 <span class="sgc-2">import</span> (
 
         <span class="sgc-3">"fmt"</span>
@@ -747,15 +576,9 @@ str = string(ints)
 
 )
 
-
-
 const <span class="sgc-4">BOM</span> = '\ufffe'
 
-
-
 <span class="sgc-2">func</span> main() {
-
-
 
         service := <span class="sgc-3">"0.0.0.0:1210"</span>
 
@@ -763,13 +586,9 @@ const <span class="sgc-4">BOM</span> = '\ufffe'
 
         checkError(err)
 
-
-
         listener, err := net.<span class="sgc-4">ListenTCP</span>(<span class="sgc-3">"tcp"</span>, tcpAddr)
 
         checkError(err)
-
-
 
         <span class="sgc-2">for</span> {
 
@@ -781,15 +600,11 @@ const <span class="sgc-4">BOM</span> = '\ufffe'
 
                 }
 
-
-
                 str := <span class="sgc-3">"j'ai arrêté"</span>
 
                 shorts := utf16.<span class="sgc-4">Encode</span>([]rune(str))
 
                 writeShorts(conn, shorts)
-
-
 
                 conn.<span class="sgc-4">Close</span>() <span class="sgc-1">// we're finished
 
@@ -797,13 +612,9 @@ const <span class="sgc-4">BOM</span> = '\ufffe'
 
 }
 
-
-
 <span class="sgc-2">func</span> writeShorts(conn net.<span class="sgc-4">Conn</span>, shorts []uint16) {
 
         <span class="sgc-2">var</span> bytes [2]<span class="sgc-5">byte</span>
-
-
 
         <span class="sgc-1">// send the BOM as first two bytes
 
@@ -819,15 +630,11 @@ const <span class="sgc-4">BOM</span> = '\ufffe'
 
         }
 
-
-
         <span class="sgc-2">for</span> <span class="sgc-6">_</span>, v := range shorts {
 
                 bytes[0] = <span class="sgc-5">byte</span>(v &gt;&gt; 8)
 
                 bytes[1] = <span class="sgc-5">byte</span>(v &amp; 255)
-
-
 
                 <span class="sgc-6">_</span>, err = conn.<span class="sgc-4">Write</span>(bytes[0:])
 
@@ -840,8 +647,6 @@ const <span class="sgc-4">BOM</span> = '\ufffe'
         }
 
 }
-
-
 
 <span class="sgc-2">func</span> checkError(err error) {
 
@@ -857,8 +662,6 @@ const <span class="sgc-4">BOM</span> = '\ufffe'
 
 </span></code></pre>
 
-
-
   <p class="en">while a client that reads a byte stream, extracts and examines the BOM and then decodes the rest of the stream is</p>
 
   <p class="zh">同时客户端读取一个字节流，提取并检查BOM，然后解码该流的其余部分的。</p>
@@ -870,8 +673,6 @@ const <span class="sgc-4">BOM</span> = '\ufffe'
  */
 
 </span><span class="sgc-2">package</span> main
-
-
 
 <span class="sgc-2">import</span> (
 
@@ -885,11 +686,7 @@ const <span class="sgc-4">BOM</span> = '\ufffe'
 
 )
 
-
-
 const <span class="sgc-4">BOM</span> = '\ufffe'
-
-
 
 <span class="sgc-2">func</span> main() {
 
@@ -903,13 +700,9 @@ const <span class="sgc-4">BOM</span> = '\ufffe'
 
         service := os.<span class="sgc-4">Args</span>[1]
 
-
-
         conn, err := net.<span class="sgc-4">Dial</span>(<span class="sgc-3">"tcp"</span>, service)
 
         checkError(err)
-
-
 
         shorts := readShorts(conn)
 
@@ -917,23 +710,15 @@ const <span class="sgc-4">BOM</span> = '\ufffe'
 
         str := string(ints)
 
-
-
         fmt.<span class="sgc-4">Println</span>(str)
-
-
 
         os.<span class="sgc-4">Exit</span>(0)
 
 }
 
-
-
 <span class="sgc-2">func</span> readShorts(conn net.<span class="sgc-4">Conn</span>) []uint16 {
 
         <span class="sgc-2">var</span> buf [512]<span class="sgc-5">byte</span>
-
-
 
         <span class="sgc-1">// read everything into the buffer
 
@@ -953,15 +738,11 @@ const <span class="sgc-4">BOM</span> = '\ufffe'
 
         }
 
-
-
         checkError(err)
 
         <span class="sgc-2">var</span> shorts []uint16
 
         shorts = make([]uint16, n/2)
-
-
 
         <span class="sgc-2">if</span> buf[0] == 0xff &amp;&amp; buf[1] == 0xfe {
 
@@ -993,11 +774,7 @@ const <span class="sgc-4">BOM</span> = '\ufffe'
 
         <span class="sgc-2">return</span> shorts
 
-
-
 }
-
-
 
 <span class="sgc-2">func</span> checkError(err error) {
 
@@ -1013,46 +790,31 @@ const <span class="sgc-4">BOM</span> = '\ufffe'
 
 </span></code></pre>
 
-
-
   <h2 id="heading_id_19" class="en">Unicode gotcha's</h2>
-
-
 
   <p class="en">This book is not about i18n issues. In particular we don't want to delve into the arcane areas of Unicode. But you should know that Unicode is not a simple encoding and there are many complexities. For example, some earlier character sets used <em>non-spacing</em> characters, particularly for accents. This was brought into Unicode, so you can produce accented characters in two ways: as a single Unicode character, or as a pair of non-spacing accent plus non-accented character. For example, U+04D6 CYRILLIC CAPITAL LETTER IE WITH BREVE is a single character. It is equivalent to U+0415 CYRILLIC CAPITAL LETTER IE combined with the breve accent U+0306 COMBINING BREVE. This makes string comparison difficult on occassions. The Go specification does not at present address such issues.</p>
 
   <p class="zh">这本书不是有关国际化问题。特别是，我们不想钻研的神秘的Unicode。但是你应该知道，Unicode不是一个简单的编码，也有很多的复杂的地方。例如，一些早期的字符集用<em>非空格字符</em>，尤其是重音字符。这些重音字符要转换成Unicode可以用两种办法：作为一个Unicode字符，或作为一个非空格字符和非重音字符的组合。例如， U+04D6 CYRILLIC CAPITAL LETTER IE WITH BREVE 是一个字符。这是相当于 U+0415 CYRILLIC CAPITAL LETTER IE和U+0306加上BREVE.。这使得字符串比较有时变得困难了。 GO规范确目前没有对这个问题过深研究。</p>
 
-
-
   <h2 id="heading_id_20" class="en">ISO 8859 and Go</h2>
   <h2 id="heading_id_20" class="zh">ISO 8859 编码和Go语言</h2>
-
 
   <p class="en">The ISO 8859 series are 8-bit character sets for different parts of Europe and some other areas. They all have the ASCII set common in the low part, but differ in the top part. According to Google, ISO 8859 codes account for about 20% of the web pages it sees.</p>
 
   <p class="zh">ISO 8859系列字符集都是8位字符集，他们为欧洲不同地区和其他一些地方设计。他们有相同的ASCII并且都在地位，但高位不同。据谷歌估计，ISO 8859编码了尽20%的网页。</p>
-
-
 
   <p class="en">The first code, ISO 8859-1 or Latin-1, has the first 256 characters in common with Unicode. The encoded value of the Latin-1 characters is the same in UTF-16 and in the default ISO 8859-1 encoding. But this doesn't really help much, as UTF-16 is a 16-bit encoding and ISO 8859-1 is an 8-bit encoding. UTF-8 is a 8-bit encoding, but it uses the top bit to signal extra bytes, so only the ASCII subset overlaps for UTF-8 and ISO 8859-1. So UTF-8 doesn't help much either.</p>
 
   <p class="zh">第一个编码字符集，ISO 8859-1或叫做Latin-1，前256个字符和Unicode相同。 Latin-1字符的utf-16和ISO 8859-1有相同的编码。但是，这并不真的有用，因为UTF-16是一个16位的编码字符集而ISO 8859-1是8位编码。 UTF-8是一种8位编码，但是高位用来表示更多的字符，所以只有ASCII的一部分是utf-8和ISO 8859-1相同，所以UTF-8并没有多大实际用途（都是8位的）。
 </p>
 
-
-
   <p class="en">But the ISO 8859 series don't have any complex issues. To each character in each set corresponds a unique Unicode character. For example, in ISO 8859-2, the character "latin capital letter I with ogonek" has ISO 8859-2 code point 0xc7 (in hexadecimal) and corresponding Unicode code point of U+012E. Transforming either way between an ISO 8859 set and the corresponding Unicode characters is essentially just a table lookup.</p>
 
   <p class="zh">但ISO8859系列没有任何复杂的问题。每一组中的每个字符对应一个唯一的Unicode字符。例如，在ISO 8859-2中的字符“latin capital letter I with ogonek”在ISO 8859-2是0xc7（十六进制），对应的Unicode的U+012E。 ISO 8859字符集和Unicode字符集之间转换其实只是一个表查找。</p>
 
-
-
   <p class="en">The table from ISO 8859 code points to Unicode code points could be done as an array of 256 integers. But many of these will have the same value as the index. So we just use a map of the different ones, and those not in the map take the index value.</p>
 
   <p class="zh">这个从 ISO 8859到Unicode的查找表，可以用一个256的数组完成。因为，许多字符索引相同。因此，我们只需要一个标注不同索引的映射就可以。</p>
-
-
 
   <p class="en">For ISO 8859-2 a portion of the map is</p>
 
@@ -1074,8 +836,6 @@ var unicodeToISOMap = map[int] uint8 {
 
     </code></pre>
 
-
-
   <p class="en">and a function to convert UTF-8 strings to an array of ISO 8859-2 bytes is</p>
 
   <p class="zh">从utf-8转换成 ISO 8859-2的函数</p>
@@ -1092,13 +852,9 @@ func unicodeStrToISO(str string) []byte {
 
         codePoints := []int(str)
 
-
-
         // create a byte array of the same length
 
         bytes := make([]byte, len(codePoints))
-
-
 
         for n, v := range(codePoints) {
 
@@ -1124,8 +880,6 @@ func unicodeStrToISO(str string) []byte {
 
     </code></pre>
 
-
-
   <p class="en">In a similar way you cacn change an array of ISO 8859-2 bytes into a UTF-8 string:</p>
 
   <p class="zh">同样你可以将ISO 8859-2转换为utf-8</p>
@@ -1143,8 +897,6 @@ var isoToUnicodeMap = map[uint8] int {
     // and more
 
 }
-
-
 
 func isoBytesToUnicode(bytes []byte) string {
 
@@ -1170,59 +922,40 @@ func isoBytesToUnicode(bytes []byte) string {
 
     </code></pre>
 
-
-
   <p class="en">These functions can be used to read and write UTF-8 strings as ISO 8859-2 bytes. By changing the mapping table, you can cover the other ISO 8859 codes. Latin-1, or ISO 8859-1, is a special case - the exception map is empty as the code points for Latin-1 are the same in Unicode. You could also use the same technique for other character sets based on a table mapping, such as Windows 1252.</p>
 
   <p class="zh">这些函数可以用来将ISO 8859-2当作UTF-8来读写。通过改变映射表，可以覆盖其他的ISO 8859字符集合。Latin-1字符集（ISO 8859-1）是一个特殊的情况：地图映射为空，因为字符在Latin-1和Unicode中编码相同。同样的方法，你也可以使用其他字符集构建映射表，如Windows1252。</p>
 
-
-
   <h2 id="heading_id_21" class="en">Other character sets and Go</h2>
   <h2 id="heading_id_21" class="zh">其他字符集和Go语言</h2>
-
 
   <p class="en">There are very, very many character set encodings. According to Google, these generally only have a small use, which will hopefully decrease even further in time. But if your software wants to capture all markets, then you may need to handle them.</p>
 
   <p class="zh">还有非常非常多的字符集编码。据谷歌称，这些字符集通常只有很少地方使用，所以可能用的会更少。但是，如果你的软件要占据所有市场，那么你可能需要对这些字符集进行处理。</p>
 
-
-
   <p class="en">In the simplest cases, a lookup table will suffice. But that doesn't always work. The character coding ISO 2022 minimised character set sizes by using a finite state machine to swap code pages in and out. This was borrowed by some of the Japanese encodings, and makes things very complex.</p>
 
   <p class="zh">在最简单的情况下，查找表就够了。但是，这样也不是总是奏效。ISO 2022字符编码方案通过……。这是从日本某写编码中借用来个，相当复杂。</p>
-
-
 
   <p class="en">Go does not at present give any language or package support for these other character sets. So you either avoid their use, fail to talk to applications that do use them, or write lots of your own code!</p>
 
   <p class="zh">Go语言目前在语言本身和包文件上支持其他字符集。所以，你要么避免使用其他字符集，虽然没法和用这些字符集的程序共存，要么自己动手写很多代码。</p>
 
-
-
   <h2 id="heading_id_22" class="en">Conclusion</h2>
-
-
 
   <p class="en">There hasn't been much code in this chapter. Instead, there have been some of the concepts of a very complex area. It's up to you: if you want to assume everyone speaks US English then the world is simple. But if you want your applications to be usable by the rest of the world, then you need to pay attention to these complexities.</p>
 
   <p class="zh">这一章没有什么代码，却有几个非常复杂的概念。当然，也取决于你：你要只满足说美式英语的人，那问题就简单了；要是你的应用也要让其他人可用，那你就要在这个复杂的问题上花点精力了。</p>
 
-
-
   <p class="en">Copyright Jan Newmarch, jan@newmarch.name</p>
 
   <p class="zh"></p>
-
-
 
   <p class="en">If you like this book, please contribute using Flattr <a class="FlattrButton sgc-8" href="http://jan.newmarch.name/go/index.html"></a><br />
 
   or donate using PayPal</p>
 
   <p class="zh"></p>
-
-
 
   <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
 
