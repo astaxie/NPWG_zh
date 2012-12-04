@@ -882,23 +882,23 @@ const (
   <p class="zh">在分布式的系统中，这样的状态消息可能是保存在客户端，服务器，也可能两边都保存。</p>
 
   <p class="en">The important point is to whether one process is keeping state information about <i>itself</i> or about the <i>other</i> process. One process may keep as much state information about itself as it wants, without causing any problems. If it needs to keep information about the state of the other process, then problems arise: the process' actual knowledge of the state of the other may become incorrect. This can be caused by loss of messages (in UDP), by failure to update, or by s/w errors.</p>
-  <p class="zh">最重要的一点是一个进程是否需要保存它 <i>自身进程</i> 的状态消息，或者是需要保存<i>其他进程</i> 的状态消息。一个进程可能会需要保存它自身的状态消息，当然前提是不能引发其他问题。如果需要保存其他进程的状态消息，这个问题就升级了：当前保存的其他进程的状态消息和实际的状态消息可能是不一致的。这可能会引起消息丢失（在UDP中）、更新失败、或者s/w错误等。</p>
+  <p class="zh">最重要的一点是，进程是否需要保存 <i>自身进程</i> 或者<i>其他进程</i> 的状态消息。一个进程保存再多自己的状态信息，也不会引发其他问题。如果需要保存其他进程的状态消息，这个问题就复杂了：当前保存的其他进程的状态消息和实际的状态消息可能是不一致的。这可能会引起消息丢失（在UDP中）、更新失败、或者s/w错误等。</p>
 
   <p class="en">An example is reading a file. In single process applications the file handling code runs as part of the application. It maintains a table of open files and the location in each of them. Each time a read or write is done this file location is updated. In the DCE file system, the file server keeps track of a client's open files, and where the client's file pointer is. If a message could get lost (but DCE uses TCP) these could get out of synch. If the client crashes, the server must eventually timeout on the client's file tables and remove them.</p>
-  <p class="zh">一个例子就是读取文件。在单个进程中，文件处理代码是应用程序的一部分。它维持一个表，表中包含所有打开的文件和文件路径。每次文件读写的时候，文件路径就会更新。在数据通信（DCE）文件系统中，文件系统必须追踪客户端打开了哪些文件，客户端的文件指针在哪。如果一个消息丢失了（但是DCE是使用TCP的），这些状态消息就不能保持同步了。如果出现客户端冲突了，服务器必须等待客户端的文件表超过过期时间，然后删除客户端文件表。</p>
+  <p class="zh">一个例子就是读取文件。在单个进程中，文件处理代码是应用程序的一部分。它维持一个表，表中包含所有打开的文件和文件指针位置。每次文件读写的时候，文件指针位置就会更新。在数据通信（DCE）文件系统中，文件系统必须追踪客户端打开了哪些文件，客户端的文件指针在哪。如果一个消息丢失了（但是DCE是使用TCP的），这些状态消息就不能保持同步了。如果出现客户端崩溃了，服务器就必须对这个表触发超时并删除。</p>
 
   <div class="sgc-1"><img alt="" src="../Images/dce.png" /></div>
 
   <p class="en">In NFS, the server does not maintain this state. The client does. Each file access from the client that reaches the server must open the file at the appropriate point, as given by the client, to perform the action.</p>
-  <p class="zh">在NFS文件系统中，服务器并没有保持这个状态消息。而是客户端保持的。客户端每次在服务器进行的读取文件操作必须能在准确的文件位置打开文件，而这个文件位置是由客户端提供的，从而才能进行后续的操作。</p>
+  <p class="zh">在NFS文件系统中，服务器并没有保存这个状态消息，而是有客户端保存的。客户端每次在服务器进行的读取文件操作必须能在准确的文件位置打开文件，而这个文件位置是由客户端提供的，从而才能进行后续的操作。</p>
 
   <div class="sgc-1"><img alt="" src="../Images/nfs.png" /></div>
 
   <p class="en">If the server maintains information about the client, then it must be able to recover if the client crashes. If information is not saved, then on each transaction the client must transfer sufficient information for the server to function.</p>
-  <p class="zh">如果由服务器保持客户端的状态消息，服务器必须有能力当客户端冲突的时候进行修复。如果服务器没有储存状态消息，那么客户端的每次事务交互都需要提供足够的消息来让服务器进行操作。</p>
+  <p class="zh">如果由服务器保持客户端的状态消息，服务器必须在客户端崩溃的时候进行修复。如果服务器没有储存状态消息，那么客户端的每次事务交互都需要提供足够的消息来让服务器进行操作。</p>
 
   <p class="en">If the connection is unreliable, then additional handling must be in place to ensure that the two do not get out of synch. The classic example is of bank account transactions where the messages get lost. A transaction server may need to be part of the client-server system.</p>
-  <p class="zh">如果连接是不可靠的，那么必须要有额外的处理程序来确保双方没有失去同步。一个典型的例子是当消息丢失的时候银行账号交易系统。交易系统是客户端与服务器交互的一部分。</p>
+  <p class="zh">如果连接是不可靠的，那么必须要有额外的处理程序来确保双方没有失去同步。一个消息丢失的典型例子就是银行账号交易系统。交易系统是客户端与服务器交互的一部分。</p>
 
   <h3 id="heading_id_18" class="en">Application State Transition Diagram</h3>
   <h3 id="heading_id_18" class="zh">应用状态转换图</h3>
@@ -970,7 +970,7 @@ const (
   <h3 id="heading_id_19" class="zh">客户端状态转换图</h3>
 
   <p class="en">The client state diagram must follow the application diagram. It has more detail though: it <em>writes</em> and then <em>reads</em></p>
-  <p class="zh">客户端状态转换图就和应用转换图一样。不同的就是有更多细节要注意：它包含有<em>读</em> 和 <em>写</em>操作</p>
+  <p class="zh">客户端状态转换图就和应用转换图一样。不同的就是要注意更多细节：它包含有<em>读</em> 和 <em>写</em>操作</p>
 
   <div class="sgc-1">
     <table border="1">
@@ -1066,7 +1066,7 @@ const (
   <h3 id="heading_id_20" class="zh">服务器状态转换图</h3>
 
   <p>The server state diagram must also follow the application diagram. It also has more detail: it <em>reads</em> and then <em>writes</em></p>
-  <p>服务器状态转换图也和应用装换图一样。不同的就是有更多细节要注意：它包含有 <em>读</em> 和 <em>写</em>操作</p>
+  <p>服务器状态转换图也和应用转换图一样。不同的就是也要注意更多细节：它包含有 <em>读</em> 和 <em>写</em>操作</p>
 
   <div class="sgc-1">
     <table border="1">
@@ -1193,7 +1193,7 @@ while true
   <h2 id="heading_id_22" class="zh">总结</h2>
 
   <p class="en">Building any application requires design decisions before you start writing code. For distributed applications you have a wider range of decisions to make compared to standalone systems. This chapter has considered some of those aspects and demonstrated what the resultant code might look like.</p>
-<p class="zh">开发一个应用写代码前要求有详细的设计。开发一个分布式的系统比开发一个独立系统需要更宽广的视野和思维来做决定和思考。这一章已经帮你考虑到了一些这样的问题，并且向你展示了最终代码的大致样子。</p>
+<p class="zh">任何应用程序在开始编写前都需要详尽的设计。开发一个分布式的系统比开发一个独立系统需要更宽广的视野和思维来做决定和思考。这一章已经考虑到了一些这样的问题，并且展示了最终代码的大致样子。</p>
   <!--
 <h2>Internet Mail Format</h2>
 
