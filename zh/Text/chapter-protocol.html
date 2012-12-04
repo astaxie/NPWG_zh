@@ -383,7 +383,7 @@
 
     <li>使用字符处理函数来解码消息类型和消息内容。</li>
 
-    <li>第一行之后的其他行包含消息内容。</li>
+    <li>第一行之后的信息和其他行包含消息数据。</li>
 
     <li>使用行处理函数和行处理规范来处理消息。</li>
   </ul>
@@ -405,7 +405,7 @@ handleClient() {
   <p class="zh">很容易进行组装，也很容易调试。例如，你可以<code>telnet</code>连接到一台服务器的端口上，然后发送客户的请求到服务器。其他的编码方式无法轻易地监听请求。但是对于字符编码，你可以使用<code>tcpdump</code> 这样的工具监听TCP的交互，并且立刻就能看到客户端发送给服务器端的消息。</p>
 
   <p class="en">There is not the same level of support in Go for managing character streams. There are significant issues with character sets and character encodings, and we will explore these issues in a later chapter.</p>
-  <p class="zh">在Go中没有像字节流那样专门处理字符流的工具。如何处理字符集和字符编码的方法是非常重要的，我们将会在下一章专门讨论这些问题。</p>
+  <p class="zh">在Go中没有像字节流那样专门处理字符流的工具。如何处理字符集和字符编码是非常重要的，我们将会在下一章专门讨论这些问题。</p>
 
   <p class="en">If we just pretend everything is ASCII, like it was once upon a time, then character formats are quite straightforward to deal with. The principal complication at this level is the varying status of "newline" across different operating systems. Unix uses the single character '\n'. Windows and others (more correctly) use the pair "\r\n". On the internet, the pair "\r\n" is most common - Unix systems just need to take care that they don't assume '\n'.</p>
   <p class="zh">如果和以前一样，处理的所有字符都是ASCII码，那么我们能直接又简单地处理这些字符。但是实际上，字符处理复杂的原因是不同的操作系统上有各种不统一的“换行符”。Unix使用简单的'\n' 来表示换行，Windows和其他的系统（这种方法更正确）使用“\r\n”来表示。在实际的网络传输中，使用一对“\r\n”是更通用的方案 -- 因为Unix系统只需要注意不要设定换行符只有“\n”就可以满足这个方案。</p>
@@ -414,7 +414,7 @@ handleClient() {
   <h2 id="heading_id_11" class="zh">简单的例子</h2>
 
   <p class="en">This example deals with a directory browsing protocol - basically a stripped down version of FTP, but without even the file transfer part. We only consider listing a directory name, listing the contents of a directory and changing the current directory - all on the server side, of course. This is a complete worked example of creating all components of a client-server application. It is a simple program which includes messages in both directions, as well as design of messaging protocol.</p>
-  <p class="zh">这个例子展示的是一个文件夹浏览协议 -- 基本上就是一个简单的FTP协议，只是没有实现FTP的文件传输功能。我们考虑这个例子包含的功能有：展示文件夹名称，列出文件夹内包含的文件，改变当前文件夹路径 -- 当然所有这些文件消息都是在服务器的。这是一个完整的包含客户端和服务器的例子。这个简单的程序既需要两个方向的消息传递，也需要消息的具体协议设计。</p>
+  <p class="zh">这个例子展示的是一个文件夹浏览协议 -- 基本上就是一个简单的FTP协议，只是连FTP的文件传输都没有实现。我们考虑这个例子包含的功能有：展示文件夹名称，列出文件夹内包含的文件，改变当前文件夹路径 -- 当然所有这些文件都是在服务器的。这是一个完整的包含客户端和服务器的例子。这个简单的程序既需要两个方向的消息交互，也需要消息的具体协议设计。</p>
 
   <p class="en">Look at a simple non-client-server program that allows you to list files in a directory and change and print the directory on the server. We omit copying files, as that adds to the length of the program without really introducing important concepts. For simplicity, all filenames will be assumed to be in 7-bit ASCII. If we just looked at a standalone application first, then the pseudo-code would be</p>
   <p class="zh">在开始例子之前，我们先看一个简单的程序，这个程序不是客户端和服务器交互的程序，它实现的功能包括：展示文件夹中的文件，打印出文件夹在服务器上的路径。在这里我们忽略正在拷贝中的文件，因为考虑这些细节会增加代码长度，却对我们要介绍的重要概念没有什么帮助。简单假设：所有的文件名都是7位的ASCII码。先考虑这个独立的程序，它的伪代码应该是：</p>
@@ -449,12 +449,12 @@ while not eof do
   <div class="sgc-1"><img alt="" src="../Images/single.png" /></div>
 
   <p class="en">In a client-server situation, the client would be at the user end, talking to a server somewhere else. Aspects of this program belong solely at the presentation end, such as getting the commands from the user. Some are messages from the client to the server, some are solely at the server end.</p>
-  <p class="zh">在包含有客户端和服务器的情况下，客户端就代表用户终端，客户端在服务器之外与服务器进行交互。这个程序最独立的部分就是表现层，比如如何获取用户的命令等。这个程序的消息有的是从客户端到服务器，有的就是仅仅只在服务器。</p>
+  <p class="zh">在包含有客户端和服务器的情况下，客户端就代表用户终端，用来和服务器交互。这个程序最独立的部分就是表现层，比如如何获取用户的命令等。这个程序的消息有的是从客户端到服务器，有的就是仅仅只在服务器。</p>
 
   <div class="sgc-1"><img alt="" src="../Images/dist.png" /></div>
 
   <p class="en">For a simple directory browser, assume that all directories and files are at the server end, and we are only transferring file information from the server to the client. The client side (including presentation aspects) will become</p>
-  <p class="zh">对于简单的文件夹浏览器来说，假设所有的文件夹和文件都是在服务器端，我们也只需要从服务器传递文件消息给客户端。客户端的伪代码（包括展现层）应该如下：</p>
+  <p class="zh">对于简单的文件夹浏览器来说，假设所有的文件夹和文件都是在服务器端，我们也只需要从服务器传递文件消息给客户端。客户端的伪代码（包括表现层）应该如下：</p>
   <pre>
 <code>
 read line from user
