@@ -449,7 +449,7 @@ while not eof do
   <div class="sgc-1"><img alt="" src="../Images/single.png" /></div>
 
   <p class="en">In a client-server situation, the client would be at the user end, talking to a server somewhere else. Aspects of this program belong solely at the presentation end, such as getting the commands from the user. Some are messages from the client to the server, some are solely at the server end.</p>
-  <p class="zh">在包含有客户端和服务器的情况下，客户端就代表用户终端，用来和服务器交互。这个程序最独立的部分就是表现层，比如如何获取用户的命令等。这个程序的消息有的是从客户端到服务器，有的就是仅仅只在服务器。</p>
+  <p class="zh">在包含有客户端和服务器的情况下，客户端就代表用户终端，用来和服务器交互。这个程序最独立的部分就是表现层，比如如何获取用户的命令等。这个程序的消息有的是从客户端到服务器，有的只是在服务器。</p>
 
   <div class="sgc-1"><img alt="" src="../Images/dist.png" /></div>
 
@@ -545,7 +545,7 @@ change dir button:
   <h3 id="heading_id_14" class="zh">文本传输协议</h3>
 
   <p class="en">This is a simple protocol. The most complicated data structure that we need to send is an array of strings for a directory listing. In this case we don't need the heavy duty serialisation techniques of the last chapter. In this case we can use a simple text format.</p>
-  <p class="zh">这是一个简单的协议。其中最复杂的部分就是我们需要使用字符串数组来列出文件夹中内容。在这里，我们就不使用最后一章讲到的繁琐复杂的序列化技术了，仅仅使用一种简单的文本格式就可以了。</p>
+  <p class="zh">这是一个简单的协议，最复杂的部分就是我们需要使用字符串数组来列出文件夹中内容。所以，我们就不使用最后一章讲到的繁琐复杂的序列化技术了，仅仅使用一种简单的文本格式就好了。</p>
 
   <p class="en">But even if we make the protocol simple, we still have to specify it in detail. We choose the following message format:</p>
   <p class="zh">但是实际上，即使我们想尽量使得协议简单，在细节上也需要考虑清楚。我们使用下面的消息格式约定：</p>
@@ -571,7 +571,7 @@ change dir button:
 
     <li>每条消息都是由一系列的行组成</li>
 
-    <li>第一行的第一个单词是用来说明消息类型。除此之外的其他单词都是具体的消息数据</li>
+    <li>第一行的第一个单词是用来说明消息类型，其他单词都是具体的消息数据</li>
 
     <li>相邻的单词应该只有一个空格符分隔</li>
 
@@ -602,7 +602,7 @@ change dir button:
   </ul>
 
   <p class="en">All of these variations exist in real protocols. Cumulatively, they make the string processing just more complex than in our case.</p>
-  <p class="zh">所有以上的变化和考虑都会在真实使用的协议中出现。渐渐地，这些东西会导致实际的字符处理程序比我们的这个例子复杂。</p>
+  <p class="zh">所有以上的变化和考虑都会在真实使用的协议中出现。渐渐地，这些会导致实际的字符处理程序比我们的这个例子复杂。</p>
 
   <div class="sgc-1">
     <table border="1">
@@ -861,7 +861,7 @@ const (
   <h2 id="heading_id_17" class="zh">状态</h2>
 
   <p class="en">Applications often make use of state information to simplify what is going on. For example</p>
-  <p class="zh">应用程序经常保存状态消息来表示下面应该做什么。比如</p>
+  <p class="zh">应用程序经常保存状态消息来简化下面要做的事情，比如</p>
 
   <ul class="en">
     <li>Keeping file pointers to current file location</li>
@@ -871,11 +871,11 @@ const (
     <li>Keeping current customer value.</li>
   </ul>
   <ul class="zh">
-    <li>保存当前文件路径的文件指针</li>
+    <li>保存当前文件路径的文件指针状态</li>
 
-    <li>保存当前的鼠标位置</li>
+    <li>保存当前的鼠标位置状态</li>
 
-    <li>保存当前的客户值</li>
+    <li>保存当前的客户值状态</li>
   </ul>
 
   <p class="en">In a distributed system, such state information may be kept in the client, in the server, or in both.</p>
