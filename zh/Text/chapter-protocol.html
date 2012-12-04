@@ -102,18 +102,18 @@
     The standards of documentation required might vary.</li>
   </ul>
   <ul class="zh">
-    <li>是广播消息还是点到点的消息？<br />
-    如果是广播消息那就应该使用UDP，本地多播或者是多播骨干网（MBONE）。点到点消息就应该使用TCP或者UDP。
+    <li>是广播还是单播？<br />
+    广播必须使用UDP，本地组播或者是更成熟的组播骨干网（MBONE）。单播就可以使用TCP或者UDP。
 </li>
 
     <li>消息应该是有状态还是无状态的？<br />
-    任意一边是否需要维持另外一边的状态消息？虽然这个似乎很好实现，但是如果发生冲突的时候又应该怎么做呢？
+    任意一边是否有必要维持另外一边的状态消息？虽然这个似乎很好实现，但是如果发生异常的时候又应该怎么做呢？
 </li>
 
     <li>协议是可靠服务还是不可靠服务？<br />
-    一般来说，提供可靠服务就会更慢些，但是好处就是不需要考虑丢失消息的情况。</li>
+    一般来说，提供可靠服务就会更慢些，但好处是不需要考虑丢失消息的情况。</li>
 
-    <li>消息发送后是否需要响应？<br />
+    <li>是否需要响应？<br />
     如果是需要响应的话，如何处理没有响应回复的情况？或许可以设置超时时间。
 </li>
 
@@ -121,13 +121,13 @@
     一般使用两种格式：MIME和字节流</li>
 
     <li>消息流是使用突发性的还是稳定性的？<br />
-    Ethernet和Internet最好都是使用突发性消息流。稳定性的消息流通常是用在视频和声频流传输上。如果要求的话，你如何保证你的服务质量（QoS）？</li>
+    Ethernet和Internet最好使用突发性消息流。稳定性的消息流通常是用在视频和声频流传输上。如果要求的话，你如何保证你的服务质量（QoS）？</li>
 
-    <li>有流同步的需求吗？<br />
-    是否有两种数据流需要进行同步？比如视频流和声频流。</li>
+    <li>有多流同步的需求吗？<br />
+    是否有多种数据流需要进行同步？比如视频流和声频流。</li>
 
     <li>建立的是单独的应用还是需要给别人使用的库？<br />
-    标准文档的编写可能需要巨大的精力。
+    可能需要花很大的精力编写标准文档。
 </li>
   </ul>
 
@@ -135,26 +135,26 @@
   <h2 id="heading_id_5" class="zh">版本控制</h2>
 
   <p class="en">A protocol used in a client/server system will evolve over time, changing as the system expands. This raises compatability problems: a version 2 client will make requests that a version 1 server doesn't understand, whereas a version 2 server will send replies that a version 1 client won't understand.</p>
-  <p class="zh">客户端和服务器之间的协议将有可能随着时间或者系统的扩展进行变化。这个可能会引起兼容性的问题：版本2的客户端发出的请求可能版本1的服务器无法解析，反之也一样，版本2的服务器也有可能回复版本1的客户端无法解析的消息。
+  <p class="zh">随着时间变化和系统的升级，客户端/服务器之间的协议也会升级。这可能会引起兼容性的问题：版本2的客户端发出的请求可能版本1的服务器无法解析，反之也一样，版本2的服务器回复的消息版本1的客户端无法解析。
 </p>
 
   <p class="en">Each side should ideally be able to understand messages for its own version and all earlier ones. It should be able to write replies to old style queries in old style response format.</p>
-  <p class="zh">不论是哪一端，最理想的情况是既能满足自己当前版本的消息规范，也能满足之前所有版本的消息规范。理想情况下，任意一端对于旧版本的请求应该返回旧版本的响应。</p>
+  <p class="zh">理想情况下，不论是哪一端，都应该既能满足自己当前版本的消息规范，也能满足早期版本的消息规范。任意一端对于旧版本的请求应该返回旧版本的响应。</p>
 
   <div class="sgc-1"><img alt="" src="../Images/version.png" /></div>
 
   <p class="en">The ability to talk earlier version formats may be lost if the protocol changes too much. In this case, you need to be able to ensure that no copies of the earlier version still exist - and that is generally imposible.</p>
-  <p class="zh">但是如果协议变化太大的话，可能就很难保持与早期版本的兼容了。在这种情况下，你就需要保证网络上不再存在早期版本的数据 -- 当然这个几乎是不可能的。
+  <p class="zh">但是如果协议变化太大的话，可能就很难保持与早期版本的兼容了。在这种情况下，你就需要保证已经不存在早期的版本了 -- 当然这个几乎是不可能的。
 </p>
 
   <p class="en">Part of the protocol setup should involve version information.</p>
-  <p class="zh">协议应该包含有版本消息。</p>
+  <p class="zh">所以，协议应该包含有版本消息。</p>
 
   <h3 id="heading_id_6" class="en">The Web</h3>
   <h3 id="heading_id_6" class="ch">Web协议</h3>
 
   <p class="en">The Web is a good example of a system that is messed up by different versions. The protocol has been through three versions, and most servers/browsers now use the latest version. The version is given in each request</p>
-  <p class="zh">Web协议就是一个由于有不同协议同时存在而混乱的例子。Web协议已经有三个版本了，通常服务器和浏览器都是使用最新的版本，版本消息包含在请求中：</p>
+  <p class="zh">Web协议就是一个由于有不同协议版本同时存在而出现混乱的例子。Web协议已经有三个版本了，通常服务器和浏览器都是使用最新的版本，版本消息包含在请求中：</p>
 
   <div class="sgc-1">
     <table border="1">
@@ -185,7 +185,7 @@
   </div>
 
   <p class="en">But the <em>content</em> of the messages has been through a large number of versions:</p>
-  <p class="zh">不仅如此<em>消息体的内容</em>已经被大量版本制定修改过：</p>
+  <p class="zh">但是<em>消息体的内容</em>已经被大量版本制定修改过：</p>
 
   <ul class="en">
     <li>HTML versions 1-4 (all different), with version 5 on the horizon;</li>
@@ -211,9 +211,9 @@
 
     <li>文档内容的不一致的处理方法（例如，在一些浏览器上，有的css会冲突）</li>
 
-    <li>浏览器对javascript的不同支持程度（当然javascript也同时存在不同的版本）</li>
+    <li>浏览器对JavaScript的不同支持程度（当然JavaScript也同时存在不同的版本）</li>
 
-    <li>不同的java运行引擎</li>
+    <li>不同的Java运行引擎</li>
 
     <li>有的页面并没有遵守<em>任何</em>HTML版本规范（比如HTML格式错误的页面）</li>
   </ul>
@@ -247,19 +247,19 @@
     <li>客户端和服务器会交换不同含义的消息，比如：
 
       <ul>
-        <li>登陆请求,</li>
+        <li>登陆请求</li>
 
-        <li>获取某些记录的请求,</li>
+        <li>获取某些记录的请求</li>
 
-        <li>登陆请求的回复,</li>
+        <li>登陆请求的回复</li>
 
-        <li>获取某些记录请求的回复.</li>
+        <li>获取某些记录请求的回复</li>
       </ul>
     </li>
 
     <li>客户端必须发送能被服务器解析的请求。</li>
 
-    <li>服务器必须回复能被客户端解析的请求。</li>
+    <li>服务器必须回复能被客户端解析的响应。</li>
   </ul>
 
   <p class="en">Commonly, the first part of the message will be a message type.</p>
@@ -298,7 +298,7 @@
   </ul>
 
   <p class="en">The message types can be strings or integers. e.g. HTTP uses integers such as 404 to mean "not found" (although these integers are written as strings). The messages from client to server and vice versa are disjoint: "LOGIN" from client to server is different to "LOGIN" from server to client.</p>
-  <p class="zh">消息类型应该设置为字符型或者整型。比如，HTTP使用整数404来表示“未找到资源”（虽然这个整型是被当做字符使用）。客户端到服务器的消息和服务器到客户端的消息是不一样的：比如从客户端到服务器的“LOGIN”消息就不同于服务器到客户端的“LOGIN”消息。</p>
+  <p class="zh">消息类型应该设置为字符型或者整型。比如，HTTP使用整数404来表示“未找到资源”（尽管这个整型是被当做字符串使用）。客户端到服务器的消息和服务器到客户端的消息是不一样的：比如从客户端到服务器的“LOGIN”消息就不同于服务器到客户端的“LOGIN”消息。</p>
 
   <h2 id="heading_id_8" class="en">Data Format</h2>
   <h2 id="heading_id_8" class="zh">数据格式</h2>
@@ -322,13 +322,13 @@
   <ul class="zh">
     <li>消息的头部通常使用一个字节来标示消息的类型。</li>
 
-    <li>消息处理者应该根据消息头部的类型字节来选择合适的处理器来处理这个类型的消息。</li>
+    <li>消息处理者应该根据消息头部的类型字节来选择合适的方法来处理这个类型的消息。</li>
 
-    <li>消息类型后面的字节应该是根据事先定义的格式（上一章节讨论的）来包含消息具体内容。</li>
+    <li>消息后面的字节应该是根据事先定义的格式（上一章节讨论的）来包含消息具体内容。</li>
   </ul>
 
   <p class="en">The advantages are compactness and hence speed. The disadvantages are caused by the opaqueness of the data: it may be harder to spot errors, harder to debug, require special purpose decoding functions. There are many examples of byte-encoded formats, including major protocols such as DNS and NFS , upto recent ones such as Skype. Of course, if your protocol is not publicly specified, then a byte format can also make it harder for others to reverse-engineer it!</p>
-  <p class="zh">字节编码的优势就是紧凑小巧，传输速度快。劣势就是数据的不透明性：字节编码很难定位错误，也很难调试。往往是要求写一些额外的解码函数。有许多字节编码格式的例子，大部分协议都是使用字节编码，例如DNS和NFS协议，还有最近出现的Skype协议。当然，对于字节编码来说，如果你的协议没有公开说明结构，其他人使用反向工程手段是很难破解的!</p>
+  <p class="zh">字节编码的优势就是紧凑小巧，传输速度快。劣势就是数据的不透明性：字节编码很难定位错误，也很难调试。往往是要求写一些额外的解码函数。有许多字节编码格式的例子，大部分协议都是使用字节编码，例如DNS和NFS协议，还有最近出现的Skype协议。当然，如果你的协议没有公开说明结构，使用字节编码可以让其他人使用反向工程手段很难破解!</p>
 
   <p class="en">Pseudocode for a byte-format server is</p>
   <p class="zh">字节编码的服务器的伪代码如下</p>
@@ -359,7 +359,7 @@
   <h3 id="heading_id_10" class="zh">字符编码</h3>
 
   <p class="en">In this mode, everything is sent as characters if possible. For example, an integer 234 would be sent as, say, the three characters '2', '3' and '4' instead of the one byte 234. Data that is inherently binary may be base64 encoded to change it into a 7-bit format and then sent as ASCII characters, as discussed in the previous chapter.</p>
-  <p class="zh">在这个编码模式下，任何事情都是尽可能以字符的形式进行发送的。例如，整型数字234会被处理成三个字符‘2’，‘3’，‘4’，而不会被处理成一个值为234的字节。二进制数据将会使用base64编码变成为7-bit的格式，然后当做ASCII码传递，就和我们上一章讨论的一样。</p>
+  <p class="zh">在这个编码模式下，所有消息都尽可能以字符的形式发送。例如，整型数字234会被处理成三个字符‘2’，‘3’，‘4’，而不会被处理成234的字节码。二进制数据将会使用base64编码变成为7-bit的格式，然后当做ASCII码传递，就和我们上一章讨论的一样。</p>
 
   <p class="en">In character format,</p>
   <p class="zh">对于字符编码,</p>
