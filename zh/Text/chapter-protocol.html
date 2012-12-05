@@ -57,7 +57,7 @@
 
   <div class="preface">
     <p class="en">A client and a server exchange messages consisting of message types and message data. This requires design of a suitable message exchange protocol. This chapter looks at some of the issues involved in this, and gives a complete example of a simple client-server application.</p>
-    <p class="zh">客户端和服务端需要进行消息交互，包括交换消息类型和消息数据。消息交互需要有准确的消息交互协议。这章着重讨论消息交互相关的问题，并给出了一个完整又简单的客户端服务端交互的例子。</p>
+    <p class="zh">客户端和服务器的交互包括消息类型和消息数据，这就需要有适当的交互协议。本章着重讨论客户端和服务器交互相关的问题，并给出一个完整又简单的客户端服务器交互的例子。</p>
   </div>
 
   <div class="generate_from_h2" id="generated-toc"></div>
@@ -66,14 +66,14 @@
   <h2 id="heading_id_3" class="zh">介绍</h2>
 
   <p class="en">A client and server need to exchange information via messages. TCP and UDP provide the transport mechanisms to do this. The two processes also need to have a protocol in place so that message exchange can take place meaningfully. A protocol defines what type of conversation can take place between two components of a distributed application, by specifying messages, data types, encoding formats and so on.</p>
-  <p class="zh">客户端和服务端需要通过消息来进行交互。TCP和UDP是两种消息交互的传输机制。在这两种传输机制之上就需要有协议来约定传输内容的含义。协议清楚说明两个分布的组件之间交互消息的消息体、消息的数据类型、编码格式等。
+  <p class="zh">客户端和服务器需要通过消息来进行交互。TCP和UDP是信息交互的两种传输机制。在这两种传输机制之上就需要有协议来约定传输内容的含义。协议清楚说明分布式应用的两个模块之间交互消息的消息体、消息的数据类型、编码格式等。
 </p>
 
   <h2 id="heading_id_4" class="en">Protocol Design</h2>
   <h2 id="heading_id_4" class="zh">协议设计</h2>
 
   <p class="en">There are many possibilities and issues to be decided on when designing a protocol. Some of the issues include:</p>
-  <p class="zh">当设计一个协议的时候，有许多可选择的方法和许多问题需要考虑。这些需要考虑的问题包括：
+  <p class="zh">当设计协议的时候，有许多许多的情况和问题需要考虑，比如：
 </p>
 
   <ul class="en">
@@ -102,18 +102,18 @@
     The standards of documentation required might vary.</li>
   </ul>
   <ul class="zh">
-    <li>是广播消息还是点到点的消息？<br />
-    如果是广播消息那就应该使用UDP，本地多播或者是多播骨干网（MBONE）。点到点消息就应该使用TCP或者UDP。
+    <li>是广播还是单播？<br />
+    广播必须使用UDP，本地组播或者是更成熟的组播骨干网（MBONE）。单播就可以使用TCP或者UDP。
 </li>
 
     <li>消息应该是有状态还是无状态的？<br />
-    任意一边是否需要维持另外一边的状态信息？虽然这个似乎很好实现，但是如果发生冲突的时候又应该怎么做呢？
+    任意一边是否有必要维持另外一边的状态消息？虽然这个似乎很好实现，但是如果发生异常的时候又应该怎么做呢？
 </li>
 
     <li>协议是可靠服务还是不可靠服务？<br />
-    一般来说，提供可靠服务就会更慢些，但是好处就是不需要考虑丢失消息的情况。</li>
+    一般来说，提供可靠服务就会更慢些，但好处是不需要考虑丢失消息的情况。</li>
 
-    <li>消息发送后是否需要响应？<br />
+    <li>是否需要响应？<br />
     如果是需要响应的话，如何处理没有响应回复的情况？或许可以设置超时时间。
 </li>
 
@@ -121,13 +121,13 @@
     一般使用两种格式：MIME和字节流</li>
 
     <li>消息流是使用突发性的还是稳定性的？<br />
-    Ethernet和Internet最好都是使用突发性信息流。稳定性的信息流通常是用在视频和声频流传输上。如果要求的话，你如何保证你的服务质量（QoS）？</li>
+    Ethernet和Internet最好使用突发性消息流。稳定性的消息流通常是用在视频和声频流传输上。如果要求的话，你如何保证你的服务质量（QoS）？</li>
 
-    <li>有流同步的需求吗？<br />
-    是否有两种数据流需要进行同步？比如视频流和声频流。</li>
+    <li>有多流同步的需求吗？<br />
+    是否有多种数据流需要进行同步？比如视频流和声频流。</li>
 
     <li>建立的是单独的应用还是需要给别人使用的库？<br />
-    标准文档的编写可能需要巨大的精力。
+    可能需要花很大的精力编写标准文档。
 </li>
   </ul>
 
@@ -135,26 +135,26 @@
   <h2 id="heading_id_5" class="zh">版本控制</h2>
 
   <p class="en">A protocol used in a client/server system will evolve over time, changing as the system expands. This raises compatability problems: a version 2 client will make requests that a version 1 server doesn't understand, whereas a version 2 server will send replies that a version 1 client won't understand.</p>
-  <p class="zh">客户端和服务端之间的协议将有可能随着时间或者系统的扩展进行变化。这个可能会引起兼容性的问题：版本2的客户端发出的请求可能版本1的服务端无法解析，反之也一样，版本2的服务端也有可能回复版本1的客户端无法解析的信息。
+  <p class="zh">随着时间变化和系统的升级，客户端/服务器之间的协议也会升级。这可能会引起兼容性的问题：版本2的客户端发出的请求可能版本1的服务器无法解析，反之也一样，版本2的服务器回复的消息版本1的客户端无法解析。
 </p>
 
   <p class="en">Each side should ideally be able to understand messages for its own version and all earlier ones. It should be able to write replies to old style queries in old style response format.</p>
-  <p class="zh">不论是哪一端，最理想的情况是既能满足自己当前版本的消息规范，也能满足之前所有版本的消息规范。理想情况下，任意一端对于旧版本的请求应该返回旧版本的响应。</p>
+  <p class="zh">理想情况下，不论是哪一端，都应该既能满足自己当前版本的消息规范，也能满足早期版本的消息规范。任意一端对于旧版本的请求应该返回旧版本的响应。</p>
 
   <div class="sgc-1"><img alt="" src="../Images/version.png" /></div>
 
   <p class="en">The ability to talk earlier version formats may be lost if the protocol changes too much. In this case, you need to be able to ensure that no copies of the earlier version still exist - and that is generally imposible.</p>
-  <p class="zh">但是如果协议变化太大的话，可能就很难保持与早期版本的兼容了。在这种情况下，你就需要保证网络上不再存在早期版本的数据 -- 当然这个几乎是不可能的。
+  <p class="zh">但是如果协议变化太大的话，可能就很难保持与早期版本的兼容了。在这种情况下，你就需要保证已经不存在早期的版本了 -- 当然这个几乎是不可能的。
 </p>
 
   <p class="en">Part of the protocol setup should involve version information.</p>
-  <p class="zh">协议应该包含有版本信息。</p>
+  <p class="zh">所以，协议应该包含有版本消息。</p>
 
   <h3 id="heading_id_6" class="en">The Web</h3>
   <h3 id="heading_id_6" class="ch">Web协议</h3>
 
   <p class="en">The Web is a good example of a system that is messed up by different versions. The protocol has been through three versions, and most servers/browsers now use the latest version. The version is given in each request</p>
-  <p class="zh">Web协议就是一个由于有不同协议同时存在而混乱的例子。Web协议已经有三个版本了，通常服务端和浏览器都是使用最新的版本，版本信息包含在请求中：</p>
+  <p class="zh">Web协议就是一个由于有不同协议版本同时存在而出现混乱的例子。Web协议已经有三个版本了，通常服务器和浏览器都是使用最新的版本，版本消息包含在请求中：</p>
 
   <div class="sgc-1">
     <table border="1">
@@ -185,7 +185,7 @@
   </div>
 
   <p class="en">But the <em>content</em> of the messages has been through a large number of versions:</p>
-  <p class="zh">不仅如此<em>消息体的内容</em>已经被大量版本制定修改过：</p>
+  <p class="zh">但是<em>消息体的内容</em>已经被大量版本制定修改过：</p>
 
   <ul class="en">
     <li>HTML versions 1-4 (all different), with version 5 on the horizon;</li>
@@ -211,9 +211,9 @@
 
     <li>文档内容的不一致的处理方法（例如，在一些浏览器上，有的css会冲突）</li>
 
-    <li>浏览器对javascript的不同支持程度（当然javascript也同时存在不同的版本）</li>
+    <li>浏览器对JavaScript的不同支持程度（当然JavaScript也同时存在不同的版本）</li>
 
-    <li>不同的java运行引擎</li>
+    <li>不同的Java运行引擎</li>
 
     <li>有的页面并没有遵守<em>任何</em>HTML版本规范（比如HTML格式错误的页面）</li>
   </ul>
@@ -244,22 +244,22 @@
   </ul>
 
   <ul class="zh">
-    <li>客户端和服务端会交换不同含义的消息，比如：
+    <li>客户端和服务器会交换不同含义的消息，比如：
 
       <ul>
-        <li>登陆请求,</li>
+        <li>登陆请求</li>
 
-        <li>获取某些记录的请求,</li>
+        <li>获取某些记录的请求</li>
 
-        <li>登陆请求的回复,</li>
+        <li>登陆请求的回复</li>
 
-        <li>获取某些记录请求的回复.</li>
+        <li>获取某些记录请求的回复</li>
       </ul>
     </li>
 
-    <li>客户端必须发送能被服务端解析的请求。</li>
+    <li>客户端必须发送能被服务器解析的请求。</li>
 
-    <li>服务端必须回复能被客户端解析的请求。</li>
+    <li>服务器必须回复能被客户端解析的响应。</li>
   </ul>
 
   <p class="en">Commonly, the first part of the message will be a message type.</p>
@@ -282,14 +282,14 @@
   </ul>
 
   <ul class="zh">
-    <li>客户端发送给服务端
+    <li>客户端发送给服务器
       <pre><code>
       LOGIN name passwd
       GET cpe4001 grade
       </code></pre>
     </li>
 
-    <li>服务端返回给客户端
+    <li>服务器返回给客户端
       <pre><code>
       LOGIN succeeded
       GRADE cpe4001 D
@@ -298,7 +298,7 @@
   </ul>
 
   <p class="en">The message types can be strings or integers. e.g. HTTP uses integers such as 404 to mean "not found" (although these integers are written as strings). The messages from client to server and vice versa are disjoint: "LOGIN" from client to server is different to "LOGIN" from server to client.</p>
-  <p class="zh">消息类型应该设置为字符型或者整型。比如，HTTP使用整数404来表示“未找到资源”（虽然这个整型是被当做字符使用）。客户端到服务端的消息和服务端到客户端的消息是不一样的：比如从客户端到服务端的“LOGIN”消息就不同于服务端到客户端的“LOGIN”消息。</p>
+  <p class="zh">消息类型应该设置为字符型或者整型。比如，HTTP使用整数404来表示“未找到资源”（尽管这个整型是被当做字符串使用）。客户端到服务器的消息和服务器到客户端的消息是不一样的：比如从客户端到服务器的“LOGIN”消息就不同于服务器到客户端的“LOGIN”消息。</p>
 
   <h2 id="heading_id_8" class="en">Data Format</h2>
   <h2 id="heading_id_8" class="zh">数据格式</h2>
@@ -322,16 +322,16 @@
   <ul class="zh">
     <li>消息的头部通常使用一个字节来标示消息的类型。</li>
 
-    <li>消息处理者应该根据消息头部的类型字节来选择合适的处理器来处理这个类型的消息。</li>
+    <li>消息处理者应该根据消息头部的类型字节来选择合适的方法来处理这个类型的消息。</li>
 
-    <li>消息类型后面的字节应该是根据事先定义的格式（上一章节讨论的）来包含消息具体内容。</li>
+    <li>消息后面的字节应该是根据事先定义的格式（上一章节讨论的）来包含消息具体内容。</li>
   </ul>
 
   <p class="en">The advantages are compactness and hence speed. The disadvantages are caused by the opaqueness of the data: it may be harder to spot errors, harder to debug, require special purpose decoding functions. There are many examples of byte-encoded formats, including major protocols such as DNS and NFS , upto recent ones such as Skype. Of course, if your protocol is not publicly specified, then a byte format can also make it harder for others to reverse-engineer it!</p>
-  <p class="zh">字节编码的优势就是紧凑小巧，传输速度快。劣势就是数据的不透明性：字节编码很难定位错误，也很难调试。往往是要求写一些额外的解码函数。有许多字节编码格式的例子，大部分协议都是使用字节编码，例如DNS和NFS协议，还有最近出现的Skype协议。当然，对于字节编码来说，如果你的协议没有公开说明结构，其他人使用反向工程手段是很难破解的!</p>
+  <p class="zh">字节编码的优势就是紧凑小巧，传输速度快。劣势就是数据的不透明性：字节编码很难定位错误，也很难调试。往往是要求写一些额外的解码函数。有许多字节编码格式的例子，大部分协议都是使用字节编码，例如DNS和NFS协议，还有最近出现的Skype协议。当然，如果你的协议没有公开说明结构，使用字节编码可以让其他人使用反向工程手段很难破解!</p>
 
   <p class="en">Pseudocode for a byte-format server is</p>
-  <p class="zh">字节编码的服务端的伪代码如下</p>
+  <p class="zh">字节编码的服务器的伪代码如下</p>
   <pre><code>
     handleClient(conn) {
         while (true) {
@@ -359,7 +359,7 @@
   <h3 id="heading_id_10" class="zh">字符编码</h3>
 
   <p class="en">In this mode, everything is sent as characters if possible. For example, an integer 234 would be sent as, say, the three characters '2', '3' and '4' instead of the one byte 234. Data that is inherently binary may be base64 encoded to change it into a 7-bit format and then sent as ASCII characters, as discussed in the previous chapter.</p>
-  <p class="zh">在这个编码模式下，任何事情都是尽可能以字符的形式进行发送的。例如，整型数字234会被处理成三个字符‘2’，‘3’，‘4’，而不会被处理成一个值为234的字节。二进制数据将会使用base64编码变成为7-bit的格式，然后当做ASCII码传递，就和我们上一章讨论的一样。</p>
+  <p class="zh">在这个编码模式下，所有消息都尽可能以字符的形式发送。例如，整型数字234会被处理成三个字符‘2’，‘3’，‘4’，而不会被处理成234的字节码。二进制数据将会使用base64编码变成为7-bit的格式，然后当做ASCII码传递，就和我们上一章讨论的一样。</p>
 
   <p class="en">In character format,</p>
   <p class="zh">对于字符编码,</p>
@@ -383,7 +383,7 @@
 
     <li>使用字符处理函数来解码消息类型和消息内容。</li>
 
-    <li>第一行之后的其他行包含消息内容。</li>
+    <li>第一行之后的信息和其他行包含消息数据。</li>
 
     <li>使用行处理函数和行处理规范来处理消息。</li>
   </ul>
@@ -402,10 +402,10 @@ handleClient() {
 </code></pre>
 
   <p class="en">Character formats are easier to setup and easier to debug. For example, you can use <code>telnet</code> to connect to a server on any port, and send client requests to that server. It isn't so easy the other way, but you can use tools like <code>tcpdump</code> to snoop on TCP traffic and see immediately what clients are sending to servers.</p>
-  <p class="zh">很容易进行组装，也很容易调试。例如，你可以<code>telnet</code>连接到一台服务器的端口上，然后发送客户的请求到服务端。其他的编码方式无法轻易地监听请求。但是对于字符编码，你可以使用<code>tcpdump</code> 这样的工具监听TCP的交互，并且立刻就能看到客户端发送给服务器端的信息。</p>
+  <p class="zh">很容易进行组装，也很容易调试。例如，你可以<code>telnet</code>连接到一台服务器的端口上，然后发送客户的请求到服务器。其他的编码方式无法轻易地监听请求。但是对于字符编码，你可以使用<code>tcpdump</code> 这样的工具监听TCP的交互，并且立刻就能看到客户端发送给服务器端的消息。</p>
 
   <p class="en">There is not the same level of support in Go for managing character streams. There are significant issues with character sets and character encodings, and we will explore these issues in a later chapter.</p>
-  <p class="zh">在Go中没有像字节流那样专门处理字符流的工具。如何处理字符集和字符编码的方法是非常重要的，我们将会在下一章专门讨论这些问题。</p>
+  <p class="zh">在Go中没有像字节流那样专门处理字符流的工具。如何处理字符集和字符编码是非常重要的，我们将会在下一章专门讨论这些问题。</p>
 
   <p class="en">If we just pretend everything is ASCII, like it was once upon a time, then character formats are quite straightforward to deal with. The principal complication at this level is the varying status of "newline" across different operating systems. Unix uses the single character '\n'. Windows and others (more correctly) use the pair "\r\n". On the internet, the pair "\r\n" is most common - Unix systems just need to take care that they don't assume '\n'.</p>
   <p class="zh">如果和以前一样，处理的所有字符都是ASCII码，那么我们能直接又简单地处理这些字符。但是实际上，字符处理复杂的原因是不同的操作系统上有各种不统一的“换行符”。Unix使用简单的'\n' 来表示换行，Windows和其他的系统（这种方法更正确）使用“\r\n”来表示。在实际的网络传输中，使用一对“\r\n”是更通用的方案 -- 因为Unix系统只需要注意不要设定换行符只有“\n”就可以满足这个方案。</p>
@@ -414,10 +414,10 @@ handleClient() {
   <h2 id="heading_id_11" class="zh">简单的例子</h2>
 
   <p class="en">This example deals with a directory browsing protocol - basically a stripped down version of FTP, but without even the file transfer part. We only consider listing a directory name, listing the contents of a directory and changing the current directory - all on the server side, of course. This is a complete worked example of creating all components of a client-server application. It is a simple program which includes messages in both directions, as well as design of messaging protocol.</p>
-  <p class="zh">这个例子展示的是一个文件夹浏览协议 -- 基本上就是一个简单的FTP协议，只是没有实现FTP的文件传输功能。我们考虑这个例子包含的功能有：展示文件夹名称，列出文件夹内包含的文件，改变当前文件夹路径 -- 当然所有这些文件信息都是在服务端的。这是一个完整的包含客户端和服务端的例子。这个简单的程序既需要两个方向的消息传递，也需要消息的具体协议设计。</p>
+  <p class="zh">这个例子展示的是一个文件夹浏览协议 -- 基本上就是一个简单的FTP协议，只是连FTP的文件传输都没有实现。我们考虑这个例子包含的功能有：展示文件夹名称，列出文件夹内包含的文件，改变当前文件夹路径 -- 当然所有这些文件都是在服务器的。这是一个完整的包含客户端和服务器的例子。这个简单的程序既需要两个方向的消息交互，也需要消息的具体协议设计。</p>
 
   <p class="en">Look at a simple non-client-server program that allows you to list files in a directory and change and print the directory on the server. We omit copying files, as that adds to the length of the program without really introducing important concepts. For simplicity, all filenames will be assumed to be in 7-bit ASCII. If we just looked at a standalone application first, then the pseudo-code would be</p>
-  <p class="zh">在开始例子之前，我们先看一个简单的程序，这个程序不是客户端和服务端交互的程序，它实现的功能包括：展示文件夹中的文件，打印出文件夹在服务器上的路径。在这里我们忽略正在拷贝中的文件，因为考虑这些细节会增加代码长度，却对我们要介绍的重要概念没有什么帮助。简单假设：所有的文件名都是7位的ASCII码。先考虑这个独立的程序，它的伪代码应该是：</p>
+  <p class="zh">在开始例子之前，我们先看一个简单的程序，这个程序不是客户端和服务器交互的程序，它实现的功能包括：展示文件夹中的文件，打印出文件夹在服务器上的路径。在这里我们忽略正在拷贝中的文件，因为考虑这些细节会增加代码长度，却对我们要介绍的重要概念没有什么帮助。简单假设：所有的文件名都是7位的ASCII码。先考虑这个独立的程序，它的伪代码应该是：</p>
   <pre>
 <code>
 read line from user
@@ -449,12 +449,12 @@ while not eof do
   <div class="sgc-1"><img alt="" src="../Images/single.png" /></div>
 
   <p class="en">In a client-server situation, the client would be at the user end, talking to a server somewhere else. Aspects of this program belong solely at the presentation end, such as getting the commands from the user. Some are messages from the client to the server, some are solely at the server end.</p>
-  <p class="zh">在包含有客户端和服务端的情况下，客户端就代表用户终端，客户端在服务器之外与服务端进行交互。这个程序最独立的部分就是表现层，比如如何获取用户的命令等。这个程序的消息有的是从客户端到服务端，有的就是仅仅只在服务端。</p>
+  <p class="zh">在包含有客户端和服务器的情况下，客户端就代表用户终端，用来和服务器交互。这个程序最独立的部分就是表现层，比如如何获取用户的命令等。这个程序的消息有的是从客户端到服务器，有的只是在服务器。</p>
 
   <div class="sgc-1"><img alt="" src="../Images/dist.png" /></div>
 
   <p class="en">For a simple directory browser, assume that all directories and files are at the server end, and we are only transferring file information from the server to the client. The client side (including presentation aspects) will become</p>
-  <p class="zh">对于简单的文件夹浏览器来说，假设所有的文件夹和文件都是在服务器端，我们也只需要从服务端传递文件信息给客户端。客户端的伪代码（包括展现层）应该如下：</p>
+  <p class="zh">对于简单的文件夹浏览器来说，假设所有的文件夹和文件都是在服务器端，我们也只需要从服务器传递文件消息给客户端。客户端的伪代码（包括表现层）应该如下：</p>
   <pre>
 <code>
 read line from user
@@ -481,7 +481,7 @@ while not eof do
 </pre>
 
   <p class="en">where the italicised lines involve communication with the server.</p>
-  <p class="zh">上面斜体字的部分是代表需要与服务端进行交互的命令。</p>
+  <p class="zh">上面斜体字的部分是代表需要与服务器进行交互的命令。</p>
 
   <h3 id="heading_id_12" class="en">Alternative presentation aspects</h3>
   <h3 id="heading_id_12" class="zh">改变表现层</h3>
@@ -545,7 +545,7 @@ change dir button:
   <h3 id="heading_id_14" class="zh">文本传输协议</h3>
 
   <p class="en">This is a simple protocol. The most complicated data structure that we need to send is an array of strings for a directory listing. In this case we don't need the heavy duty serialisation techniques of the last chapter. In this case we can use a simple text format.</p>
-  <p class="zh">这是一个简单的协议。其中最复杂的部分就是我们需要使用字符串数组来列出文件夹中内容。在这里，我们就不使用最后一章讲到的繁琐复杂的序列化技术了，仅仅使用一种简单的文本格式就可以了。</p>
+  <p class="zh">这是一个简单的协议，最复杂的部分就是我们需要使用字符串数组来列出文件夹中内容。所以，我们就不使用最后一章讲到的繁琐复杂的序列化技术了，仅仅使用一种简单的文本格式就好了。</p>
 
   <p class="en">But even if we make the protocol simple, we still have to specify it in detail. We choose the following message format:</p>
   <p class="zh">但是实际上，即使我们想尽量使得协议简单，在细节上也需要考虑清楚。我们使用下面的消息格式约定：</p>
@@ -571,7 +571,7 @@ change dir button:
 
     <li>每条消息都是由一系列的行组成</li>
 
-    <li>第一行的第一个单词是用来说明消息类型。除此之外的其他单词都是具体的消息数据</li>
+    <li>第一行的第一个单词是用来说明消息类型，其他单词都是具体的消息数据</li>
 
     <li>相邻的单词应该只有一个空格符分隔</li>
 
@@ -602,7 +602,7 @@ change dir button:
   </ul>
 
   <p class="en">All of these variations exist in real protocols. Cumulatively, they make the string processing just more complex than in our case.</p>
-  <p class="zh">所有以上的变化和考虑都会在真实使用的协议中出现。渐渐地，这些东西会导致实际的字符处理程序比我们的这个例子复杂。</p>
+  <p class="zh">所有以上的变化和考虑都会在真实使用的协议中出现。渐渐地，这些会导致实际的字符处理程序比我们的这个例子复杂。</p>
 
   <div class="sgc-1">
     <table border="1">
@@ -636,7 +636,7 @@ change dir button:
   </div>
 
   <h3 id="heading_id_15" class="en">Server code</h3>
-  <h3 id="heading_id_15" class="zh">服务端代码</h3>
+  <h3 id="heading_id_15" class="zh">服务器代码</h3>
   <pre><code><span class="sgc-9">
 <span class="sgc-3">/* FTP Server
  */
@@ -861,7 +861,7 @@ const (
   <h2 id="heading_id_17" class="zh">状态</h2>
 
   <p class="en">Applications often make use of state information to simplify what is going on. For example</p>
-  <p class="zh">应用程序经常保存状态信息来表示下面应该做什么。比如</p>
+  <p class="zh">应用程序经常保存状态消息来简化下面要做的事情，比如</p>
 
   <ul class="en">
     <li>Keeping file pointers to current file location</li>
@@ -871,34 +871,34 @@ const (
     <li>Keeping current customer value.</li>
   </ul>
   <ul class="zh">
-    <li>保存当前文件路径的文件指针</li>
+    <li>保存当前文件路径的文件指针状态</li>
 
-    <li>保存当前的鼠标位置</li>
+    <li>保存当前的鼠标位置状态</li>
 
-    <li>保存当前的客户值</li>
+    <li>保存当前的客户值状态</li>
   </ul>
 
   <p class="en">In a distributed system, such state information may be kept in the client, in the server, or in both.</p>
-  <p class="zh">在分布式的系统中，这样的状态信息可能是保存在客户端，服务端，也可能两边都保存。</p>
+  <p class="zh">在分布式的系统中，这样的状态消息可能是保存在客户端，服务器，也可能两边都保存。</p>
 
   <p class="en">The important point is to whether one process is keeping state information about <i>itself</i> or about the <i>other</i> process. One process may keep as much state information about itself as it wants, without causing any problems. If it needs to keep information about the state of the other process, then problems arise: the process' actual knowledge of the state of the other may become incorrect. This can be caused by loss of messages (in UDP), by failure to update, or by s/w errors.</p>
-  <p class="zh">最重要的一点是一个进程是否需要保存它 <i>自身进程</i> 的状态信息，或者是需要保存<i>其他进程</i> 的状态信息。一个进程可能会需要保存它自身的状态信息，当然前提是不能引发其他问题。如果需要保存其他进程的状态信息，这个问题就升级了：当前保存的其他进程的状态信息和实际的状态信息可能是不一致的。这可能会引起消息丢失（在UDP中）、更新失败、或者s/w错误等。</p>
+  <p class="zh">最重要的一点是，进程是否需要保存 <i>自身进程</i> 或者<i>其他进程</i> 的状态消息。一个进程保存再多自己的状态信息，也不会引发其他问题。如果需要保存其他进程的状态消息，这个问题就复杂了：当前保存的其他进程的状态消息和实际的状态消息可能是不一致的。这可能会引起消息丢失（在UDP中）、更新失败、或者s/w错误等。</p>
 
   <p class="en">An example is reading a file. In single process applications the file handling code runs as part of the application. It maintains a table of open files and the location in each of them. Each time a read or write is done this file location is updated. In the DCE file system, the file server keeps track of a client's open files, and where the client's file pointer is. If a message could get lost (but DCE uses TCP) these could get out of synch. If the client crashes, the server must eventually timeout on the client's file tables and remove them.</p>
-  <p class="zh">一个例子就是读取文件。在单个进程中，文件处理代码是应用程序的一部分。它维持一个表，表中包含所有打开的文件和文件路径。每次文件读写的时候，文件路径就会更新。在数据通信（DCE）文件系统中，文件系统必须追踪客户端打开了哪些文件，客户端的文件指针在哪。如果一个消息丢失了（但是DCE是使用TCP的），这些状态信息就不能保持同步了。如果出现客户端冲突了，服务端必须等待客户端的文件表超过过期时间，然后删除客户端文件表。</p>
+  <p class="zh">一个例子就是读取文件。在单个进程中，文件处理代码是应用程序的一部分。它维持一个表，表中包含所有打开的文件和文件指针位置。每次文件读写的时候，文件指针位置就会更新。在数据通信（DCE）文件系统中，文件系统必须追踪客户端打开了哪些文件，客户端的文件指针在哪。如果一个消息丢失了（但是DCE是使用TCP的），这些状态消息就不能保持同步了。如果出现客户端崩溃了，服务器就必须对这个表触发超时并删除。</p>
 
   <div class="sgc-1"><img alt="" src="../Images/dce.png" /></div>
 
   <p class="en">In NFS, the server does not maintain this state. The client does. Each file access from the client that reaches the server must open the file at the appropriate point, as given by the client, to perform the action.</p>
-  <p class="zh">在NFS文件系统中，服务端并没有保持这个状态信息。而是客户端保持的。客户端每次在服务端进行的读取文件操作必须能在准确的文件位置打开文件，而这个文件位置是由客户端提供的，从而才能进行后续的操作。</p>
+  <p class="zh">在NFS文件系统中，服务器并没有保存这个状态消息，而是有客户端保存的。客户端每次在服务器进行的读取文件操作必须能在准确的文件位置打开文件，而这个文件位置是由客户端提供的，从而才能进行后续的操作。</p>
 
   <div class="sgc-1"><img alt="" src="../Images/nfs.png" /></div>
 
   <p class="en">If the server maintains information about the client, then it must be able to recover if the client crashes. If information is not saved, then on each transaction the client must transfer sufficient information for the server to function.</p>
-  <p class="zh">如果由服务端保持客户端的状态信息，服务端必须有能力当客户端冲突的时候进行修复。如果服务端没有储存状态信息，那么客户端的每次事务交互都需要提供足够的信息来让服务端进行操作。</p>
+  <p class="zh">如果由服务器保持客户端的状态消息，服务器必须在客户端崩溃的时候进行修复。如果服务器没有储存状态消息，那么客户端的每次事务交互都需要提供足够的消息来让服务器进行操作。</p>
 
   <p class="en">If the connection is unreliable, then additional handling must be in place to ensure that the two do not get out of synch. The classic example is of bank account transactions where the messages get lost. A transaction server may need to be part of the client-server system.</p>
-  <p class="zh">如果连接是不可靠的，那么必须要有额外的处理程序来确保双方没有失去同步。一个典型的例子是当消息丢失的时候银行账号交易系统。交易系统是客户端与服务端交互的一部分。</p>
+  <p class="zh">如果连接是不可靠的，那么必须要有额外的处理程序来确保双方没有失去同步。一个消息丢失的典型例子就是银行账号交易系统。交易系统是客户端与服务器交互的一部分。</p>
 
   <h3 id="heading_id_18" class="en">Application State Transition Diagram</h3>
   <h3 id="heading_id_18" class="zh">应用状态转换图</h3>
@@ -970,7 +970,7 @@ const (
   <h3 id="heading_id_19" class="zh">客户端状态转换图</h3>
 
   <p class="en">The client state diagram must follow the application diagram. It has more detail though: it <em>writes</em> and then <em>reads</em></p>
-  <p class="zh">客户端状态转换图就和应用转换图一样。不同的就是有更多细节要注意：它包含有<em>读</em> 和 <em>写</em>操作</p>
+  <p class="zh">客户端状态转换图就和应用转换图一样。不同的就是要注意更多细节：它包含有<em>读</em> 和 <em>写</em>操作</p>
 
   <div class="sgc-1">
     <table border="1">
@@ -1063,10 +1063,10 @@ const (
   </div>
 
   <h3 id="heading_id_20" class="en">Server state transition diagrams</h3>
-  <h3 id="heading_id_20" class="zh">服务端状态转换图</h3>
+  <h3 id="heading_id_20" class="zh">服务器状态转换图</h3>
 
   <p>The server state diagram must also follow the application diagram. It also has more detail: it <em>reads</em> and then <em>writes</em></p>
-  <p>服务端状态转换图也和应用装换图一样。不同的就是有更多细节要注意：它包含有 <em>读</em> 和 <em>写</em>操作</p>
+  <p>服务器状态转换图也和应用转换图一样。不同的就是也要注意更多细节：它包含有 <em>读</em> 和 <em>写</em>操作</p>
 
   <div class="sgc-1">
     <table border="1">
@@ -1159,7 +1159,7 @@ const (
   </div>
 
   <h3 id="heading_id_21" class="en">Server pseudocode</h3>
-  <h3 id="heading_id_21" class="zh">服务端伪代码</h3>
+  <h3 id="heading_id_21" class="zh">服务器伪代码</h3>
   <pre><code>
 state = login
 while true
@@ -1193,7 +1193,7 @@ while true
   <h2 id="heading_id_22" class="zh">总结</h2>
 
   <p class="en">Building any application requires design decisions before you start writing code. For distributed applications you have a wider range of decisions to make compared to standalone systems. This chapter has considered some of those aspects and demonstrated what the resultant code might look like.</p>
-<p class="zh">开发一个应用写代码前要求有详细的设计。开发一个分布式的系统比开发一个独立系统需要更宽广的视野和思维来做决定和思考。这一章已经帮你考虑到了一些这样的问题，并且向你展示了最终代码的大致样子。</p>
+<p class="zh">任何应用程序在开始编写前都需要详尽的设计。开发一个分布式的系统比开发一个独立系统需要更宽广的视野和思维来做决定和思考。这一章已经考虑到了一些这样的问题，并且展示了最终代码的大致样子。</p>
   <!--
 <h2>Internet Mail Format</h2>
 
