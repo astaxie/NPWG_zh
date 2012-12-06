@@ -452,19 +452,20 @@ func Unmarshal(val interface{}, b []byte) (rest []byte, err os.Error)
 
     <li>ASN.1 PrintableString 或者 IA5String可以被写入string中.</li>
 
-    <li> 以上的任何ASN.1类型的值都可以作为对应的Go类型的值写入interface{}中，对于整数，类型将是int64.</li>
+    <li> 以上的任何ASN.1类型的值都可以作为对应的Go类型的值写入interface{}中。比如整数放入interface{}的话，它对应的类型是int64。</li>
 
-    <li>如果 x可以被写入某个类型中，那么ASN.1 SEQUENCE OF x 或者 SET OF x,则可以写入此类型构成的slice中.</li>
+    <li>如果一个变量x可以被当做某个类型写入，那么ASN.1中的x有序列或者x集合就可以当做这个类型的slice写入了。</li>
 
-    <li>如果某个序列中的所有元素都可以被写入到某个结构里与之对应的元素中，那么此ASN.1 SEQUENCE 或者SET则可以写入到此结构中.</li>
+    <li>如果某个有序列或者集合中的所有元素都可以被写入到某个结构里与之对应的元素中，那么此ASN.1 SEQUENCE 或者SET就可以写入这个结构中。</li>
   </ul>
 
   <p class="en">Go places real restrictions on ASN.1. For example, ASN.1 allows integers of any size, while the Go implementation will only allow upto signed 64-bit integers. On the other hand, Go distinguishes between signed and unsigned types, while ASN.1 doesn't. So for example, transmitting a value of <code>uint64</code> may fail if it is too large for <code>int64</code>,</p>
-  <p class="zh">Go在实现上,为ASN.1添加了一些约束，例如ASN.1允许任意大小的整数,而GO只允许最大为64位有符号整数的值.另一方面Go将类型区分有符号类型与无符号类型,而ASN.1则没有分别.因此传递一个大于<code>int64</code>能表示的最大值的<code>uint64</code>的值,那么可能会失败。</p>
+  <p class="zh">Go在实现上,为ASN.1添加了一些约束。例如ASN.1允许任意大小的整数,而GO只允许最大为64位有符号整数的值.另一方面，Go区分符号类型与无符号类型,而ASN.1则没有分别.因此传递一个大于<code>int64</code>能表示的最大值的<code>uint64</code>可能会失败。</p>
+  
   <p class="en">In a similar vein, ASN.1 allows several different character sets. Go only supports PrintableString and IA5String (ASCII). ASN.1 does not support Unicode characters (which require the BMPString ASN.1 extension). The basic Unicode character set of Go is not supported, and if an application requires transport of Unicode characters, then an encoding such as UTF-7 will be needed. Such encodings are discussed in a later chapter on character sets.</p>
-  <p class="zh">同理ASN.1允许多个不同的字符集,而Go只支持PrintableString和IA5String(ASCII). ASN.1不支持Unicode字符(它需要BMPString ASN.1扩展)，Go中的基本Unicode字符集它也不支持，如果应用程序需要传输Unicode字符，则可能需要类似UTF-7的编码，编码相关的内容将会在后边有关字符集的章节来讨论。</p>
+  <p class="zh">同理ASN.1允许多个不同的字符集,而Go只支持PrintableString和IA5String(ASCII). ASN.1不支持Unicode字符(它需要BMPString ASN.1扩展)，Go中的基本Unicode字符集它也不支持，如果应用程序需要传输Unicode字符，则可能需要类似UTF-7的编码。编码相关的内容将会在后边有关字符集的章节来讨论。</p>
   <p class="en">We have seen that a value such as an integer can be easily marshalled and unmarshalled. Other basic types such as booleans and reals can be similarly dealt with. Strings which are composed entirely of ASCII characters can be marshalled and unmarshalled. However, if the string is, for example, "hello \u00bc" which contains the non-ASCII character '¼' then an error will occur: "ASN.1 structure error: PrintableString contains invalid character". This code works, as long as the string is only composed of printable characters:</p>
-  <p class="zh">我们已经看到整型的值很容易被编、解组，类似的boolean与real等基本类型处理手法也类似，由ASCII字符构成的字符串也很容易。但对 "hello \u00bc"这个含有 '¼'这个非ASCII字符的字符串，在处理时,则会出现错误:”ASN.1 结构错误:PrintableString包含非法字符时，以下的代码在处理仅由可打印字符构成的字符串时,工作良好。</p>
+  <p class="zh">我们已经看到整型的值很容易被编、解组，类似的boolean与real等基本类型处理手法也类似。由ASCII字符构成的字符串也很容易。但对 "hello \u00bc"这样含有 '¼'这个非ASCII字符的字符串，在处理时,则会出现错误：“ASN.1 结构错误:PrintableString包含非法字符”。以下的代码在处理仅由可打印字符（printable characters）构成的字符串时,工作良好。</p>
 <pre><code>
         s := "hello"
         mdata, _ := asn1.Marshal(s)
@@ -474,7 +475,7 @@ func Unmarshal(val interface{}, b []byte) (rest []byte, err os.Error)
     </code></pre>
 
   <p class="en">ASN.1 also includes some "useful types" not in the above list, such as UTC time. Go supports this UTC time type. This means that you can pass time values in a way that is not possible for other data values. ASN.1 does not support pointers, but Go has special code to manage pointers to time values. The function <code>GetLocalTime</code> returns <code>*time.Time</code>. The special code marshals this, and it can be unmarshalled into a pointer variable to a <code>time.Time</code> object. Thus this code works</p>
-  <p class="zh">ASN.1还包含一些未在上边列表中出现的“有用的类型(useful types)”, 比如UTC时间类型，GO支持此UTC时间类型。这意味着你可以以一种其他数据值不能使用的方式来传递时间值。ASN.1不支持指针,Go中却含有用来管理指向时间值的指针特定代码。函数<codem>GetLocalTime</code>返回<code>*time.Time</code>,特定的代码将执行此编组动作，它也可以解组到一ime.Time对象的指针中。因此以下代码是可以工作的.</p>
+  <p class="zh">ASN.1还包含一些未在上边列表中出现的“有用的类型(useful types)”, 比如UTC时间类型，GO支持此UTC时间类型。就是说你可以用一种特有的类型来传递时间值。ASN.1不支持指针,Go中却有指向时间值的指针。比如函数<codem>GetLocalTime</code>返回<code>*time.Time</code>。asn1包编组这个time结构，也是使用这个包解组到一个<code>time.Time</code>对象指针中。代码如下</p>
 <pre><code>
         t := time.LocalTime()
         mdata, err := asn1.Marshal(t)
@@ -484,9 +485,10 @@ func Unmarshal(val interface{}, b []byte) (rest []byte, err os.Error)
     </code></pre>
 
   <p class="en">Both <code>LocalTime</code> and <code>new</code> handle pointers to a <code>*time.Time</code>, and Go looks after this special case.</p>
-  <p class="zh"><code>LocalTime</code>与<code>new</code>函数都返回的是*time.Time类型的指针，GO将自己来照管此类特殊情况.</p>
+  <p class="zh"><code>LocalTime</code>与<code>new</code>函数都返回的是*time.Time类型的指针，GO将内部对这些特殊类型进行处理。</p>
+
   <p class="en">In general, you will probably want to marshal and unmarshal structures. Apart from the special case of time, Go will happily deal with structures, but not with pointers to structures. Operations such as <code>new</code> create pointers, so you have to dereference them before marshalling/unmarshalling them. Go normally dereferences pointers for you when needed, but not in this case. These both work for a type <code>T</code>:</p>
-  <p class="zh">除了time这种特殊情况外，一般说来，你可能希望编、解组结构类型.Go在处理结构上，除开指向结构的指针外，还是令人非常愉快的。类以<code>new</code>的操作将会创建指针，因此在编、解组之前，你需要解引用它，通常，在你需要的时候，Go会自动对指针进行解引用，但是在此处并不是这么个情况，对于类型T，以下两种方式均可.</p>
+  <p class="zh">除了time这种特殊情况外，你可能要编、解组结构类型。除了上面提到的Time结构外，其他的结构Go还是很好处理的。类以<code>new</code>的操作将会创建指针，因此在编、解组之前，你需要解引用它。通常，在你需要的时候，Go会自动对指针进行解引用，但是下面这个例子并不是这么个情况。对于类型T，以下两种方式均可.</p>
 <pre><code>
 // using variables
 var t1 T
