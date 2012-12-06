@@ -508,9 +508,9 @@ asn1.Unmarshal(newT2, mdata2)
     </code></pre>
 
   <p class="en">Any suitable mix of pointers and variables will work as well.</p>
-  <p class="zh">恰当地的混用指针与变量，代码还是会工作得比较好.</p>
+  <p class="zh">恰当地的使用指针与变量能让代码工作更好。</p>
   <p class="en">The fields of a structure must all be exportable, that is, field names must begin with an uppercase letter. Go uses the <code>reflect</code> package to marshal/unmarshal structures, so it must be able to examine all fields. This type cannot be marshalled:</p>
-  <p class="zh">结构的所有字段必须是可导出的，即字段名必须以大写字母开头。Go使用<code>reflect</code>包来编、解组结构，因此他必须检查所有的字段，这个类型不能被编组:</p>
+  <p class="zh">结构的所有字段必须是公共的，即字段名必须以大写字母开头。Go内部实际是使用<code>reflect</code>包来编、解组结构，因此reflect包必须能访问所有的字段。比如下面这个类型是不能被编组的:</p>
  <pre><code>
       type T struct {
           Field1 int
@@ -533,7 +533,7 @@ type T2 struct {
     </code></pre>
 
   <p class="en">Not only the types of each field must match, but the number must match as well. These two types don't work:</p>
-  <p class="zh">不仅每个字段的类型必须匹配，而且字段数目也要相等，下面两个类型将不会正常工作。</p>
+  <p class="zh">不仅每个字段的类型必须匹配，而且字段数目也要相等，下面两个类型将不能互编解码：</p>
   <pre><code>
 type T1 struct {
     F1 int
@@ -546,9 +546,9 @@ type T2 struct {
     </code></pre>
 
   <h3 id="heading_id_7" class="en">ASN.1 daytime client and server</h3>
-  <h3 id="heading_id_7" class="zh">ASN.1 daytime 客户端与服务器</h3>
+  <h3 id="heading_id_7" class="zh">ASN.1 日期查询服务客户端与服务器</h3>
   <p class="en">Now (finally) let us turn to using ASN.1 to transport data across the network.</p>
-  <p class="zh">现在(最后)让我们转向使用ASN.1来跨网络传输数据</p>
+  <p class="zh">现在（最后）让我们使用ASN.1来跨网络传输数据</p>
   <p class="en">We can write a TCP server that delivers the current time as an ASN.1 Time type, using the techniques of the last chapter. A server is</p>
    <p class="zh">我们可以使用上一章的技术来编写一个将当前时间作为ASN.Time类型时间来传送的TCP服务器。服务器是:</p>
 <pre><code><span class="sgc-8">
@@ -596,7 +596,7 @@ type T2 struct {
 </span></code></pre>
 
   <p class="en">which can be compiled to an executable such as <code>ASN1DaytimeServer</code> and run with no arguments. It will wait for connections and then send the time as an ASN.1 string to the client.</p>
-  <p class="zh">它可以被编译为一个可能叫做<em>ASN1DaytimeServer</em>的可执行程序，运行它不需要任何实际参数，(启动后)它将等待来自客户端的连接，当有新连接后它会将当前时间当作ASN.1字符串传回给客户端.</p>
+  <p class="zh">它可以被编译为一个诸如名为<em>ASN1DaytimeServer</em>的可执行程序，运行它不需要任何实际参数，（启动后）它将等待来自客户端的连接，当有新连接后它会将当前时间当作ASN.1字符串传回给客户端.</p>
   <p class="en">A client is</p>
  <p class="zh">客户端代码是</p>
   <pre><code><span class="sgc-8">
@@ -663,17 +663,18 @@ type T2 struct {
 </span></code></pre>
 
   <p class="en">This connects to the service given in a form such as <code>localhost:1200</code>, reads the TCP packet and decodes the ASN.1 content back into a string, which it prints.</p>
-  <p class="zh">连接字符串形如:<code>localhost:1200</code>.它将读取应答TCP包然后将ASN.1内容解码成字符串并输出</p>
+  <p class="zh">连接字符串形如：<code>localhost:1200</code>。它将读取应答TCP包然后将ASN.1内容解码成字符串并输出。</p>
   <p class="en">We should note that neither of these two - the client or the server - are compatable with the text-based clients and servers of the last chapter. This client and server are exchanging ASN.1 encoded data values, not textual strings.</p>
-  <p class="zh">我们应当注意,无论是客户端还是服务器都不与兼容前一章介绍的基于文本的客户端与服务器。此地的客户端与服务器交换的是ASN.1编码的数据值，而非文本串.</p>
+  <p class="zh">我们应当注意，无论是客户端还是服务器都不与兼容前一章介绍的基于文本的客户端与服务器。此地的客户端与服务器交换的是ASN.1编码的数据值，而非文本串。</p>
+
   <h2 id="heading_id_8" class="en">JSON</h2>
   <h2 id="heading_id_8" class="zh">JSON</h2>
   <p class="en">JSON stands for JavaScript Object Notation. It was designed to be a lighweight means of passing data between JavaScript systems. It uses a text-based format and is sufficiently general that it has become used as a general purpose serialisation method for many programming languages.</p>
-  <p class="zh">JSON全称是JavaScript Object Notation,它是一种应用于JavaScript系统之间传递数据的轻量级格式，它使用基于文本的格式，因为足够通用，现在已经成为了被多种编程语言所采用的通用序列化方法。</p>
+  <p class="zh">JSON全称是JavaScript Object Notation,它是一种应用于JavaScript系统之间传递数据的轻量级格式。它使用基于文本的格式，因为足够通用，现在已经成为了多种编程语言采用的通用的序列化方法了。</p>
   <p class="en">JSON serialises objects, arrays and basic values. The basic values include string, number, boolean values and the null value. Arrays are a comma-separated list of values that can represent arrays, vectors, lists or sequences of various programming languages. They are delimited by square brackets "[ ... ]". Objects are represented by a list of "field: value" pairs enclosed in curly braces "{ ... }".</p>
-  <p class="zh">JSON 序列化对象，数组和基本值，基本值包括:字符串,数字，布林值和NULL值。数组是逗号分割的一组值的列表，可以用来表示各种编程语言中的数组、向量、列表或者序列。它们由方括号来界定，对象则由一个包含在大括号中的"field: values"对构成的列表来表示。</p>
+  <p class="zh">JSON 序列化对象，数组和基本值。基本值包括：字符串，数字，布尔值和NULL值。数组是逗号分割的一组值的列表，可以用来表示各种编程语言中的数组、向量、列表或者序列。它们由方括号来界定，对象则由一个包含在大括号中的"field: values"对构成的列表来表示。</p>
   <p class="en">For example, the table of employees given earlier could be written as an array of employee objects:</p>
-  <p class="zh">例如.前面提到过的雇员表可以被编码成如下的一个雇员数组.</p>
+  <p class="zh">例如.前面提到过的雇员表可以被编码成如下的一个雇员对象的数组.</p>
   <pre>
 <code>
 [
@@ -685,9 +686,9 @@ type T2 struct {
 </pre>
 
   <p class="en">There is no special support for complex data types such as dates, no distinction between number types, no recursive types, etc. JSON is a very simple language, but nevertheless can be quite useful. Its text-based format makes it easy for people to use, even though it has the overheads of string handling.</p>
-  <p class="zh">JSON并没有为 类似date这类复杂的数据类型提供特殊支持，也不区别数字类型，没有递归类型等。JSON是一个非常简单但却十分有用的语言，尽管他基于文本的格式在字符串处理上开销过多，但是却很易用。</p>
+  <p class="zh">JSON并没有为类似日期这这样的复杂数据类型提供特别的格式支持，也不区分各种数字类型，也没有递归类型等。JSON是一个非常简单但却十分有用的语言，尽管他基于文本的格式在字符传递上开销过多，但是却很适合人类阅读和使用。</p>
   <p class="en">From the Go JSON package specification, marshalling uses the following type-dependent default encodings:</p>
-   <p class="zh">从Go JSON包的规范文档可知，将在编组时使用以下类型相关的默认编码方法:</p>
+   <p class="zh">从Go JSON包的规范文档可知，JSON包将在编组时使用以下类型相关的默认编码方法：</p>
   <ul class="en">
     <li>Boolean values encode as JSON booleans.</li>
 
@@ -711,25 +712,25 @@ type T2 struct {
   </ul>
 
   <ul class="zh">
-    <li>布林值被编码为JSON的布林值</li>
+    <li>布尔值被编码为JSON的布尔值。</li>
 
-    <li>浮点数与整数被编码为JSON的数字值.</li>
+    <li>浮点数与整数被编码为JSON的数字值。</li>
 
-    <li>字符串被编码为JSON的字符串，对于每一个非法的UTF-8序列将由UTF8替换符U+FFFD替换.</li>
+    <li>字符串被编码为JSON的字符串，每一个非法的UTF-8序列将会被UTF8替换符U+FFFD替换。</li>
 
-    <li>数组与切片被JSON数组,除开[]byte,它将被编码会base64字符串.</li>
+    <li>数组与Slice会被编码为JSON数组，但是[]byte是会被编码为base64字符串。</li>
 
-    <li>结构体变量被编码为JSON对象.每一个结构体字段被编码为此对象的对应成员，默认情况下对象的key的名字将是对应结构体字段名转换为小写的结果，如果此字段含有tag.则此tag将成员key的名字.</li>
+    <li>结构体被编码为JSON对象。每一个结构体字段被编码为此对象的对应成员，默认情况下对象的key的名字是对应结构体字段名的小写。如果此字段含有tag，则此tag将是最终对象key的名字。</li>
 
-    <li>map值被编码为JSON对象，此map的key的类型必须是string. map的key直接被当作JSON对象的key.(原文有误？)</li>
+    <li>map值被编码为JSON对象，此map的key的类型必须是string；map的key直接被当作JSON对象的key。</li>
 
-    <li>指针值被编码为指针所指向的值(注意:此处只允许出现树(tree),而不允许出现’图(graph),空指针被编码为空JSON对象.</li>
+    <li>指针值被编码为指针所指向的值（注意：此处只允许出现树(tree),而不允许出现图（graph）！）。空指针被编码为空JSON对象.</li>
 
-    <li>接口值被编码为接口实际包含的值。空接口被编码为空JSON对象</li>
+    <li>接口值被编码为接口实际包含的值。空接口被编码为空JSON对象。</li>
 
-    <li>程道，复数，函数不能被编码为JSON格式，如果尝试这样做，Marshal将会返回一个InvalidTypeError错误.</li>
+    <li>程道，复数，函数不能被编码为JSON格式。如果尝试这样做，Marshal将会返回一个InvalidTypeError错误。</li>
 
-    <li>JSON不能表示环形数据结构.Go的Marshal函数也不处理它们，将一个环形结构传递给Marshal将会导致死循环.</li>
+    <li>JSON不能表示环形数据结构。Go的Marshal函数也不处理它们，将一个环形结构传递给Marshal将会导致死循环。</li>
   </ul>
 
   <p class="en">A program to store JSON serialised data into a file is</p>
@@ -848,7 +849,7 @@ type T2 struct {
 </span></code></pre>
 
   <p class="en">The serialised form is (formatted nicely)</p>
-  <p class="zh">被序列化后的结果型如:(良好格式化后)</p>
+  <p class="zh">被序列化后的结果如：（经过了美化处理）</p>
   <pre><code>
 {"Name":{"Family":"Newmarch",
          "Personal":"Jan"},
@@ -1029,7 +1030,7 @@ type T2 struct {
   <h2 id="heading_id_10" class="en">The gob package</h2>
   <h2 id="heading_id_10" class="zh">gob包</h2>
   <p class="en">Gob is a serialisation technique specific to Go. It is designed to encode Go data types specifically and does not at present have support for or by any other languages. It supports all Go data types except for channels, functions and interfaces. It supports integers of all types and sizes, strings and booleans, structs, arrays and slices. At present it has some problems with circular structures such as rings, but that will improve over time.</p>
-  <p class="zh">gob是一个只能在Go程序中使用的序列化技术，它被设计用于编码特定于Go的数据类型,目前它既不支持其他语言，反之亦然.它支持除interface, function, channel外的所有的Go数据类型。它支持任何整数类型，任何大小的整数，字符串和布林值，结构，数组据与切片，目前它在处理ring等环型数据结构方面还存在一些问题，但假以时日，这将得到改善。</p>
+  <p class="zh">gob是一个Go中特有的序列化技术。它只能编码Go的数据类型，目前它不支持其他语言。它支持除interface，function，channel外的所有的Go数据类型。它支持任何类型和任何大小的整数，还有字符串和布尔值，结构，数组据与切片。目前它在处理ring等环型数据结构方面还存在一些问题，但假以时日，将会得到改善。</p>
   <p class="en">Gob encodes type information into its serialised forms. This is far more extensive than the type information in say an X.509 serialisation, but far more efficient than the type information contained in an XML document. Type information is only included once for each piece of data, but includes, for example, the names of struct fields.</p>
   <p class="zh">Go将类型信息编码到序列化后的表单中，在扩展性方面这远比对应的X.509序列化方法要好。而同时与将类型信息包含在表单中的XML文档相比，则更加高效。对于每一个数据片断，类型信息只包含一次，例如，结构体字段的名字.</p>
   <p class="en">This inclusion of type information makes Gob marshalling and unmarshalling fairly robust to changes or differences between the marshaller and unmarshaller. For example, a struct</p>
