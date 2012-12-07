@@ -1032,7 +1032,7 @@ type T2 struct {
   <p class="en">Gob is a serialisation technique specific to Go. It is designed to encode Go data types specifically and does not at present have support for or by any other languages. It supports all Go data types except for channels, functions and interfaces. It supports integers of all types and sizes, strings and booleans, structs, arrays and slices. At present it has some problems with circular structures such as rings, but that will improve over time.</p>
   <p class="zh">gob是一个Go中特有的序列化技术。它只能编码Go的数据类型，目前它不支持其他语言。它支持除interface，function，channel外的所有的Go数据类型。它支持任何类型和任何大小的整数，还有字符串和布尔值，结构，数组据与切片。目前它在处理ring等环型数据结构方面还存在一些问题，但假以时日，将会得到改善。</p>
   <p class="en">Gob encodes type information into its serialised forms. This is far more extensive than the type information in say an X.509 serialisation, but far more efficient than the type information contained in an XML document. Type information is only included once for each piece of data, but includes, for example, the names of struct fields.</p>
-  <p class="zh">Go将类型信息编码到序列化后的表单中，在扩展性方面这远比对应的X.509序列化方法要好。而同时与将类型信息包含在表单中的XML文档相比，则更加高效。对于每一个数据片断，类型信息只包含一次，例如，结构体字段的名字.</p>
+  <p class="zh">Go将类型信息编码到序列化后的表单中，在扩展性方面这远比对应的X.509序列化方法要好。而同时与将类型信息包含在表单中的XML文档相比，则更加高效。对于每个数据，类型信息只包含一次。当然，包含的是字段名称这样的信息。</p>
   <p class="en">This inclusion of type information makes Gob marshalling and unmarshalling fairly robust to changes or differences between the marshaller and unmarshaller. For example, a struct</p>
    <p class="zh">包含类型信息使得Gob在编、解组操作上，当marshaler与unmarshaler不同或者有变化时，具有相当高的健壮性。例如，如下这个结构:</p>
 <pre><code>
@@ -1052,7 +1052,7 @@ type T2 struct {
     </code></pre>
 
   <p class="en">where the order of fields has changed. It can also cope with missing fields (the values are ignored) or extra fields (the fields are left unchanged). It can cope with pointer types, so that the above struct could be unmarshalled into</p>
-  <p class="zh">此处变更了字段的顺序.它也可以处理缺少字段(值将被忽略)或多出字段(此字段原样保持)的情况指针类型，因此上边的结构可以被解组到下面的结构中.</p>
+  <p class="zh">此处变更了字段的顺序.它也可以处理缺少字段（值将被忽略）或多出字段（此字段原样保持）的情况。它也可以处理指针类型，因此上边的结构可以被解组到下面的结构中.</p>
 <pre><code>
  struct T {
      *a int
@@ -1061,13 +1061,13 @@ type T2 struct {
     </code></pre>
 
   <p class="en">To some extent it can cope with type coercions so that an <code>int</code> field can be broadened into an <code>int64</code>, but not with incompatable types such as <code>int</code> and <code>uint</code>.</p>
-  <p class="zh">在一定程度上，它也可以强转类型，以至于int字段被扩展成为int64。而对于不兼容类型比如int与unit,就无能为力了.</p>
+  <p class="zh">在一定程度上，它也可以强制执行类型转换，比如<code>int<code>字段被扩展成为<code>int64</code>。而对于不兼容类型，比如<code>int</code>与<code>uint</code>,就无能为力了.</p>
   <p class="en">To use Gob to marshall a data value, you first need to create an <code>Encoder</code>. This takes a <code>Writer</code> as parameter and marshalling will be done to this write stream. The encoder has a method <code>Encode</code> which marshalls the value to the stream. This method can be called multiple times on multiple pieces of data. Type information for each data type is only written once, though.</p>
-  <p class="zh">为了使用gob编组一个数据值，首先你得创建<code>Encoder</code>.它使用<code>Writer</code>作为参数，编组操作将会将最终结果写入此流中. encoder有个<em>Encode</em>方法，它将执行将值编组成流的操作。此方法可以在多份数据上被调用多次，但是对于每一种数据类型，类型信息却只会被写入一回.</p>
+  <p class="zh">为了使用gob编组一个数据值，首先你得创建<code>Encoder</code>。它使用<code>Writer</code>作为参数，编组操作将会将最终结果写入此流中。encoder有个<code>Encode</code>方法，它执行将值编组成流的操作。此方法可以在多份数据上被调用多次。但是对于每一种数据类型，类型信息却只会被写入一次。</p>
   <p class ="en">You use a <code>Decoder</code> to unmarshall the serialised data stream. This takes a <code>Reader</code> and each read returns an unmarshalled data value.</p>
-  <p class="zh">你将使用<em>Decoder</em>来执行解组序列化后的数据流的操作.它持有一个Reader参数，每次读取都将返回一个解组后的数据值.</p>
+  <p class="zh">你将使用<code>Decoder</code>来执行解组序列化后的数据流的操作。它持有一个<code>Reader</code>参数，每次读取都将返回一个解组后的数据值。</p>
   <p class="en">A program to store gob serialised data into a file is</p>
-  <p class="zh">将gob序列化后的数据存入文件的示例程序如下:</p>
+  <p class="zh">将gob序列化后的数据存入文件的示例程序如下：</p>
   <pre><code><span class="sgc-8">
 <span class="sgc-2">/* SaveGob
  */
@@ -1122,7 +1122,7 @@ type T2 struct {
 </span></code></pre>
 
   <p class="en">and to load it back into memory is</p>
-  <p class="zh">将之重新加载回内存的操作如下:</p>
+  <p class="zh">将之重新加载回内存的操作如下：</p>
   <pre><code><span class="sgc-8">
 <span class="sgc-2">/* LoadGob
  */
@@ -1182,7 +1182,7 @@ type T2 struct {
 </span></code></pre>
 
   <h3 id="heading_id_11" class="en">A client and server</h3>
-  <h3 id="heading_id_11" class="zh">客户端与服务器</h3>
+  <h3 id="heading_id_11" class="zh">一个客户端与服务器的例子</h3>
   <p class="en">A client to send a person's data and read it back ten times is</p>
   <p class="zh">一个将person数据收发10次的客户端</p>
   <pre><code><span class="sgc-8">
@@ -1277,7 +1277,7 @@ type T2 struct {
 </span></code></pre>
 
   <p class="en">and the corrsponding server is</p>
-  <p class="zh">对应的服务器</p>
+  <p class="zh">对应的服务器：</p>
   <pre><code><span class="sgc-8">
 <span class="sgc-2">/* Gob EchoServer
  */
@@ -1350,7 +1350,7 @@ type T2 struct {
 </span></code></pre>
 
   <h2 id="heading_id_12" class="en">Encoding binary data as strings</h2>
-  <h2 id="heading_id_12">将二进制数据编码为字符串</h2>
+  <h2 id="heading_id_12" class="zh">将二进制数据编码为字符串</h2>
   <p class="en">Once upon a time, transmtting 8-bit data was problematic. It was often transmitted over noisy serial lines and could easily become corrupted. 7-bit data on the other hand could be transmitted more reliably because the 8th bit could be used as check digit. For example, in an "even parity" scheme, the check digit would be set to one or zero to make an even number of 1's in a byte. This allows detection of errors of a single bit in each byte.</p>
   <p class="zh">以前，传输8-bit数据总是会出现各种问题。它通常由充满噪声的串行线来输入，因此常被中断，另一方面因为第8个比特位可以被用来做数字检验，所以7-bit的传输要值得信任一些。例如在 “偶数奇偶校检”模式下，为了让一个字节中出现偶数个1,校检位可以被设置1或0，这将可侦测每个字节中的单个bit位出现的错误.</p>
   <p class="en">ASCII is a 7-bit character set. A number of schemes have been developed that are more sophisticated than simple parity checking, but which involve translating 8-bit binary data into 7-bit ASCII format. Essentially, the 8-bit data is stretched out in some way over the 7-bit bytes.</p>
