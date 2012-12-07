@@ -1352,11 +1352,11 @@ type T2 struct {
   <h2 id="heading_id_12" class="en">Encoding binary data as strings</h2>
   <h2 id="heading_id_12" class="zh">将二进制数据编码为字符串</h2>
   <p class="en">Once upon a time, transmtting 8-bit data was problematic. It was often transmitted over noisy serial lines and could easily become corrupted. 7-bit data on the other hand could be transmitted more reliably because the 8th bit could be used as check digit. For example, in an "even parity" scheme, the check digit would be set to one or zero to make an even number of 1's in a byte. This allows detection of errors of a single bit in each byte.</p>
-  <p class="zh">以前，传输8-bit数据总是会出现各种问题。它通常由充满噪声的串行线来输入，因此常被中断，另一方面因为第8个比特位可以被用来做数字检验，所以7-bit的传输要值得信任一些。例如在 “偶数奇偶校检”模式下，为了让一个字节中出现偶数个1,校检位可以被设置1或0，这将可侦测每个字节中的单个bit位出现的错误.</p>
+  <p class="zh">以前，传输8-bit数据总是会出现各种问题。它通常由充满噪声的串行线来输入，因此会出错。因为第8个比特位可以被用来做数字检验，所以7-bit的传输要值得信任一些。例如在 “偶数奇偶校检”模式下，为了让一个字节中出现偶数个1,校检位可以被设置1或0，这将可侦测每个字节中的单个bit位出现的错误.</p>
   <p class="en">ASCII is a 7-bit character set. A number of schemes have been developed that are more sophisticated than simple parity checking, but which involve translating 8-bit binary data into 7-bit ASCII format. Essentially, the 8-bit data is stretched out in some way over the 7-bit bytes.</p>
-  <p class="zh">ASCII是一种7-bit字符集。很多比‘奇偶检验’精巧的模式被开发出来，但是本质上都是将8-bit二进制数据转化成7-bit ASCII格式，本质上8-bit数据是7-bit数据的延伸.</p>
+  <p class="zh">ASCII是一种7-bit字符集。很多比‘奇偶检验’精巧的模式被开发出来，但是本质上都是将8-bit二进制数据转化成7-bit ASCII格式。本质上8-bit数据是7-bit数据的延伸。</p>
   <p class="en">Binary data transmitted in HTTP responses and requests is often translated into an ASCII form. This makes it easy to inspect the HTTP messages with a simple text reader without worrying about what strange 8-bit bytes might do to your display!</p>
-  <p class="zh">在HTTP的请求与应答中,二进制数据常被转化为ASCII的形式，这使得通过一个简单的文本阅读器来检视HTT消息变得容易，而不需要担心8-bit字节造成的显示乱码的问题。</p>
+  <p class="zh">在HTTP的请求与应答中，二进制数据常被转化为ASCII的形式。这使得通过一个简单的文本阅读器来检视HTT消息变得容易，而不需要担心8-bit字节造成的显示乱码的问题！</p>
   <p class="en">One common format is Base64. Go has support for many binary-to-text formats, including base64.</p>
   <p class="zh">一个通用的格式是Base64，Go支持包括base64在内的多种binary-to-text格式.</p>
 
