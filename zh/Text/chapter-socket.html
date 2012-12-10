@@ -58,7 +58,7 @@
 
   <div class="preface">
     <p class="en">This chapter looks at the basic techniques for network programming. It deals with host and service addressing, and then considers TCP and UDP. It shows how to build both servers and clients using the TCP and UDP Go APIs. It also looks at raw sockets, in case you need to implement your own protocol above IP.</p>
-    <p class="zh">本章将着眼于网络编程的基本技术。先是关于主机和服务的定位。然后再是TCP与UDP的内容，也将展示如何使用GO的TCP和UDP相关的API来构建服务器和客户端。最后介绍了原生套接字，如果你需要基于IP协议实现你自己的协议的话。</p>
+    <p class="zh">本章将着眼于网络编程的基础方法，将涉及到主机和服务寻址，也会考虑到TCP和UDP。同时也将展示如何使用GO的TCP和UDP相关的API来构建服务器和客户端。最后介绍了原生套接字，如果你需要基于IP协议实现你自己的协议的话。</p>
   </div>
 
   <div class="generate_from_h2" id="generated-toc"></div>
@@ -67,13 +67,13 @@
   <h2 id="heading_id_3" class="zh">介绍</h2>
 
   <p class="en">There are many kinds of networks in the world. These range from the very old such as serial links, through to wide area networks made from copper and fibre, to wireless networks of various kinds, both for computers and for telecommunications devices such as phones. These networks obviously differ at the physical link layer, but in many cases they also differed at higher layers of the OSI stack.</p>
-  <p class="zh">世上存在很多种网络。它们涵盖了从古老如串行链路，到为计算机或如手机这样的通讯设备所搭建的基于铜缆和光纤的广域网，或各种各样的无线网络。在物理链路层它们区别明显，但很多时候，在OSI模型的更高层次它们也存在差异。</p>
+  <p class="zh">世上存在很多种网络。它们涵盖了从古老如串行链路，到为计算机或手机这样的通讯设备所搭建的铜缆和光纤的广域网，或各种各样的无线网络。在物理链路层它们区别明显，但很多时候，在更高层次的OSI模型它们也存在差异。</p>
 
   <p class="en">Over the years there has been a convergence to the "internet stack" of IP and TCP/UDP. For example, Bluetooth defines physical layers and protocol layers, but on top of that is an IP stack so that the same internet programming techniques can be employed on many Bluetooth devices. Similarly, developing 4G wireless phone technologies such as LTE (Long Term Evolution) will also use an IP stack.</p>
-  <p class="zh">多年以来，IP和TCP/UDP协议基本上就等价于互联网协议。例如, 蓝牙定义了物理层和协议层，但最重要的是IP协议栈，可以在许多蓝牙设备使相同的互联网编程技术。同样, 开发4G无线手机技术，如LTE（Long Term Evolution）也将使用IP协议栈。</p>
+  <p class="zh">多年的发展，使得IP和TCP/UDP协议基本上就等价于网络协议栈。例如, 蓝牙定义了物理层和协议层，但最重要的是IP协议栈，可以在许多蓝牙设备使相同的互联网编程技术。同样, 开发4G无线手机技术，如LTE（Long Term Evolution）也将使用IP协议栈。</p>
 
   <p class="en">While IP provides the networking layer 3 of the OSI stack, TCP and UDP deal with layer 4. These are not the final word, even in the interenet world: SCTP has come from the telecommunications to challenge both TCP and UDP, while to provide internet services in interplanetary space requires new, under development protocols such as DTN. Nevertheless, IP, TCP and UDP hold sway as principal networking technologies now and at least for a considerable time into the future. Go has full support for this style of programming</p>
-  <p class="zh">IP提供了第3层的OSI网络协议栈，TCP和UDP则提供了第4层。即使在因特网世界，这些都不是固定不变的：虽然，IP, TCP和UDP至少在当前甚至未来相当长的时间内是主要的网络技术，但是TCP和UDP将面临来自SCTP（STREAM CONTROL TRANSMISSION PROTOCOL 流控制传输协议）的挑战，以及在星际空间中提供互联网服务需要新的像正在开发的DTN协议。</p>
+  <p class="zh">IP提供了第3层的OSI网络协议栈，TCP和UDP则提供了第4层。即使在因特网世界，这些都不是固定不变的：TCP和UDP将面临来自SCTP（STREAM CONTROL TRANSMISSION PROTOCOL 流控制传输协议）的挑战，同时在星际空间中提供互联网服务需要新的像正在开发的DTN协议。不过，IP, TCP和UDP至少在当前甚至未来相当长的时间内是主要的网络技术。Go语言提供了对这种编程的全面支持。</p>
 
   <p class="en">This chapter shows how to do TCP and UDP programming using Go, and how to use a raw socket for other protocols.</p>
   <p class="zh">本章介绍如何使用GO编写TCP和UDP程序，以及如何使用其他协议的原始套接字。</p>
