@@ -53,12 +53,12 @@
 <body>
   <div class="chapter">
     <h1 id="heading_id_2" class="en">Socket-level Programming</h1>
-    <h1 id="heading_id_2" class="zh">套接字级别编程</h1>
+    <h1 id="heading_id_2" class="zh">套接字级编程</h1>
   </div>
 
   <div class="preface">
     <p class="en">This chapter looks at the basic techniques for network programming. It deals with host and service addressing, and then considers TCP and UDP. It shows how to build both servers and clients using the TCP and UDP Go APIs. It also looks at raw sockets, in case you need to implement your own protocol above IP.</p>
-    <p class="zh">本章着眼于网络编程技巧。解决TCP和UDP涉及的主机和服务地址。包含了如何使用TCP和UDP的GO API来构建服务器和客户端。还包含使用原始套接字来实现基于IP之上的协议。</p>
+    <p class="zh">本章将着眼于网络编程的基本技术。先是关于主机和服务的定位。然后再是TCP与UDP的内容，也将展示如何使用GO的TCP和UDP相关的API来构建服务器和客户端。最后介绍了原生套接字，如果你需要基于IP协议实现你自己的协议的话。</p>
   </div>
 
   <div class="generate_from_h2" id="generated-toc"></div>
@@ -67,7 +67,7 @@
   <h2 id="heading_id_3" class="zh">介绍</h2>
 
   <p class="en">There are many kinds of networks in the world. These range from the very old such as serial links, through to wide area networks made from copper and fibre, to wireless networks of various kinds, both for computers and for telecommunications devices such as phones. These networks obviously differ at the physical link layer, but in many cases they also differed at higher layers of the OSI stack.</p>
-  <p class="zh">在世界上有许多种网络。这些范围从很老的：如串行链路，通过由铜缆和光纤，各种的无线网络接入到广域网的无论是计算机和手机这样的通讯设备。这些网络在物理链路层显然不同, 但在许多情况下，它们的不同也仅仅体现在高于(OSI)开放系统互连的层。</p>
+  <p class="zh">世上存在很多种网络。它们涵盖了从古老如串行链路，到为计算机或如手机这样的通讯设备所搭建的基于铜缆和光纤的广域网，或各种各样的无线网络。在物理链路层它们区别明显，但很多时候，在OSI模型的更高层次它们也存在差异。</p>
 
   <p class="en">Over the years there has been a convergence to the "internet stack" of IP and TCP/UDP. For example, Bluetooth defines physical layers and protocol layers, but on top of that is an IP stack so that the same internet programming techniques can be employed on many Bluetooth devices. Similarly, developing 4G wireless phone technologies such as LTE (Long Term Evolution) will also use an IP stack.</p>
   <p class="zh">多年以来，IP和TCP/UDP协议基本上就等价于互联网协议。例如, 蓝牙定义了物理层和协议层，但最重要的是IP协议栈，可以在许多蓝牙设备使相同的互联网编程技术。同样, 开发4G无线手机技术，如LTE（Long Term Evolution）也将使用IP协议栈。</p>
