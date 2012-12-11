@@ -82,10 +82,10 @@
   <h2 id="heading_id_4" class="zh">TCP/IP协议栈</h2>
 
   <p class="en">The OSI model was devised using a committee process wherein the standard was set up and then implemented. Some parts of the OSI standard are obscure, some parts cannot easily be implemented, some parts have not been implemented.</p>
-  <p class="zh">OSI模型标准的建立和实施是一个委员会（国际标准化组织ISO）设计的。OSI标准中的一些部分是模糊的，有些部件不能很容易地实现，一些地方还没有得到落实。</p>
+  <p class="zh">OSI模型标准的建立和实施是一个委员会（国际标准化组织ISO--译者注）设计的。OSI标准中的一些部分是模糊的，有些部件不能很容易地实现，一些地方还没有得到落实。</p>
 
   <p class="en">The TCP/IP protocol was devised through a long-running DARPA project. This worked by implementation followed by RFCs (Request For Comment). TCP/IP is the principal Unix networking protocol. TCP/IP = Transmission Control Protocol/Internet Protocol.</p>
-  <p class="zh">TCP/IP协议由长期运行的一个DARPA（美国国防先进研究项目局）项目设计。该工作其次由RFC (Request For Comment)实施。TCP/IP是Unix的首要网络协议。TCP/IP协议等于传输控制协议/互联网协议。</p>
+  <p class="zh">TCP/IP协议由长期运行的一个DARPA（美国国防先进研究项目局）项目设计。该工作其次由RFC (Request For Comment)实施。TCP/IP是Unix的首要网络协议。TCP/IP等于传输控制协议/互联网协议。</p>
 
   <p class="en">The TCP/IP stack is shorter than the OSI one:<br />
   <img alt="" src="../Images/tcp_stack.gif" /><br />
@@ -98,10 +98,10 @@
   <h3 id="heading_id_5" class="zh">IP数据包</h3>
 
   <p class="en">The IP layer provides a connectionless and unreliable delivery system. It considers each datagram independently of the others. Any association between datagrams must be supplied by the higher layers.</p>
-  <p class="zh">IP层提供了无连接的不可靠传输系统，任何数据包之间的关联必须依赖更高的层来提供。</p>
+  <p class="zh">IP层提供了无连接的不可靠的传输系统，任何数据包之间的关联必须依赖更高的层来提供。</p>
 
   <p class="en">The IP layer supplies a checksum that includes its own header. The header includes the source and destination addresses.</p>
-  <p class="zh">IP层包头包含了校验数据，包头包括源地址和目的地址。</p>
+  <p class="zh">IP层包头支持数据校验，在包头包括源地址和目的地址。</p>
 
   <p class="en">The IP layer handles routing through an Internet. It is also responsible for breaking up large datagrams into smaller ones for transmission and reassembling them at the other end.</p>
   <p class="zh">IP层通过路由连接到因特网，还负责将大数据包分解为更小的包，并传输到另一端后进行重组。</p>
