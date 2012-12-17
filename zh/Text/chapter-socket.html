@@ -337,7 +337,7 @@ type IPAddr {
   </pre>
 
   <p class="en">A primary use of this type is to perform DNS lookups on IP host names.</p>
-  <p class="zh">这种类型的主要用途是执行DNS查找IP主机名。</p>
+  <p class="zh">这种类型的主要用途是通过IP主机名执行DNS查找。</p>
   <pre>
     <code>
 func ResolveIPAddr(net, addr string) (*IPAddr, os.Error)
@@ -386,7 +386,7 @@ Resolved address is  66.102.11.104
   <h3 id="heading_id_15" class="zh">主机查询</h3>
 
   <p class="en">The function <code>ResolveIPAddr</code> will perform a DNS lookup on a hostname, and return a single IP address. However, hosts may have multiple IP addresses, usually from multiple network interface cards. They may also have multiple host names, acting as aliases.</p>
-  <p class="zh"><code>ResolveIPAddr</code>函数将执行DNS查询的主机名，并返回一个简单的IP地址。然而，通常主机如果有多个网卡，则可以有多个IP地址。它们也可能有多个主机名，作为别名。</p>
+  <p class="zh"><code>ResolveIPAddr</code>函数将对某个主机名执行DNS查询，并返回一个简单的IP地址。然而，通常主机如果有多个网卡，则可以有多个IP地址。它们也可能有多个主机名，作为别名。</p>
   <pre>
     <code>
 func LookupHost(name string) (cname string, addrs []string, err os.Error)
@@ -437,7 +437,7 @@ func LookupHost(name string) (cname string, addrs []string, err os.Error)
   <h2 id="heading_id_16" class="zh">服务</h2>
 
   <p class="en">Services run on host machines. They are typically long lived and are designed to wait for requests and respond to them. There are many types of services, and there are many ways in which they can offer their services to clients. The internet world bases many of these services on two methods of communication, TCP and UDP, although there are other communication protocols such as SCTP waiting in the wings to take over. Many other types of service, such as peer-to-peer, remote procedure calls, communicating agents, and many others are built on top of TCP and UDP.</p>
-  <p class="zh">服务运行在主机。它们通常长期存活目的是等待的请求和响应。有许多类型的服务，有很多途径使他们能够向客户提供服务。互联网的世界基于TCP和UDP这两种通信方法提供许多这些服务，虽然也有其他通信协议如SCTP​​伺机取代。许多其他类型的服务，例如点对点, 远过程调用, 通信代理, 和许多其他建立在TCP和UDP之上的服务。</p>
+  <p class="zh">服务运行在主机。它们通常长期存活，同时被设计成等待的请求和响应请求。有许多类型的服务，有他们能够通过各种方法向客户提供服务。互联网的世界基于TCP和UDP这两种通信方法提供许多这些服务，虽然也有其他通信协议如SCTP​​伺机取代。许多其他类型的服务，例如点对点, 远过程调用, 通信代理, 和许多其他建立在TCP和UDP之上的服务之上。</p>
 
   <h3 id="heading_id_17" class="en">Ports</h3>
   <h3 id="heading_id_17" class="zh">端口</h3>
@@ -495,7 +495,7 @@ func LookupPort(network, service string) (port int, err os.Error)
 </span></code></pre>
 
   <p class="en">For example, running <code>LookupPort tcp telnet</code> prints <code>Service port: 23</code></p>
-  <p class="zh">如例子所示, 运行<code>LookupPort tcp telnet</code> 打印 <code>Service port: 23</code></p>
+  <p class="zh">举个例子, 运行<code>LookupPort tcp telnet</code> 打印 <code>Service port: 23</code></p>
 
   <h3 id="heading_id_18" class="en">The type TCPAddr</h3>
   <h3 id="heading_id_18" class="zh">TCPAddr类型</h3>
@@ -526,10 +526,10 @@ func ResolveTCPAddr(net, addr string) (*TCPAddr, os.Error)
   <h2 id="heading_id_19" class="zh">TCP套接字</h2>
 
   <p class="en">When you know how to reach a service via its network and port IDs, what then? If you are a client you need an API that will allow you to connect to a service and then to send messages to that service and read replies back from the service.</p>
-  <p class="zh">当你知道如何通过网络和端口ID查找一个服务器时，然后呢？如果你是一个客户端，你需要一个API，让您连接到服务，然后将消息发送到该服务，并从服务读取回复。</p>
+  <p class="zh">当你知道如何通过网络和端口ID查找一个服务时，然后呢？如果你是一个客户端，你需要一个API，让您连接到服务，然后将消息发送到该服务，并从服务读取回复。</p>
 
   <p class="en">If you are a server, you need to be able to bind to a port and listen at it. When a message comes in you need to be able to read it and write back to the client.</p>
-  <p class="zh">如果你是一个服务器，你需要能够绑定到一个端口，监听它。当有消息到来，你需要能够读取它并写回消息到客户端。</p>
+  <p class="zh">如果你是一个服务器，你需要能够绑定到一个端口，并监听它。当有消息到来，你需要能够读取它并回复客户端。</p>
 
   <p class="en">The <code>net.TCPConn</code> is the Go type which allows full duplex communication between the client and the server. Two major methods of interest are</p>
   <p class="zh"><code>net.TCPConn</code>是允许在客户端和服务器之间的全双工通信的Go类型。两种主要方法是</p>
@@ -539,31 +539,31 @@ func (c *TCPConn) Read(b []byte) (n int, err os.Error)
     </code></pre>
 
   <p class="en">A <code>TCPConn</code> is used by both a client and a server to read and write messages.</p>
-  <p class="zh"><code>TCPConn</code>被用来客户端和服务器来读取和写入的消息。/p>
+  <p class="zh"><code>TCPConn</code>被客户端和服务器用来读写消息。/p>
 
   <h3 id="heading_id_20" class="en">TCP client</h3>
   <h3 id="heading_id_20" class="zh">TCP客户端</h3>
 
   <p class="en">Once a client has established a TCP address for a service, it "dials" the service. If succesful, the dial returns a <code>TCPConn</code> for communication. The client and the server exchange messages on this. Typically a client writes a request to the server using the <code>TCPConn</code>, and reads a response from the <code>TCPConn</code>. This continues until either (or both) sides close the connection. A TCP connection is established by the client using the function</p>
-  <p class="zh">一旦客户端已经建立TCP服务, 就可以和对方设备"通话"了. 如果成功，该调用返回一个用于通信的<code>TCPConn</code>。客户端和服务器通过它交换消息。通常情况下，客户端使用<code>TCPConn</code>写入请求到服务器, 并从<code>TCPConn</code>的读取响应。持续这样，直到任一（或两者）的两侧关闭连接。客户端使用该函数建立一个TCP连接。</p>
+  <p class="zh">一旦客户端已经建立TCP服务, 就可以和对方设备"通话"了. 如果成功，该调用返回一个用于通信的<code>TCPConn</code>。客户端和服务器通过它交换消息。通常情况下，客户端使用<code>TCPConn</code>写入请求到服务器, 并从<code>TCPConn</code>的读取响应。持续如此，直到任一（或两者）的两侧关闭连接。客户端使用该函数建立一个TCP连接。</p>
   <pre><code>
 func DialTCP(net string, laddr, raddr *TCPAddr) (c *TCPConn, err os.Error)
     </code></pre>
 
   <p class="en">where <code>laddr</code> is the local address which is usually set to <code>nil</code> and <code>raddr</code> is the remote address of the service, and the <code>net</code> string is one of "tcp4", "tcp6" or "tcp" depending on whether you want a TCPv4 connection, a TCPv6 connection or don't care.</p>
-  <p class="zh">其中<code>laddr</code>是本地地址，通常设置为<code>nil</code>和<code>raddr</code>是一个服务的远程地址, <code>net</code>是一个字符串，根据您是否希望是一个TCPv4连接，TCPv6连接或不关心来设置为"tcp4", "tcp6"或"tcp"中的一个。</p>
+  <p class="zh">其中<code>laddr</code>是本地地址，通常设置为<code>nil</code>和<code>raddr</code>是一个服务的远程地址, <code>net</code>是一个字符串，根据您是否希望是一个TCPv4连接，TCPv6连接来设置为"tcp4", "tcp6"或"tcp"中的一个，当然你也可以不关心链接形式。</p>
 
   <p class="en">A simple example can be provided by a client to a web (HTTP) server. We will deal in substantially more detail with HTTP clients and servers in a later chapter, but for now we will keep it simple.</p>
-  <p class="zh">一个简单的例子，可以展示有一个客户端连接到一个网页(HTTP)服务器。在后面的章节，我们将处理大量的HTTP客户端和服务器细节。</p>
+  <p class="zh">一个简单的例子，展示个客户端连接到一个网页(HTTP)服务器。在后面的章节，我们将处理大量的HTTP客户端和服务器细节，现在我们先从简单的看看。</p>
 
   <p class="en">One of the possible messages that a client can send is the "HEAD" message. This queries a server for information about the server and a document on that server. The server returns information, but does not return the document itself. The request sent to query an HTTP server could be</p>
-  <p class="zh">其中一个可能的消息，一个客户端可以发送“HEAD”消息. 查询关于服务器的信息和文档。 服务器返回的信息，不返回文档本身，可能是对一个HTTP服务器发送查询请求。</p>
+  <p class="zh">客户端可能发送的消息之一就是“HEAD”消息。这用来查询服务器的信息和文档信息。 服务器返回的信息，不返回文档本身。发送到服务器的请求可能是</p>
   <pre><code>
 "HEAD / HTTP/1.0\r\n\r\n"
     </code></pre>
 
   <p class="en">which asks for information about the root document and the server. A typical response might be</p>
-  <p class="zh">它返回关于服务器的根文件信息。 一个典型的响应可能是</p>
+  <p class="zh">这是在请求服务器的根文件信息。 一个典型的响应可能是</p>
   <pre><code>
 HTTP/1.0 200 OK
 ETag: "-9985996"
@@ -575,7 +575,7 @@ Server: lighttpd/1.4.23
     </code></pre>
 
   <p class="en">We first give the program (GetHeadInfo.go) to establish the connection for a TCP address, send the request string, read and print the response. Once compiled it can be invoked by e.g.</p>
-  <p class="zh">我们首先给出(GetHeadInfo.go)程序来建立TCP连接，发送请求字符串，读取并打印响应。编译后就可以调用，例如：</p>
+  <p class="zh">我们首先通过(GetHeadInfo.go)程序来建立TCP连接，发送请求字符串，读取并打印响应。编译后就可以调用，例如：</p>
   <pre><code>
 GetHeadInfo www.google.com:80
     </code></pre>
