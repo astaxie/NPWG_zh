@@ -120,7 +120,7 @@
   <h2 id="heading_id_8" class="zh">互联网地址</h2>
 
   <p class="en">In order to use a service you must be able to find it. The Internet uses an address scheme for devices such as computers so that they can be located. This addressing scheme was originally devised when there were only a handful of connected computers, and very generously allowed upto 2^32 addresses, using a 32 bit unsigned integer. These are the so-called IPv4 addresses. In recent years, the number of connected (or at least directly addressable) devices has threatened to exceed this number, and so "any day now" we will switch to IPv6 addressing which will allow upto 2^128 addresses, using an unsigned 128 bit integer. The changeover is most likely to be forced by emerging countries, as the developed world has already taken nearly all of the pool of IPv4 addresses.</p>
-  <p class="zh">为了确保能够访问服务，互联网使用一个地址让例如计算机的设备能够被定位。这种寻址方案最初被设计出来只允许极少数的计算机连接上，使用32位无符号整形，拥有高达2^32个地址。这就是所谓的IPv4地址。近年来，连接（至少直接寻址）的设备的数量可能超过这个数字，所以在不久的某一天我们将切换到利用128位无符号整数，拥有高2^128个地址的IPv6寻址。这种转换最有可能被已经耗尽了所有的IPv4地址的新兴国家发达地区。</p>
+  <p class="zh">要想使用一项服务，你必须先能找到它。互联网使用地址定位例如计算机的设备。这种寻址方案最初被设计出来只允许极少数的计算机连接上，使用32位无符号整形，拥有高达2^32个地址。这就是所谓的IPv4地址。近年来，连接（至少可以直接寻址）的设备的数量可能超过这个数字，所以在不久的某一天我们将切换到利用128位无符号整数，拥有高2^128个地址的IPv6寻址。这种转换最有可能被已经耗尽了所有的IPv4地址的新兴国家发达地区。</p>
 
   <h3 id="heading_id_9" class="en">IPv4 addresses</h3>
   <h3 id="heading_id_9" class="zh">IPv4地址</h3>
@@ -147,10 +147,10 @@
   </ul>
 
   <p class="en">This scheme doesn't work well if you want, say, 400 computers on a network. 254 is too small, while 65,536 is too large. In binary arithmetic terms, you want about 512. This can be achieved by using a 23 bit network address and 9 bits for the device addresses. Similarly, if you want upto 1024 devices, you use a 22 bit network address and a 10 bit device address.</p>
-  <p class="zh">如果你需要400台计算机在同一个网络，该方案是不可行的。254太小，而65,536又太大。根据二进制计算，你大约需要512(2^9)。这样就可以通过使用一个23位的网络地址和9位的设备地址实现。同样，如果您需要高达1024台设备，使用一个22位网络地址和一个10位的设备地址。</p>
+  <p class="zh">但是，比如你需要400台计算机在同一个网络，该方案是不可行的。254太小，而65,536又太大。根据二进制计算，你大约需要512(2^9，译者注)。这样就可以通过使用一个23位的网络地址和9位的设备地址实现。同样，如果您需要高达1024台设备，使用一个22位网络地址和一个10位的设备地址。</p>
   
   <p class="en">Given an IP address of a device, and knowing how many bits N are used for the network address gives a relatively straightforward process for extracting the network address and the device address within that network. Form a "network mask" which is a 32-bit binary number with all ones in the first N places and all zeroes in the remaining ones. For example, if 16 bits are used for the network address, the mask is 11111111111111110000000000000000. It's a little inconvenient using binary, so decimal bytes are usually used. The netmask for 16 bit network addresses is 255.255.0.0, for 24 bit network addresses it is 255.255.255.0, while for 23 bit addresses it would be 255.255.254.0 and for 22 bit addresses it would be 255.255.252.0.</p>
-  <p class="zh">根据设备的IP地址，知道多少字节用于网络地址，通过网络提取网络地址和设备地址给出了一个相对简单的处理。例如：“网络掩码”是一个前面N位为1，其他所有位为0的32位二进制数。例如，如果使用16位的网络地址，掩码为11111111111111110000000000000000。使用二进制有一点不方便，所以通常使用十进制字节。16位网络地址的子网掩码是255.255.0.0，而对于23位地址，这将是255.255.254.0，和22位地址，这将是255.255.252.0。</p>
+  <p class="zh">知道设备的IP地址和多少字节用于网络地址，那么可以比较直接的提取出这个网络中的网络地址和设备地址。例如：“网络掩码”是一个前面N位为1，其他所有位为0的32位二进制数。例如，如果使用16位的网络地址，掩码为11111111111111110000000000000000。使用二进制有一点不方便，所以通常使用十进制字节。16位网络地址的子网掩码是255.255.0.0，而对于23位地址，这将是255.255.254.0，和22位地址，这将是255.255.252.0。</p>
   
   <p class="en">Then to find the network of a device, bit-wise AND it's IP address with the network mask, while the device address within the subnet is found with bit-wise AND of the 1's complement of the mask with the IP address.</p>
   <p class="zh">接着查找设备的网络，并将其IP地址与网络掩码进行按位与操作，而该设备在子网中的地址，可通过其IP地址同掩码与1的补码的按位与操作发现。</p>
@@ -179,7 +179,7 @@
   </pre>
 
   <p class="en">There are several functions to manipulate a variable of type <code>IP</code>, but you are likely to use only some of them in practice. For example, the function <code>ParseIP(String)</code> will take a dotted IPv4 address or a colon IPv6 address, while the <code>IP</code> method <code>String</code> will return a string. Note that you may not get back what you started with: the string form of 0:0:0:0:0:0:0:1 is ::1.</p>
-  <p class="zh">有几个函数来处理一个<code>IP</code>类型的变量, 但是在实践中你很可能只用到其中的一些。例如, <code>ParseIP(String)</code>函数将获取逗号分隔的IPv4或者冒号分隔的IPv6地址, 而<code>IP</code>方法的字符串将返回一个<code>字符串</code>。请注意，您可能无法取回你期望的: 字符串 0:0:0:0:0:0:0:1是::1。</p>
+  <p class="zh">有几个函数来处理一个<code>IP</code>类型的变量, 但是在实践中你很可能只用到其中的一些。例如, <code>ParseIP(String)</code>函数将获取逗号分隔的IPv4或者冒号分隔的IPv6地址, 而<code>IP</code>方法的<code>字符串</code>将返回一个字符串。请注意，您可能无法取回你期望的: 字符串 0:0:0:0:0:0:0:1是::1。</p>
 
   <p class="en">A program to illustrate this is</p>
   <p class="zh">下面用一个程序来说明</p>
@@ -327,7 +327,7 @@ Address is  127.0.0.1  Default mask length is  8  Network is  127.0.0.0
   <h3 id="heading_id_14" class="zh">IPAddr类型</h3>
 
   <p class="en">Many of the other functions and methods in the net package return a pointer to an <code>IPAddr</code>. This is simply a structure containing an <code>IP</code>.</p>
-  <p class="zh">在net包的许多函数和方法会返回一个指向<code>IPAddr</code>的指针。这是一个简单的结构，它包含一个<code>IP</code>。</p>
+  <p class="zh">在net包的许多函数和方法会返回一个指向<code>IPAddr</code>的指针。这不过只是一个包含<code>IP</code>类型的结构体。</p>
   <pre>
     <code>
 type IPAddr {
