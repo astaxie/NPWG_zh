@@ -322,7 +322,7 @@
   <ul class="zh">
     <li>消息的头部通常使用一个字节来标示消息的类型。</li>
 
-    <li>消息处理者应该根据消息头部的类型字节来选择合适的方法来处理这个类型的消息。</li>
+    <li>消息处理者应该根据消息头部的类型字节来选择合适的处理程序来处理这个类型的消息。</li>
 
     <li>消息后面的字节应该是根据事先定义的格式（上一章节讨论的）来包含消息具体内容。</li>
   </ul>
@@ -402,7 +402,7 @@ handleClient() {
 </code></pre>
 
   <p class="en">Character formats are easier to setup and easier to debug. For example, you can use <code>telnet</code> to connect to a server on any port, and send client requests to that server. It isn't so easy the other way, but you can use tools like <code>tcpdump</code> to snoop on TCP traffic and see immediately what clients are sending to servers.</p>
-  <p class="zh">很容易进行组装，也很容易调试。例如，你可以<code>telnet</code>连接到一台服务器的端口上，然后发送客户的请求到服务器。其他的编码方式无法轻易地监听请求。但是对于字符编码，你可以使用<code>tcpdump</code> 这样的工具监听TCP的交互，并且立刻就能看到客户端发送给服务器端的消息。</p>
+  <p class="zh">字符编码很容易进行组装，也很容易调试。例如，你可以<code>telnet</code>连接到一台服务器的端口上，然后发送客户的请求到服务器。其他的编码方式无法轻易地监听请求。但是对于字符编码，你可以使用<code>tcpdump</code> 这样的工具监听TCP的交互，并且立刻就能看到客户端发送给服务器端的消息。</p>
 
   <p class="en">There is not the same level of support in Go for managing character streams. There are significant issues with character sets and character encodings, and we will explore these issues in a later chapter.</p>
   <p class="zh">在Go中没有像字节流那样专门处理字符流的工具。如何处理字符集和字符编码是非常重要的，我们将会在下一章专门讨论这些问题。</p>
