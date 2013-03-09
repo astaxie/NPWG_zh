@@ -139,11 +139,11 @@
     <li>Class C networks use the first three bytes to identify the network and the last one to identify devices within that network. This allows upto 2^8 (actually 254, not 256) devices</li>
   </ul>
   <ul class="zh">
-    <li>一个A类IP地址由1字节的网络地址和3字节主机地址组成。A类网络只有128个, 被很早的互联网成员例如IBM，通用电气公司(the General Electric Company)和MIT所拥有。(http://www.iana.org/assignments/ipv4-address-space/ipv4-address-space.xml)</li>
+    <li>一个A类网络，前1个字节标识为网络地址，同时后3字节标识为主机地址。A类网络只有128个, 被很早的互联网成员例如IBM，通用电气公司(the General Electric Company)和MIT所拥有。(http://www.iana.org/assignments/ipv4-address-space/ipv4-address-space.xml)</li>
 
-    <li>一个B类IP地址由1字节的网络地址和3字节主机地址组成。这最多允许2^16 (65,536)个设备在同一个子网。</li>
+    <li>一个B类网络使用前2个字节标识为网络地址，后2字节标识为子网的主机地址。这最多允许2^16 (65,536)个设备在同一个子网。</li>
 
-    <li>一个C类IP地址由3字节的网络地址和1字节的主机地址组成。这最多允许2^8 (其实是254, 不是256)个设备。</li>
+    <li>一个C类网络使用前3字节标识为网络地址，后1字节的主机地址。这最多允许2^8 (其实是254, 不是256)个设备。</li>
   </ul>
 
   <p class="en">This scheme doesn't work well if you want, say, 400 computers on a network. 254 is too small, while 65,536 is too large. In binary arithmetic terms, you want about 512. This can be achieved by using a 23 bit network address and 9 bits for the device addresses. Similarly, if you want upto 1024 devices, you use a 22 bit network address and a 10 bit device address.</p>
