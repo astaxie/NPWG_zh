@@ -693,7 +693,7 @@ func (l *TCPListener) Accept() (c Conn, err os.Error)
 <span class="sgc-2">func</span> main() {
 
         service := <span class="sgc-3">":1200"</span>
-        tcpAddr, err := net.<span class="sgc-4">ResolveTCPAddr</span>(<span class="sgc-3">"ip4"</span>, service)
+        tcpAddr, err := net.<span class="sgc-4">ResolveTCPAddr</span>(<span class="sgc-3">"tcp4"</span>, service)
         checkError(err)
 
         listener, err := net.<span class="sgc-4">ListenTCP</span>(<span class="sgc-3">"tcp"</span>, tcpAddr)
