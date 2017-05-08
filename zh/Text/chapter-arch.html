@@ -93,7 +93,7 @@
   <img alt="" src="../Images/iso.gif" /></p>
 
   <p class="zh">尽管OSI（开放系统互联）协议从未被完整地实现过，但它仍对分布式系统的讨论和设计产生了十分重要的影响。它的结构大致为下图所示：<br />
-  <img alt="" src="../Images/zh/iso.gif" /></p>
+  <img alt="" src="../Images/iso.gif" /></p>
 
   <h3 id="heading_id_6" class="en">OSI layers</h3>
 
@@ -135,7 +135,7 @@
   <img alt="" src="../Images/tcp_stack.gif" /></p>
 
   <p class="zh">当OSI标准模型正在为实现细节闹得不可开交时，DARPA互联网技术项目却在忙着构建TCP/IP协议。它们取得了极大的成功，并引领了Internet（首字母大写），因为这是个更简单的层次结构：<br />
-  <img alt="" src="../Images/zh/tcp_stack.gif" /></p>
+  <img alt="" src="../Images/tcp_stack.gif" /></p>
 
   <h3 id="heading_id_8" class="en">Some Alternative Protocols</h3>
 
@@ -226,7 +226,7 @@
   The packet transmitted over ethernet, is of course the bottom one.</p>
 
   <p class="zh">例如，TFTP（普通文件传输协议）将文件从一台计算机移动到另一台上。它使用IP协议上的UDP协议，该协议可通过以太网发送。看起来就像这样：<br />
-  <img alt="" src="../Images/zh/packets.gif" /><br />
+  <img alt="" src="../Images/packets.gif" /><br />
   通过以太网发送的数据包，当然是底部那个。</p>
 
   <h2 id="heading_id_12" class="en">Connection Models</h2>
@@ -285,7 +285,7 @@
   <img alt="" src="../Images/msg.gif" /></p>
 
   <p class="zh">消息传递是分布式系统最基本的机制，也就是建立连接并通过它传输一些数据。在另一端则需要理解这些消息的意思并做出响应，有时还需要返回一些消息。如下图所示：<br />
-  <img alt="" src="../Images/zh/msg.gif" /></p>
+  <img alt="" src="../Images/msg.gif" /></p>
 
   <p class="en">Low level event driven systems such as the X Window System function in a somewhat similar way: wait for message from a user (mouse clicks, etc), decode them and act on them.</p>
 
@@ -311,7 +311,7 @@
   <img alt="" src="../Images/rpc.gif" /></p>
 
   <p class="zh">DLL作为调用代码运行在相同的机器上。尽管对于不同机器上运行的过程传输控制来说，这种机制（在概念上）是一种简单的手段，但它实际上可不怎么简单！不过，这种控制模型却催生了“远程过程调用”（RPC），更多关于它的详情会在后面的章节中讨论。如下图所示：<br />
-  <img alt="" src="../Images/zh/rpc.gif" /></p>
+  <img alt="" src="../Images/rpc.gif" /></p>
 
   <p class="en">There is an historical oddity called the "lightweight remote procedure call" invented by Microsoft as they transitioned from 16-bit to 32-bit applications. A 16-bit application might need to transfer data to a 32-bit application <em>on the same machine</em>. That made it lightweight as there was no networking! But it had many of the other issues of RPC systems in data representations and conversion.</p>
 
@@ -337,7 +337,7 @@
   <img alt="" src="../Images/peer.gif" /></p>
 
   <p class="zh">如下所示：<br />
-  <img alt="" src="../Images/zh/peer.gif" /></p>
+  <img alt="" src="../Images/peer.gif" /></p>
 
   <h2 id="heading_id_19" class="en">Client/Server System</h2>
 
@@ -347,7 +347,7 @@
   <img alt="" src="../Images/cs-system.gif" /></p>
 
   <p class="zh">客户端/服务器系统的另一种方式：<br />
-  <img alt="" src="../Images/zh/cs-system.gif" /></p>
+  <img alt="" src="../Images/cs-system.gif" /></p>
 
   <h2 id="heading_id_20" class="en">Client/Server Application</h2>
 
@@ -357,7 +357,7 @@
   <img alt="" src="../Images/cs-application.gif" /></p>
 
   <p class="zh">第三种方式：<br />
-  <img alt="" src="../Images/zh/cs-application.gif" /></p>
+  <img alt="" src="../Images/cs-application.gif" /></p>
 
   <h2 id="heading_id_21" class="en">Server Distribution</h2>
 
@@ -370,16 +370,16 @@
   In this, the master receives requests and instead of handling them one at a time itself, passes them off to other servers to handle. This is a common model when concurrent clients are possible.</p>
 
   <p class="zh">客户端/服务器系统并不简单。其基本模型是单一客户端，单一服务器：<br />
-  <img alt="" src="../Images/zh/one-one.gif" /><br />
+  <img alt="" src="../Images/one-one.gif" /><br />
   不过你也可以有多个客户端，单一服务器：<br />
-  <img alt="" src="../Images/zh/many-one.gif" /><br />
+  <img alt="" src="../Images/many-one.gif" /><br />
   这样，主站只需接收请求并处理一次，而无需将它们传递给其它服务器来处理。当客户端可能并发时，这就是个通用的模型。</p>
 
   <p class="en">There are also single client, multiple servers<br />
   <img alt="" src="../Images/one-many.gif" /> which occurs frequently when a server needs to act as a client to other servers, such as a business logic server getting information from a database server. And of course, there could be multiple clients with multiple servers</p>
 
   <p class="zh">还有单一客户端，多个服务器的情况：<br />
-  <img alt="" src="../Images/zh/one-many.gif" />当一个服务器需要作为其它服务器的客户端时，这种情况就会经常发生，例如当业务逻辑服务器从数据库服务器获取信息时。当然，还可以有多个客户端，多个服务器的情况。</p>
+  <img alt="" src="../Images/one-many.gif" />当一个服务器需要作为其它服务器的客户端时，这种情况就会经常发生，例如当业务逻辑服务器从数据库服务器获取信息时。当然，还可以有多个客户端，多个服务器的情况。</p>
 
   <h2 id="heading_id_22" class="en">Component Distribution</h2>
 
@@ -425,7 +425,7 @@
   <img alt="" src="../Images/gartner.gif" /></p>
 
   <p class="zh">基于这三部分的应用划分，Gartner公司考虑了这些组件在客户端-服务器系统中如何分布。他们想出了五种模型：<br />
-  <img alt="" src="../Images/zh/gartner.gif" /></p>
+  <img alt="" src="../Images/gartner.gif" /></p>
 
   <h3 id="heading_id_24" class="en">Example: Distributed Database</h3>
 
@@ -442,7 +442,7 @@
   <p class="en"><img alt="" src="../Images/gartner1.gif" /><br />
   Modern mobile phones make good examples of this: due to limited memory they may store a small part of a database locally so that they can usuall respond quickly. However, if data is required that is not held locally, then a request may be made to a remote database for that additional data.</p>
 
-  <p class="zh"><img alt="" src="../Images/zh/gartner1.gif" /><br />
+  <p class="zh"><img alt="" src="../Images/gartner1.gif" /><br />
   现代的移动电话就是个很好的例子：由于内存有限，它们只能通过存储一小部分本地数据库，因此它们通常能快速响应。若请求的数据不在本地，那么可为该附加数据请求远程数据库。</p>
 
   <p class="en">Google maps forms another good example. Al of the maps reside on Google's servers. When one is requested by a user, the "nearby" maps are also downloaded into a small database in the browser. When the user moves the map a little bit, the extra bits required are already in the local store for quick response.</p>
@@ -458,7 +458,7 @@
   There are many examples of scuh systems: NFS, Microsoft shares, DCE, etc</p>
 
    <p class="zh">Gartner第二种分类允许远程客户端访问已共享的文件系统：<br />
-  <img alt="" src="../Images/zh/gartner2.gif" /><br />
+  <img alt="" src="../Images/gartner2.gif" /><br />
   这里有一些这类系统的例子：NFS、Microsoft共享和DCE等等。</p>
 
   <h3 id="heading_id_26" class="en">Example: Web</h3>
@@ -469,7 +469,7 @@
   <img alt="" src="../Images/gartner3.gif" /></p>
 
   <p class="zh">Gartner第三种分类的一个例子就是Web上的小型Java应用。以下为带有一些附加机制的分布式超文本系统：<br />
-  <img alt="" src="../Images/zh/gartner3.gif" /></p>
+  <img alt="" src="../Images/gartner3.gif" /></p>
 
   <h3 id="heading_id_27" class="en">Example: Terminal Emulation</h3>
 
@@ -480,7 +480,7 @@
   Telnet is the most common example of this.</p>
 
   <p class="zh">Gartner第四种分类就是终端仿真。这允许远程系统在本地系统上作为普通的终端：<br />
-  <img alt="" src="../Images/zh/gartner4.gif" /><br />
+  <img alt="" src="../Images/gartner4.gif" /><br />
   Telnet就是最常见的例子。</p>
 
   <h3 id="heading_id_28" class="en">Example: Expect</h3>
@@ -491,7 +491,7 @@
   <img alt="" src="../Images/expect.gif" /></p>
 
   <p class="zh">预期（Expect）是Gartner第五种分类的一种另类的演示。它的行为类似于命令行接口这样的经典系统。它在此之上建立了X窗口界面，以此来让用户与GUI进行交互，然后GUI转而与命令行界面进行交互。<br />
-  <img alt="" src="../Images/zh/expect.gif" /></p>
+  <img alt="" src="../Images/expect.gif" /></p>
 
   <h3 id="heading_id_29" class="en">Example: X Window System</h3>
 
@@ -511,7 +511,7 @@
   <img alt="" src="../Images/threetier.gif" /></p>
 
   <p class="zh">当然，如果你有两层，你也可以有三层、四层甚至多层。下图展示了一些可能的三层模型：<br />
-  <img alt="" src="../Images/zh/threetier.gif" /></p>
+  <img alt="" src="../Images/threetier.gif" /></p>
 
   <p class="en">The modern Web is a good example of the rightmost of these. The backend is made up of a database, often running stored procedures to hold some of the database logic. The middle tier is an HTTP server such as Apache running PHP scripts (or Ruby on Rails, or JSP pages, etc). This will manage some of the logic and will have data such as HTML pages stored locally. The frontend is a browser to display the pages, under the control of some Javascript. In HTML 5, the frontend may also have a local database.</p>
 
@@ -537,7 +537,7 @@
   <img alt="" src="../Images/middleware.gif" /></p>
 
   <p class="zh">中间件是连接器分布式系统组件的“胶水”层。中间件模型如图所示：<br />
-  <img alt="" src="../Images/zh/middleware.gif" /></p>
+  <img alt="" src="../Images/middleware.gif" /></p>
 
   <h2 id="heading_id_33" class="en">Middleware</h2>
 
@@ -637,7 +637,7 @@
   <img alt="" src="../Images/continuum.gif" /></p>
 
   <p class="zh">Gartner模型基于将一个应用分解为表现组件、应用逻辑和数据处理。一个更细粒度的分解方式为：<br />
-  <img alt="" src="../Images/zh/continuum.gif" /></p>
+  <img alt="" src="../Images/continuum.gif" /></p>
 
   <h2 id="heading_id_37" class="en">Points of Failure</h2>
 
